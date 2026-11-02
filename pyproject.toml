@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dspy-wsp"
+version = "0.1.0"
+description = "Weight-space programming as a DSPy optimizer: a frontier LM reads and edits a small model's weights, with no gradients."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Drew Breunig", email = "dbreunig@gmail.com" }]
+keywords = ["dspy", "llm", "optimizer", "interpretability", "weight editing"]
+dependencies = [
+    "dspy>=3.4,<3.5",
+    "numpy>=1.26",
+    "safetensors>=0.4",
+    "torch>=2.2",
+]
+
+[project.optional-dependencies]
+hf = ["transformers>=4.45", "huggingface_hub>=0.24"]
+dev = ["pytest>=8", "transformers>=4.45", "huggingface_hub>=0.24"]
+
+[project.scripts]
+dspy-wsp = "dspy_wsp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
