@@ -97,6 +97,9 @@ def _int_list(v, name: str, lo: int, hi: int | None) -> list[int]:
     return v
 
 
+METRIC_FAILED = "metric failed: "
+
+
 class ForwardTool:
     def __init__(
         self,
@@ -223,29 +226,42 @@ class ForwardTool:
         return copy_program(self.program, lm)
 
     def run_items(self, program, items, n: int, which: str) -> list[dict]:
-        rows = []
-        for item_id, ex in items:
-            graded = not isinstance(ex, dict)
-            inputs = ex.inputs().toDict() if graded else dict(ex)
-            for j in range(n):
-                self.backend.seed(item_seed(self.seed, item_id, j))
-                row = {"id": item_id, "sample": j, "model": which, "inputs": {k: _jsonable(v) for k, v in inputs.items()}}
-                with self.backend.record_calls() as calls:
-                    try:
-                        pred = program(**inputs)
-                        row["outputs"] = {k: _jsonable(v) for k, v in pred.items()}
-                    except Exception as e:
-                        pred = None
-                        row["error"] = f"{type(e).__name__}: {str(e)[:500]}"
-                if graded:
-                    row["score"], feedback = (0.0, None) if pred is None else self._score(ex, pred)
-                    if feedback:
-                        row["feedback"] = feedback
-                row["calls"] = [dataclasses.asdict(c) for c in calls]
-                row["cut"] = any(c.finish_reason == "length" for c in calls)
-                row["output_tokens"] = sum(c.output_tokens for c in calls)
-                rows.append(row)
-        return rows
+        """Run the program on every (item, sample). Rows come back in request order.
+
+        Runs go `backend.concurrency` at a time, so a batching backend can serve
+        their LM calls together. Each run's seed depends only on its item and sample.
+        """
+        jobs = [(item_id, ex, j) for item_id, ex in items for j in range(n)]
+        workers = max(1, int(getattr(self.backend, "concurrency", 1) or 1))
+        if workers == 1 or len(jobs) <= 1:
+            return [self._run_one(program, *job, which) for job in jobs]
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=min(workers, len(jobs)), thread_name_prefix="wsp-gen") as pool:
+            return list(pool.map(lambda job: self._run_one(program, *job, which), jobs))
+
+    def _run_one(self, program, item_id, ex, j: int, which: str) -> dict:
+        graded = not isinstance(ex, dict)
+        inputs = ex.inputs().toDict() if graded else dict(ex)
+        self.backend.seed(item_seed(self.seed, item_id, j))
+        row = {"id": item_id, "sample": j, "model": which, "inputs": {k: _jsonable(v) for k, v in inputs.items()}}
+        with self.backend.record_calls() as calls:
+            try:
+                pred = program(**inputs)
+                row["outputs"] = {k: _jsonable(v) for k, v in pred.items()}
+            except Exception as e:
+                pred = None
+                row["error"] = f"{type(e).__name__}: {str(e)[:500]}"
+        if graded:
+            row["score"], feedback = (0.0, None) if pred is None else self._score(ex, pred)
+            if feedback:
+                row["feedback"] = feedback
+            if feedback and feedback.startswith(METRIC_FAILED):
+                row["metric_error"] = True
+        row["calls"] = [dataclasses.asdict(c) for c in calls]
+        row["cut"] = any(c.finish_reason == "length" for c in calls)
+        row["output_tokens"] = sum(c.output_tokens for c in calls)
+        return row
 
     @staticmethod
     def _arity(metric) -> int:
@@ -266,7 +282,7 @@ class ForwardTool:
                 return float(r.score), getattr(r, "feedback", None)
             return float(r), None
         except Exception as e:
-            return 0.0, f"metric failed: {type(e).__name__}: {e}"
+            return 0.0, f"{METRIC_FAILED}{type(e).__name__}: {e}"
 
     @staticmethod
     def _scores(rows) -> dict[str, list[float]]:
@@ -282,14 +298,15 @@ class ForwardTool:
         per_item = {i: stats.mean(v) for i, v in ForwardTool._scores(rows).items()}
         cut = sum(r["cut"] for r in rows)
         errors = sum(("error" in r) and not r["cut"] for r in rows)
-        imperfect = sum(r.get("score", 1.0) < 1.0 and not r["cut"] and "error" not in r for r in graded)
+        metric_errors = sum(bool(r.get("metric_error")) for r in graded)
+        imperfect = sum(r.get("score", 1.0) < 1.0 and not r["cut"] and "error" not in r and not r.get("metric_error") for r in graded)
         return {
             "graded": len(graded),
             "score": stats.mean([r["score"] for r in graded]),
             "score_se_over_items": stats.standard_error(list(per_item.values())),
             "mean_output_tokens": stats.mean([r["output_tokens"] for r in rows]),
             "cut_share": cut / len(rows) if rows else float("nan"),
-            "failures": {"cut_at_max_tokens": cut, "program_error": errors, "scored_below_1": imperfect},
+            "failures": {"cut_at_max_tokens": cut, "program_error": errors, "metric_error": metric_errors, "scored_below_1": imperfect},
         }
 
     def _pooled(self, rows, hidden_layers, mlp_layers, folder: Path) -> dict:

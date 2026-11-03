@@ -140,3 +140,27 @@ def exact_answer(example, pred, trace=None):
 @pytest.fixture
 def trainset():
     return [dspy.Example(question=f"What is {i} + {4 - i}?", answer="4").with_inputs("question") for i in range(5)]
+
+
+@pytest.fixture(scope="session")
+def tiny_model(tmp_path_factory):
+    """A tiny random Llama with its own tokenizer, saved in Hugging Face format (no downloads)."""
+    pytest.importorskip("transformers")
+    from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
+    from transformers import LlamaConfig, LlamaForCausalLM, PreTrainedTokenizerFast
+
+    d = tmp_path_factory.mktemp("tiny")
+    corpus = ["[[ ## question ## ]] What is 2 + 2? [[ ## answer ## ]] 4 [[ ## completed ## ]]", "Your input fields are: question. Respond with answer."] * 20
+    tok = Tokenizer(models.BPE(unk_token="<unk>"))
+    tok.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+    tok.decoder = decoders.ByteLevel()
+    tok.train_from_iterator(corpus, trainers.BpeTrainer(vocab_size=400, special_tokens=["<unk>", "<s>", "</s>", "<pad>"], initial_alphabet=pre_tokenizers.ByteLevel.alphabet()))
+    fast = PreTrainedTokenizerFast(tokenizer_object=tok, bos_token="<s>", eos_token="</s>", unk_token="<unk>", pad_token="<pad>")
+    fast.chat_template = "{% for m in messages %}<s>{{ m['role'] }}\n{{ m['content'] }}</s>\n{% endfor %}{% if add_generation_prompt %}<s>assistant\n{% endif %}"
+    fast.save_pretrained(d)
+    cfg = LlamaConfig(vocab_size=len(fast), hidden_size=32, intermediate_size=64, num_hidden_layers=2, num_attention_heads=4,
+                      num_key_value_heads=2, max_position_embeddings=4096, tie_word_embeddings=False,
+                      bos_token_id=fast.bos_token_id, eos_token_id=fast.eos_token_id, pad_token_id=fast.pad_token_id)
+    torch.manual_seed(0)
+    LlamaForCausalLM(cfg).to(torch.bfloat16).save_pretrained(d)
+    return d

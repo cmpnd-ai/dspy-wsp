@@ -10,6 +10,7 @@ The method comes from Takehi, Teoh, Zhang and Khattab, *Sparks of Weight Space P
 
 ```bash
 pip install -e ".[hf]"      # from a clone; adds transformers for the Hugging Face backend
+pip install -e ".[mlx]"     # or: mlx-lm for the batched backend on Apple silicon
 apt install bubblewrap       # sandboxes the writer's code (Linux)
 ```
 
@@ -25,11 +26,11 @@ backend = HFBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=8192,
 def metric(example, pred, trace=None):
     return float(pred.answer.strip() == example.answer)
 
-program = dspy.ChainOfThought("question -> answer")
+program = dspy.Predict("question -> answer")
 
 optimizer = WeightSpace(
     metric=metric,
-    writer_lm=dspy.LM("anthropic/claude-opus-5-5", max_tokens=32000),
+    writer_lm=dspy.LM("openai/gpt-6-luna"),
     backend=backend,
     max_passes=50,
     run_dir="runs/qwen-math",
@@ -42,6 +43,22 @@ print(compiled.wsp_report["validation"]["paired"])
 ```
 
 `trainset` becomes the writer's practice set. The writer never sees `valset`; the optimizer uses it once at the end, comparing original and edited weights on the same examples with the same seeds. Metrics can return a number, a bool, or `dspy.Prediction(score=..., feedback=...)` as GEPA metrics do. The writer reads any feedback text in the generation records.
+
+## Backends
+
+A backend holds the student model, swaps edits in and out, and runs every forward pass.
+
+- **`HFBackend`** runs transformers in-process on CUDA, MPS or CPU. It generates one answer at a time, so it suits small models and short answers.
+- **`MLXBackend`** runs mlx-lm on Apple silicon. It decodes up to `batch_size` answers together, and the forward-pass tool runs that many programs at once to fill the batch. Each answer samples from its own seed. It also supports the presence penalty in Qwen's recommended sampling settings. On an M2 Max it generates about 650 tokens per second across a batch of 32 answers from Qwen3.5-0.8B, which is several times faster than `HFBackend` on the same machine.
+
+```python
+from dspy_wsp import MLXBackend
+
+backend = MLXBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", batch_size=64, max_tokens=32_768,
+                     presence_penalty=1.5, chat_template_kwargs={"enable_thinking": True})
+```
+
+`MLXBackend` reads attention probabilities only from softmax-attention blocks. In Qwen3.5 those are blocks 3, 7, 11, 15, 19 and 23; the other blocks use linear attention. `examples/math500_qwen_mlx.py` runs the paper's MATH setup on a Mac. Its `--baseline N` flag scores the unedited model without a writer.
 
 ## How a run works
 
@@ -106,7 +123,7 @@ The writer's code runs on your machine. With `sandbox="auto"` (the default), the
 
 ## Limits and roadmap
 
-- `HFBackend` generates one sequence at a time in-process. That's fine for small models and short answers, but too slow at the paper's scale. There, one pass produced 512 answers of up to 32k tokens, and a pass took up to 30 minutes on a server. Next on the list is a vLLM backend that pushes edited tensors to a running server.
+- `HFBackend` generates one sequence at a time in-process. That's fine for small models and short answers, but too slow at the paper's scale. There, one pass produced 512 answers of up to 32k tokens, and a pass took up to 30 minutes on a server. `MLXBackend` batches on a Mac, but a 64-problem paired pass at 32k tokens still takes one to two hours. Next on the list is a vLLM backend that pushes edited tensors to a running server.
 - A run is long and costly. The paper's 50-pass run took 158 turns and 20 hours. Budget for the writer's tokens accordingly.
 - Editing removes obstacles; it doesn't add abilities. The paper's Gemma 3 270M follow-up barely moved. That model didn't loop, so the writer had no failure mechanism to repair.
 - Neither the paper nor this package compares against prompt optimization yet. Run GEPA on the same student and budget before you trust a gain.

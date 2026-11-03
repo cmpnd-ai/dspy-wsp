@@ -10,6 +10,7 @@ A backend owns the student model's weights. It must:
 from __future__ import annotations
 
 import contextlib
+import threading
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -28,9 +29,13 @@ class LMCall:
 
 
 class WeightBackend(ABC):
+    # How many program runs the forward-pass tool may have in flight at once.
+    # Batched backends raise this so concurrent LM calls share a batch.
+    concurrency: int = 1
+
     def __init__(self) -> None:
         self._edits: dict[str, np.ndarray] = {}
-        self._recording: list[LMCall] | None = None
+        self._local = threading.local()  # per-thread seed and call recording
 
     # --- identity -------------------------------------------------------------------
     @property
@@ -74,22 +79,35 @@ class WeightBackend(ABC):
     def lm(self):
         """A dspy.LM whose calls run on the backend's current weights. Must not cache."""
 
-    @abstractmethod
     def seed(self, seed: int) -> None:
-        """Fix the sampling seed for the calls that follow (derived per call)."""
+        """Fix the sampling seed for this thread's calls that follow (derived per call)."""
+        self._local.seed = int(seed)
+        self._local.call_index = 0
+
+    def _next_seed(self, explicit: int | None = None) -> int | None:
+        if explicit is not None:
+            return int(explicit)
+        base = getattr(self._local, "seed", None)
+        if base is None:
+            return None
+        s = (base * 1_000_003 + self._local.call_index) % (2**63 - 1)
+        self._local.call_index += 1
+        return s
 
     @contextlib.contextmanager
     def record_calls(self):
+        """Collect the LM calls this thread makes inside the block."""
         calls: list[LMCall] = []
-        self._recording = calls
+        self._local.calls = calls
         try:
             yield calls
         finally:
-            self._recording = None
+            self._local.calls = None
 
     def _record(self, call: LMCall) -> None:
-        if self._recording is not None:
-            self._recording.append(call)
+        calls = getattr(self._local, "calls", None)
+        if calls is not None:
+            calls.append(call)
 
     @abstractmethod
     def render_chat(self, messages: Sequence[dict], *, add_generation_prompt: bool = False, **template_kwargs) -> str: ...
@@ -129,3 +147,78 @@ class WeightBackend(ABC):
 
     def close(self) -> None:
         pass
+
+
+class BackendEngine:
+    """A DSPy 3.4 engine: one canonical request in, one response out, run on the backend's current weights.
+
+    Subclasses set `backend_class`. DSPy saves a program's LM through `dump_state`
+    (the base model, its settings and the patch) and rebuilds it with `load_state`.
+    """
+
+    backend_class: type | None = None
+
+    def __init__(self, backend):
+        self.backend = backend
+
+    def complete(self, request):
+        from dspy.clients.engines.base import validate_request
+        from dspy.lm15 import Message, Response, TextPart, ThinkingPart, Usage
+
+        validate_request(request)
+        msgs = []
+        if request.system is not None:
+            system = request.system if isinstance(request.system, str) else "".join(getattr(p, "text", "") or "" for p in request.system)
+            msgs.append({"role": "system", "content": system})
+        msgs.extend({"role": m.role, "content": m.text or ""} for m in request.messages)
+        prompt = self.backend.render_chat(msgs, add_generation_prompt=True)
+        c = request.config
+        call = self.backend.generate(prompt, max_tokens=c.max_tokens, temperature=c.temperature, top_p=c.top_p, top_k=c.top_k, seed=c.seed, stop=c.stop)
+        text = call.completion
+        parts = [TextPart(text)]
+        if self.backend.split_thinking and "</think>" in text:
+            thinking, answer = text.split("</think>", 1)
+            parts = [ThinkingPart(thinking.replace("<think>", "").strip()), TextPart(answer.lstrip())]
+        elif self.backend.split_thinking and (prompt.rstrip().endswith("<think>") or text.lstrip().startswith("<think>")):
+            # Cut off while thinking: there is no answer yet.
+            parts = [ThinkingPart(text.replace("<think>", "").strip()), TextPart("")]
+        return Response(
+            id=None,
+            model=self.backend.model_id,
+            message=Message.assistant(parts),
+            finish_reason=call.finish_reason,
+            usage=Usage(input_tokens=call.input_tokens, output_tokens=call.output_tokens, total_tokens=call.input_tokens + call.output_tokens),
+        )
+
+    def stream(self, request):
+        from dspy.lm15 import response_to_events
+
+        return response_to_events(self.complete(request))
+
+    def close(self) -> None:
+        pass
+
+    def dump_state(self) -> dict:
+        return {"backend": self.backend._init_kwargs, "patch": self.backend.patch_dir}
+
+    @classmethod
+    def load_state(cls, state: dict):
+        # DSPy loads each predictor's LM separately (and once more in a trial run),
+        # so share one backend per (class, model, settings, patch).
+        import json
+
+        key = cls.__name__ + json.dumps(state, sort_keys=True, default=str)
+        backend = LOADED_BACKENDS.get(key)
+        if backend is None:
+            from dspy_wsp.patch import Patch
+
+            backend = cls.backend_class(**state["backend"])
+            if state.get("patch"):
+                patch = Patch.load(state["patch"])
+                backend.set_weights({n: t.float().numpy() for n, t in patch.edited_tensors(backend.reader).items()})
+                backend.patch_dir = state["patch"]
+            LOADED_BACKENDS[key] = backend
+        return cls(backend)
+
+
+LOADED_BACKENDS: dict[str, WeightBackend] = {}

@@ -3,7 +3,7 @@
 A scaled-down version of the paper's Experiment 8. Needs a GPU for the student
 model, bubblewrap for the sandbox, and an API key for the writer.
 
-    pip install -e ".[hf]"
+    pip install -e ".[examples]"
     python examples/gsm8k_qwen.py
 """
 
@@ -25,12 +25,12 @@ backend = HFBackend(
 )
 
 # The writer: any capable dspy.LM. The paper used a frontier model at maximum reasoning effort.
-writer = dspy.LM("anthropic/claude-opus-5-5", max_tokens=32_000)
+writer = dspy.LM("openai/gpt-6-luna")
 
 data = GSM8K()
 trainset, valset = data.train[:2000], data.dev[:200]
 
-program = dspy.ChainOfThought("question -> answer")
+program = dspy.Predict("question -> answer")
 
 optimizer = WeightSpace(
     metric=gsm8k_metric,

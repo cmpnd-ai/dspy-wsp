@@ -18,28 +18,6 @@ L1 = "model.layers.1.mlp.down_proj.weight"
 
 
 @pytest.fixture(scope="module")
-def tiny_model(tmp_path_factory):
-    from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
-    from transformers import LlamaConfig, LlamaForCausalLM, PreTrainedTokenizerFast
-
-    d = tmp_path_factory.mktemp("tiny")
-    corpus = ["[[ ## question ## ]] What is 2 + 2? [[ ## answer ## ]] 4 [[ ## completed ## ]]", "Your input fields are: question. Respond with answer."] * 20
-    tok = Tokenizer(models.BPE(unk_token="<unk>"))
-    tok.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
-    tok.decoder = decoders.ByteLevel()
-    tok.train_from_iterator(corpus, trainers.BpeTrainer(vocab_size=400, special_tokens=["<unk>", "<s>", "</s>", "<pad>"], initial_alphabet=pre_tokenizers.ByteLevel.alphabet()))
-    fast = PreTrainedTokenizerFast(tokenizer_object=tok, bos_token="<s>", eos_token="</s>", unk_token="<unk>", pad_token="<pad>")
-    fast.chat_template = "{% for m in messages %}<s>{{ m['role'] }}\n{{ m['content'] }}</s>\n{% endfor %}{% if add_generation_prompt %}<s>assistant\n{% endif %}"
-    fast.save_pretrained(d)
-    cfg = LlamaConfig(vocab_size=len(fast), hidden_size=32, intermediate_size=64, num_hidden_layers=2, num_attention_heads=4,
-                      num_key_value_heads=2, max_position_embeddings=4096, tie_word_embeddings=False,
-                      bos_token_id=fast.bos_token_id, eos_token_id=fast.eos_token_id, pad_token_id=fast.pad_token_id)
-    torch.manual_seed(0)
-    LlamaForCausalLM(cfg).to(torch.bfloat16).save_pretrained(d)
-    return d
-
-
-@pytest.fixture(scope="module")
 def hf(tiny_model):
     return HFBackend(str(tiny_model), device="cpu", max_tokens=12, attn_implementation="eager")
 
@@ -140,3 +118,22 @@ def test_compile_end_to_end(hf, tiny_model, tmp_path):
     assert other is not hf
     assert torch.equal(dict(other.model.named_parameters())[L1].detach(), expected)
     hf.set_weights(None)
+
+
+def test_vision_language_checkpoint_names_map_to_text_params(tiny_model, tmp_path):
+    import shutil
+
+    from safetensors.torch import load_file, save_file
+
+    d = tmp_path / "vl"
+    shutil.copytree(tiny_model, d)
+    tensors = load_file(str(d / "model.safetensors"))
+    renamed = {k.replace("model.", "model.language_model.", 1): v for k, v in tensors.items()}
+    renamed["model.visual.proj.weight"] = torch.zeros(2, 2)
+    save_file(renamed, str(d / "model.safetensors"), metadata={"format": "pt"})
+    vl = HFBackend(str(d), device="cpu", max_tokens=4, attn_implementation="eager")
+    name = "model.language_model.layers.1.mlp.down_proj.weight"
+    assert name in vl.editable_names() and "model.visual.proj.weight" not in vl.editable_names()
+    w = TensorReader(d).get_f32(name) + 1.0
+    with vl.using({name: w}):
+        assert torch.equal(dict(vl.model.named_parameters())[L1].detach(), torch.from_numpy(w).to(torch.bfloat16))

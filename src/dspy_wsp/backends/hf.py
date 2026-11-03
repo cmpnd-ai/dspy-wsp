@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from dspy_wsp.backends.base import LMCall, WeightBackend
+from dspy_wsp.backends.base import LOADED_BACKENDS, BackendEngine, LMCall, WeightBackend
 from dspy_wsp.tensors import TensorReader
 
 _ALLOW = ["*.safetensors", "*.json", "*.txt", "*.model", "*.jinja", "*.tiktoken", "tokenizer*", "merges*", "vocab*"]
@@ -100,8 +100,6 @@ class HFBackend(WeightBackend):
         self._param_for = self._map_params()
         self._saved: dict[str, torch.Tensor] = {}
         self._mlp_module = mlp_module or self._detect_mlp_module()
-        self._seed: int | None = None
-        self._call_index = 0
         self._lm = None
         eos = self.model.generation_config.eos_token_id
         self._eos = set(eos if isinstance(eos, (list, tuple)) else [eos] if eos is not None else [])
@@ -151,6 +149,11 @@ class HFBackend(WeightBackend):
             if name in self._params:
                 mapping[name] = name
                 continue
+            # Vision-language checkpoints (e.g. Qwen3.5) nest the text model under "language_model."
+            text_name = name.replace("language_model.", "", 1)
+            if text_name != name and text_name in self._params:
+                mapping[name] = text_name
+                continue
             cands = [p for p in self._params if p.endswith("." + name) or name.endswith("." + p)]
             if len(cands) == 1:
                 mapping[name] = cands[0]
@@ -180,19 +183,6 @@ class HFBackend(WeightBackend):
             short = Path(self.model_id).name if Path(self.model_id).is_dir() else self.model_id
             self._lm = dspy.LM(f"wsp/{short}", engine=HFEngine(self), cache=False, temperature=self.temperature, max_tokens=self.max_tokens)
         return self._lm
-
-    def seed(self, seed: int) -> None:
-        self._seed = int(seed)
-        self._call_index = 0
-
-    def _next_seed(self, explicit: int | None) -> int | None:
-        if explicit is not None:
-            return int(explicit)
-        if self._seed is None:
-            return None
-        s = (self._seed * 1_000_003 + self._call_index) % (2**63 - 1)
-        self._call_index += 1
-        return s
 
     def render_chat(self, messages: Sequence[dict], *, add_generation_prompt: bool = False, **template_kwargs) -> str:
         kwargs = {**self.chat_template_kwargs, **template_kwargs}
@@ -393,68 +383,8 @@ class HFBackend(WeightBackend):
         return out
 
 
-class HFEngine:
-    """A DSPy 3.4 engine: one canonical request in, one response out, run on the backend's current weights."""
-
-    def __init__(self, backend: HFBackend):
-        self.backend = backend
-
-    def complete(self, request):
-        from dspy.clients.engines.base import validate_request
-        from dspy.lm15 import Message, Response, TextPart, ThinkingPart, Usage
-
-        validate_request(request)
-        msgs = []
-        if request.system is not None:
-            system = request.system if isinstance(request.system, str) else "".join(getattr(p, "text", "") or "" for p in request.system)
-            msgs.append({"role": "system", "content": system})
-        msgs.extend({"role": m.role, "content": m.text or ""} for m in request.messages)
-        prompt = self.backend.render_chat(msgs, add_generation_prompt=True)
-        c = request.config
-        call = self.backend.generate(prompt, max_tokens=c.max_tokens, temperature=c.temperature, top_p=c.top_p, top_k=c.top_k, seed=c.seed, stop=c.stop)
-        text = call.completion
-        parts = [TextPart(text)]
-        if self.backend.split_thinking and "</think>" in text:
-            thinking, answer = text.split("</think>", 1)
-            parts = [ThinkingPart(thinking.replace("<think>", "").strip()), TextPart(answer.lstrip())]
-        return Response(
-            id=None,
-            model=self.backend.model_id,
-            message=Message.assistant(parts),
-            finish_reason=call.finish_reason,
-            usage=Usage(input_tokens=call.input_tokens, output_tokens=call.output_tokens, total_tokens=call.input_tokens + call.output_tokens),
-        )
-
-    def stream(self, request):
-        from dspy.lm15 import response_to_events
-
-        return response_to_events(self.complete(request))
-
-    def close(self) -> None:
-        pass
-
-    # DSPy saves a program's LM through these: the base model, its settings and the patch.
-    def dump_state(self) -> dict:
-        return {"backend": self.backend._init_kwargs, "patch": self.backend.patch_dir}
-
-    @classmethod
-    def load_state(cls, state: dict) -> "HFEngine":
-        # DSPy loads each predictor's LM separately (and once more in a trial run),
-        # so share one backend per (model, settings, patch).
-        import json
-
-        key = json.dumps(state, sort_keys=True, default=str)
-        backend = _LOADED.get(key)
-        if backend is None:
-            from dspy_wsp.patch import Patch
-
-            backend = HFBackend(**state["backend"])
-            if state.get("patch"):
-                patch = Patch.load(state["patch"])
-                backend.set_weights({n: t.float().numpy() for n, t in patch.edited_tensors(backend.reader).items()})
-                backend.patch_dir = state["patch"]
-            _LOADED[key] = backend
-        return cls(backend)
+class HFEngine(BackendEngine):
+    backend_class = HFBackend
 
 
-_LOADED: dict[str, HFBackend] = {}
+_LOADED = LOADED_BACKENDS
