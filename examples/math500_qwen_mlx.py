@@ -76,6 +76,22 @@ class BoxedAnswerAdapter(dspy.ChatAdapter):
             return {"answer": answer}
 
 
+class PaperPromptAdapter(dspy.Adapter):
+    """The paper's evaluation protocol: one user turn holding the problem and the instruction,
+    graded by the last \\boxed{} anywhere in the reply, thinking included.
+
+    Use it with the backend's split_thinking=False, so answers cut off while thinking still reach the parser.
+    """
+
+    instruction = "Please reason step by step, and put your final answer within \\boxed{}."
+
+    def format(self, signature, demos, inputs):
+        return [{"role": "user", "content": f"{inputs['question']}\n{self.instruction}"}]
+
+    def parse(self, signature, completion):
+        return {"answer": last_boxed(completion) or ""}
+
+
 def practice_set() -> list[dspy.Example]:
     """The paper's MATH train practice problems (CC BY 4.0, from its released logs)."""
     path = RUN_DIR.parent / "practice_math_train.jsonl"

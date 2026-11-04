@@ -133,6 +133,8 @@ class ForwardTool:
             req = json.loads(body)
             if not isinstance(req, dict):
                 raise RequestError("the forward block must contain one JSON object")
+            if set(req) == {"file"}:
+                req = self._request_from_file(req["file"])
         except json.JSONDecodeError as e:
             return f"FORWARD REQUEST FAILED (not counted): invalid JSON: {e}", False
         except RequestError as e:
@@ -153,6 +155,21 @@ class ForwardTool:
             return f"FORWARD REQUEST FAILED (not counted): {type(e).__name__}: {e}", False
         summary["seconds"] = round(time.time() - t0, 1)
         return f"RESULT of forward pass {k}:\n```\n{json.dumps(summary, indent=1)}\n```", True
+
+    def _request_from_file(self, name) -> dict:
+        """A request the writer saved as JSON in its work folder, so long texts can be built in code."""
+        if not isinstance(name, str):
+            raise RequestError('"file" must be a path in the work folder')
+        work = self.work_dir.resolve()
+        path = (work / name).resolve()
+        if not path.is_relative_to(work):
+            raise RequestError(f'"file" must be inside {work}')
+        if not path.is_file():
+            raise RequestError(f"no such file: {path}")
+        req = json.loads(path.read_text())
+        if not isinstance(req, dict) or "file" in req:
+            raise RequestError("the request file must contain one JSON request object")
+        return req
 
     # --- generation -----------------------------------------------------------------
     def generate(self, req: dict, k: int) -> dict:

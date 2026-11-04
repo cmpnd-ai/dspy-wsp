@@ -118,3 +118,15 @@ def test_paired_eval_reuses_saved_original_rows(tool, trainset, tmp_path):
     assert (out / "edited.jsonl").exists()
     other = tool.paired_eval(trainset[1:3], edits, out_dir=out)  # different items: run again
     assert other["original"]["score"] == 0.0
+
+
+def test_request_can_come_from_a_file(tool):
+    req = {"type": "teacher_forced", "model": "original", "texts": ["What is 2 + 2 ?"], "return": {"token_logprobs": True}}
+    (tool.work_dir / "req.json").write_text(json.dumps(req))
+    msg, counted = tool.handle(json.dumps({"file": "req.json"}), 1)
+    assert counted and '"texts": 1' in msg
+    msg, counted = tool.handle(json.dumps({"file": str(tool.work_dir / "req.json")}), 2)
+    assert counted
+    for bad in ("../outside.json", "/etc/hostname", "missing.json"):
+        msg, counted = tool.handle(json.dumps({"file": bad}), 3)
+        assert not counted and "FAILED" in msg

@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 
 import dspy
-from math500_qwen_mlx import BoxedAnswerAdapter, MathQA, math500, metric, practice_set
+from math500_qwen_mlx import BoxedAnswerAdapter, MathQA, PaperPromptAdapter, math500, metric, practice_set
 
 from dspy_wsp import Limits, VLLMBackend, WeightSpace
 
@@ -30,9 +30,10 @@ MAX_PASSES = 50
 VAL_SAMPLES = 4
 
 
-def student(gpu_memory_utilization: float = 0.6, data_parallel_size: int = 1) -> VLLMBackend:
+def student(gpu_memory_utilization: float = 0.6, data_parallel_size: int = 1, split_thinking: bool = True) -> VLLMBackend:
     """gpu_memory_utilization: vLLM's share of each GPU's memory; the Hugging Face model for reads uses the rest of GPU 0.
     data_parallel_size: GPUs that each hold a full copy of the model and serve part of the batch.
+    split_thinking: give the adapter only the text after </think> (False passes the whole reply).
     """
     return VLLMBackend(
         "Qwen/Qwen3.5-0.8B",
@@ -45,6 +46,7 @@ def student(gpu_memory_utilization: float = 0.6, data_parallel_size: int = 1) ->
         presence_penalty=1.5,
         chat_template_kwargs={"enable_thinking": True},
         gpu_memory_utilization=gpu_memory_utilization,
+        split_thinking=split_thinking,
         engine_kwargs={
             "limit_mm_per_prompt": {"image": 0, "video": 0},  # text only: skip the vision encoder's memory
             "data_parallel_size": data_parallel_size,
@@ -52,11 +54,11 @@ def student(gpu_memory_utilization: float = 0.6, data_parallel_size: int = 1) ->
     )
 
 
-def baseline(n: int, gpu_mem: float, dp: int) -> None:
+def baseline(n: int, gpu_mem: float, dp: int, paper_prompt: bool) -> None:
     """Score the unedited model on n MATH-500 problems and report speed and cut-off answers."""
     from dspy_wsp.forward import ForwardTool
 
-    backend = student(gpu_mem, dp)
+    backend = student(gpu_mem, dp, split_thinking=not paper_prompt)
     items = [(f"val_{i}", ex) for i, ex in enumerate(math500(n))]
     tool = ForwardTool(backend=backend, program=dspy.Predict(MathQA), metric=metric, practice={}, edit_store=None, work_dir=RUN_DIR)
     t = time.time()
@@ -64,7 +66,7 @@ def baseline(n: int, gpu_mem: float, dp: int) -> None:
     summary = ForwardTool.summarize(rows)
     summary["seconds"] = round(time.time() - t)
     summary["tokens_per_second"] = round(sum(r["output_tokens"] for r in rows) / max(1, summary["seconds"]))
-    out = RUN_DIR / f"baseline_{n}.jsonl"
+    out = RUN_DIR / f"baseline_{n}{'_paper_prompt' if paper_prompt else ''}.jsonl"
     out.parent.mkdir(parents=True, exist_ok=True)
     ForwardTool._write_rows(out, rows)
     print(json.dumps(summary, indent=1))
@@ -79,7 +81,7 @@ def main(args) -> None:
     optimizer = WeightSpace(
         metric=metric,
         writer_lm=dspy.LM("openai/gpt-6-luna"),
-        backend=student(args.gpu_mem, args.dp),
+        backend=student(args.gpu_mem, args.dp, split_thinking=not args.paper_prompt),
         max_passes=args.passes,
         limits=limits,
         task_description="The program solves competition math problems; the answer field holds the final answer in \\boxed{}.",
@@ -94,8 +96,6 @@ def main(args) -> None:
 
 
 if __name__ == "__main__":
-    # One LM call per problem: with JSON fallback on, every unparseable 32k-token answer would be regenerated.
-    dspy.configure(adapter=BoxedAnswerAdapter(use_json_adapter_fallback=False))
     parser = argparse.ArgumentParser()
     parser.add_argument("--baseline", type=int, metavar="N", help="only score the unedited model on N MATH-500 problems")
     parser.add_argument("--gpu-mem", type=float, default=0.6, help="vLLM's share of each GPU's memory")
@@ -105,5 +105,8 @@ if __name__ == "__main__":
     parser.add_argument("--val-size", type=int, default=500, help="MATH-500 problems in the final check")
     parser.add_argument("--val-samples", type=int, default=VAL_SAMPLES, help="samples per problem in the final check")
     parser.add_argument("--run-dir", default=str(RUN_DIR))
+    parser.add_argument("--paper-prompt", action="store_true", help="the paper's bare prompt and last-\\boxed{} grading instead of DSPy's ChatAdapter")
     args = parser.parse_args()
-    baseline(args.baseline, args.gpu_mem, args.dp) if args.baseline else main(args)
+    # One LM call per problem: with JSON fallback on, every unparseable 32k-token answer would be regenerated.
+    dspy.configure(adapter=PaperPromptAdapter() if args.paper_prompt else BoxedAnswerAdapter(use_json_adapter_fallback=False))
+    baseline(args.baseline, args.gpu_mem, args.dp, args.paper_prompt) if args.baseline else main(args)
