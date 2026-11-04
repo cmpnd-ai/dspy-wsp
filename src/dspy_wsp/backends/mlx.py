@@ -55,6 +55,9 @@ class _Tap:
         return getattr(self._inner, name)
 
 
+TIDY_EVERY = 256  # decode steps between cutting cache counter chains and clearing MLX's buffer cache
+
+
 class _Sampler:
     """Temperature, top-k and top-p sampling for one sequence, from its own seed."""
 
@@ -206,6 +209,9 @@ class MLXBackend(WeightBackend):
             completion_batch_size=self.batch_size,
             prefill_batch_size=min(self.prefill_batch_size, self.batch_size),
         )
+        # BatchGenerator wires GPU memory, which registers every buffer in a Metal residency set.
+        # On long runs that registration can abort the process, and a small model gains little from it.
+        mx.set_wired_limit(0)
         mx.eval(self.model.parameters())
 
     def _loop(self) -> None:
@@ -229,7 +235,10 @@ class MLXBackend(WeightBackend):
         self._tasks.put(item)
 
     def _serve(self) -> None:
+        import mlx.core as mx
+
         pending_calls: list = []
+        steps = 0
         while True:
             items = []
             try:
@@ -250,7 +259,12 @@ class MLXBackend(WeightBackend):
                     except BaseException as e:  # noqa: BLE001 - every failure goes back to the caller
                         fut.set_exception(e)
                 pending_calls = []
+                mx.clear_cache()
             elif self._uid_jobs:
+                steps += 1
+                if steps % TIDY_EVERY == 0:
+                    self._cut_counter_chains()
+                    mx.clear_cache()
                 try:
                     self._step()
                 except BaseException as e:  # noqa: BLE001
@@ -258,6 +272,25 @@ class MLXBackend(WeightBackend):
                     self._gen.remove(list(jobs))
                     for job in jobs.values():
                         job["future"].set_exception(e)
+
+    def _cut_counter_chains(self) -> None:
+        """Evaluate the batch caches' per-step counters.
+
+        mlx-lm's ArraysCache.advance subtracts from `left_padding` every step, but only one
+        layer's copy is ever read. The others grow a lazy chain that holds one scalar buffer
+        per step, and at about 29k steps the process hits Metal's buffer-count limit.
+        """
+        import mlx.core as mx
+
+        counters = []
+        for batch in (getattr(self._gen, "_prompt_batch", None), getattr(self._gen, "_generation_batch", None)):
+            for c in getattr(batch, "prompt_cache", None) or []:
+                for attr in ("left_padding", "lengths", "offset"):
+                    v = getattr(c, attr, None)
+                    if isinstance(v, mx.array):
+                        counters.append(v)
+        if counters:
+            mx.eval(counters)
 
     def _insert(self, jobs: list[dict]) -> None:
         samplers = [_Sampler(j["seed"], j["temperature"], j["top_p"], j["top_k"]) for j in jobs]
