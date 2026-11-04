@@ -15,6 +15,7 @@ _EXPORTS = {
     "WeightSpace": "dspy_wsp.optimizer",
     "HFBackend": "dspy_wsp.backends.hf",
     "MLXBackend": "dspy_wsp.backends.mlx",
+    "VLLMBackend": "dspy_wsp.backends.vllm",
     "WeightBackend": "dspy_wsp.backends.base",
     "Patch": "dspy_wsp.patch",
     "Limits": "dspy_wsp.forward",

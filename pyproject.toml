@@ -21,6 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 hf = ["transformers>=4.45", "huggingface_hub>=0.24"]
 mlx = ["mlx-lm>=0.32", "huggingface_hub>=0.24"]
+vllm = ["vllm>=0.32", "transformers>=4.45", "huggingface_hub>=0.24"]
 examples = ["transformers>=4.45", "huggingface_hub>=0.24", "datasets>=2.14", "math-verify>=0.7"]
 dev = ["pytest>=8", "transformers>=4.45", "huggingface_hub>=0.24", "mlx-lm>=0.32; sys_platform == 'darwin' and platform_machine == 'arm64'"]
 

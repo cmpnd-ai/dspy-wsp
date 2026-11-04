@@ -11,6 +11,7 @@ The method comes from Takehi, Teoh, Zhang and Khattab, *Sparks of Weight Space P
 ```bash
 pip install -e ".[hf]"      # from a clone; adds transformers for the Hugging Face backend
 pip install -e ".[mlx]"     # or: mlx-lm for the batched backend on Apple silicon
+pip install -e ".[vllm]"    # or: vLLM for the batched backend on NVIDIA GPUs
 apt install bubblewrap       # sandboxes the writer's code (Linux)
 ```
 
@@ -59,6 +60,17 @@ backend = MLXBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", batch_size=64, ma
 ```
 
 `MLXBackend` reads attention probabilities only from softmax-attention blocks. In Qwen3.5 those are blocks 3, 7, 11, 15, 19 and 23; the other blocks use linear attention. `examples/math500_qwen_mlx.py` runs the paper's MATH setup on a Mac. Its `--baseline N` flag scores the unedited model without a writer.
+
+- **`VLLMBackend`** runs vLLM on NVIDIA GPUs for runs at the paper's scale. vLLM schedules every concurrent LM call, so the forward-pass tool keeps a whole pass in flight (`concurrency=512`). Teacher-forced reads go to an `HFBackend` on the same GPU, because vLLM cannot return hidden states or MLP activations. Both models hold the same edits. To swap edits, the backend waits for running requests to finish, reloads the checkpoint in place with the edited tensors substituted, and clears vLLM's prefix cache. `gpu_memory_utilization` (default 0.6) sets vLLM's share of GPU memory; the Hugging Face model uses the rest. `batch_invariant=True` makes each answer depend only on its prompt and seed, at some cost in speed.
+
+```python
+from dspy_wsp import VLLMBackend
+
+backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_768, presence_penalty=1.5,
+                      chat_template_kwargs={"enable_thinking": True})
+```
+
+`examples/math500_qwen_vllm.py` runs the paper's MATH setup on one GPU: 50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with 4 samples each.
 
 ## How a run works
 

@@ -1,0 +1,91 @@
+"""Edit Qwen3.5-0.8B's weights to improve MATH-500, at the paper's scale on an NVIDIA GPU.
+
+This is the paper's Experiment 8 setup: thinking on, the model card's sampling
+(temperature 0.6, top-p 0.95, top-k 20, presence penalty 1.5, up to 32,768 tokens),
+50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with
+4 samples each. The writer practices on the paper's 7,275 MATH train problems.
+
+    pip install -e ".[examples,vllm]"
+    apt install bubblewrap
+    python examples/math500_qwen_vllm.py --baseline 500   # the unedited model only; no writer, no API cost
+    OPENAI_API_KEY=... python examples/math500_qwen_vllm.py
+
+One H100 runs a pass in roughly 10 to 15 minutes. Rerun the script to resume.
+"""
+
+import argparse
+import json
+import time
+from pathlib import Path
+
+import dspy
+from math500_qwen_mlx import BoxedAnswerAdapter, MathQA, math500, metric, practice_set
+
+from dspy_wsp import Limits, VLLMBackend, WeightSpace
+
+RUN_DIR = Path("runs/math500-qwen-vllm")
+MAX_PASSES = 50
+VAL_SAMPLES = 4
+
+
+def student(gpu_memory_utilization: float = 0.6) -> VLLMBackend:
+    """gpu_memory_utilization: vLLM's share of GPU memory; the Hugging Face model for reads uses the rest."""
+    return VLLMBackend(
+        "Qwen/Qwen3.5-0.8B",
+        revision="2fc06364715b967f1860aea9cf38778875588b17",  # pin the base so the patch names it exactly
+        concurrency=512,
+        max_tokens=32_768,
+        temperature=0.6,
+        top_p=0.95,
+        top_k=20,
+        presence_penalty=1.5,
+        chat_template_kwargs={"enable_thinking": True},
+        gpu_memory_utilization=gpu_memory_utilization,
+        engine_kwargs={"limit_mm_per_prompt": {"image": 0, "video": 0}},  # text only: skip the vision encoder's memory
+    )
+
+
+def baseline(n: int) -> None:
+    """Score the unedited model on n MATH-500 problems and report speed and cut-off answers."""
+    from dspy_wsp.forward import ForwardTool
+
+    backend = student()
+    items = [(f"val_{i}", ex) for i, ex in enumerate(math500(n))]
+    tool = ForwardTool(backend=backend, program=dspy.Predict(MathQA), metric=metric, practice={}, edit_store=None, work_dir=RUN_DIR)
+    t = time.time()
+    rows = tool.run_items(tool._program(None), items, 1, "original")
+    summary = ForwardTool.summarize(rows)
+    summary["seconds"] = round(time.time() - t)
+    summary["tokens_per_second"] = round(sum(r["output_tokens"] for r in rows) / max(1, summary["seconds"]))
+    out = RUN_DIR / f"baseline_{n}.jsonl"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    ForwardTool._write_rows(out, rows)
+    print(json.dumps(summary, indent=1))
+    print(f"rows: {out}")
+
+
+def main() -> None:
+    optimizer = WeightSpace(
+        metric=metric,
+        writer_lm=dspy.LM("openai/gpt-6-luna"),
+        backend=student(),
+        max_passes=MAX_PASSES,
+        limits=Limits(),  # the paper's pass sizes: 512 answers, or 256 per model for "both"
+        task_description="The program solves competition math problems; the answer field holds the final answer in \\boxed{}.",
+        val_samples=VAL_SAMPLES,
+        run_dir=RUN_DIR,
+        resume=True,
+    )
+    compiled = optimizer.compile(dspy.Predict(MathQA), trainset=practice_set(), valset=math500(500))
+    print(compiled.wsp_patch.summary())
+    print(compiled.wsp_report["validation"]["paired"])
+    compiled.save(str(RUN_DIR / "program.json"))
+
+
+if __name__ == "__main__":
+    # One LM call per problem: with JSON fallback on, every unparseable 32k-token answer would be regenerated.
+    dspy.configure(adapter=BoxedAnswerAdapter(use_json_adapter_fallback=False))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--baseline", type=int, metavar="N", help="only score the unedited model on N MATH-500 problems")
+    args = parser.parse_args()
+    baseline(args.baseline) if args.baseline else main()
