@@ -330,6 +330,21 @@ class ForwardTool:
             for r in rows:
                 f.write(json.dumps(r) + "\n")
 
+    @staticmethod
+    def _saved_rows(path: Path, items, n: int) -> list[dict] | None:
+        """Rows saved at `path` if they cover exactly these items and samples with the same inputs."""
+        if not path.exists():
+            return None
+        try:
+            rows = [json.loads(line) for line in path.open()]
+        except (OSError, json.JSONDecodeError):
+            return None
+        expected = [(item_id, dict(ex.inputs()), j) for item_id, ex in items for j in range(n)]
+        if [(r.get("id"), r.get("inputs"), r.get("sample")) for r in rows] != expected:
+            return None
+        logger.info("reusing %d saved rows from %s", len(rows), path)
+        return rows
+
     def paired_eval(self, examples, edits, *, n: int = 1, out_dir: str | Path) -> dict:
         """Host-only paired evaluation (never shown to the writer, never counted)."""
         out = Path(out_dir)
@@ -338,9 +353,13 @@ class ForwardTool:
         program = self._program(None)
         results = {}
         for which in ("original", "edited"):
-            with self.backend.using(edits if which == "edited" else None):
-                rows = self.run_items(program, items, n, which)
-            self._write_rows(out / f"{which}.jsonl", rows)
+            path = out / f"{which}.jsonl"
+            # The original weights never change, so a rerun reuses saved original rows for the same items.
+            rows = self._saved_rows(path, items, n) if which == "original" else None
+            if rows is None:
+                with self.backend.using(edits if which == "edited" else None):
+                    rows = self.run_items(program, items, n, which)
+                self._write_rows(path, rows)
             results[which] = rows
         return {
             "original": self.summarize(results["original"]),

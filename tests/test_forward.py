@@ -102,3 +102,19 @@ def test_gepa_style_feedback_is_recorded(tool):
     msg, counted = tool.handle(json.dumps({"type": "generate", "model": "original", "problems": ["train_0"]}), 1)
     row = json.loads(open(tool.work_dir / "gen_1.jsonl").readline())
     assert row["score"] == 0.5 and row["feedback"] == "close, but show your work"
+
+
+def test_paired_eval_reuses_saved_original_rows(tool, trainset, tmp_path):
+    _edit(tool)
+    edits = tool.edit_store.load_all()
+    out = tmp_path / "check"
+    first = tool.paired_eval(trainset[:2], edits, out_dir=out)
+    (out / "edited.jsonl").unlink()
+    rows = [json.loads(line) for line in open(out / "original.jsonl")]
+    rows[0]["score"] = 0.5  # a marker: the rerun must read this file instead of generating again
+    tool._write_rows(out / "original.jsonl", rows)
+    again = tool.paired_eval(trainset[:2], edits, out_dir=out)
+    assert again["original"]["score"] == 0.25 and again["edited"] == first["edited"]
+    assert (out / "edited.jsonl").exists()
+    other = tool.paired_eval(trainset[1:3], edits, out_dir=out)  # different items: run again
+    assert other["original"]["score"] == 0.0
