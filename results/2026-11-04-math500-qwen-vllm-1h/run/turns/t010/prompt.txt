@@ -1,0 +1,24 @@
+RESULT of forward pass 1:
+```
+{
+ "type": "generate",
+ "model": "original",
+ "generations": 8,
+ "files": [
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_1.jsonl"
+ ],
+ "graded": 8,
+ "score": 0.0,
+ "score_se_over_items": 0.0,
+ "mean_output_tokens": 2048.0,
+ "cut_share": 1.0,
+ "failures": {
+  "cut_at_max_tokens": 8,
+  "program_error": 0,
+  "metric_error": 0,
+  "scored_below_1": 0
+ },
+ "seconds": 8.9
+}
+```
+[forward passes used: 1 of 8; Python runs used: 1 of 300]

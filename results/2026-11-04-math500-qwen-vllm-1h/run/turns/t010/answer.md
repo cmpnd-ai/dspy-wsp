@@ -1,0 +1,1 @@
+All eight diagnostic calls hit the token cap, so I’ll inspect their saved completions to determine whether they share a repetition or non-termination pattern before considering any weight change. This will help distinguish a decoding-length problem from ordinary math errors.

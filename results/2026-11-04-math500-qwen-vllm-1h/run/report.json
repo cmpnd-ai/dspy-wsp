@@ -1,0 +1,50 @@
+{
+ "run_dir": "/lambda/nfs/dspy-wsp-is/runs/hour",
+ "final_answer": "I removed the block-3 MLP down-projection channel-382 edit, so the submitted weights are unchanged from the original. The edit\u2019s evidence was inconsistent: it gained 1/24 on the short-limit paired test but all calls still cut off; on the full-limit test it lost by 1/8, with more cutoffs (7/8 versus 6/8). Given the small samples and negative full-budget result, I found no justified edit to retain.",
+ "budget": {
+  "max_passes": 8,
+  "max_code_runs": 300,
+  "passes_used": 8,
+  "code_runs_used": 24
+ },
+ "turns": 49,
+ "conversations": 2,
+ "validation": {
+  "original": {
+   "graded": 250,
+   "score": 0.084,
+   "score_se_over_items": 0.017578738526776348,
+   "mean_output_tokens": 30703.972,
+   "cut_share": 0.924,
+   "failures": {
+    "cut_at_max_tokens": 231,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 0
+   }
+  },
+  "edited": {
+   "graded": 250,
+   "score": 0.088,
+   "score_se_over_items": 0.017953084777052892,
+   "mean_output_tokens": 30604.776,
+   "cut_share": 0.916,
+   "failures": {
+    "cut_at_max_tokens": 229,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 0
+   }
+  },
+  "paired": {
+   "items": 250,
+   "original": 0.084,
+   "edited": 0.088,
+   "gain": 0.004,
+   "se": 0.015520940641390724,
+   "improved": 8,
+   "worsened": 7
+  }
+ },
+ "patch": "empty patch (no weights changed)"
+}

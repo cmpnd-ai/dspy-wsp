@@ -1,0 +1,164 @@
+HANDOFF. The conversation was restarted to keep it short; the kernel and its variables are unchanged. Your task follows, unchanged.
+
+TASK. You are given the weights of a language model: /home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3.5-0.8B/snapshots/2fc06364715b967f1860aea9cf38778875588b17 (qwen3_5_text): 24 layers, width 1024, MLP width 3584, 8 attention heads (2 key/value heads), vocabulary 248320, tied input/output embeddings: True; 752,393,024 parameters stored as bfloat16. It runs every language-model call of the DSPy program described below. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program solves competition math problems; the answer field holds the final answer in \boxed{}.
+
+THE PROGRAM.
+Predict, with 1 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'self': question -> answer
+  instructions: Solve the math problem. Please reason step by step, and put your final answer within \boxed{}.
+  answer: the final answer, in \boxed{}
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    """Graded with math-verify, as in the paper's evaluation."""
+    from math_verify import parse, verify
+
+    # math-verify's default timeout uses signal.alarm, which fails outside the main thread.
+    gold = parse(f"${example.answer}$", parsing_timeout=None)
+    got = str(pred.answer)
+    return float(any(verify(gold, parse(text, parsing_timeout=None), timeout_seconds=None) for text in (got, f"${got}$")))
+
+Only weight values can change (same tensor names and shapes): the program, its prompts, the tokenizer and the decoding settings stay fixed. Decoding: temperature 0.6, top_p 0.95, top_k 20, at most 32768 new tokens per LM call, chat template options {'enable_thinking': True}.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or circuits) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model often fails because it repeats itself and never finishes, finding and fixing what drives that repetition counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the input embedding, the output layer and the final norm), and any edit that only multiplies a whole tensor by a constant. Global knobs (making the whole output distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no internet, no GPU): variables survive between your code blocks, like a notebook. The model's files are in /home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3.5-0.8B/snapshots/2fc06364715b967f1860aea9cf38778875588b17 (read only), practice examples are in /lambda/nfs/dspy-wsp-is/runs/hour/work/practice, and /lambda/nfs/dspy-wsp-is/runs/hour/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  model.language_model.embed_tokens.weight [248320, 1024] (out of scope)
+  model.language_model.layers.0.input_layernorm.weight [1024]
+  model.language_model.layers.0.linear_attn.A_log [16]
+  model.language_model.layers.0.linear_attn.conv1d.weight [6144, 1, 4]
+  model.language_model.layers.0.linear_attn.dt_bias [16]
+  model.language_model.layers.0.linear_attn.in_proj_a.weight [16, 1024]
+  model.language_model.layers.0.linear_attn.in_proj_b.weight [16, 1024]
+  model.language_model.layers.0.linear_attn.in_proj_qkv.weight [6144, 1024]
+  model.language_model.layers.0.linear_attn.in_proj_z.weight [2048, 1024]
+  model.language_model.layers.0.linear_attn.norm.weight [128] (out of scope)
+  model.language_model.layers.0.linear_attn.out_proj.weight [1024, 2048]
+  model.language_model.layers.0.mlp.down_proj.weight [1024, 3584]
+  model.language_model.layers.0.mlp.gate_proj.weight [3584, 1024]
+  model.language_model.layers.0.mlp.up_proj.weight [3584, 1024]
+  model.language_model.layers.0.post_attention_layernorm.weight [1024]
+  model.language_model.norm.weight [1024] (out of scope)
+  model.visual.blocks.0.attn.proj.bias [768] (out of scope)
+  model.visual.blocks.0.attn.proj.weight [768, 768] (out of scope)
+  model.visual.blocks.0.attn.qkv.bias [2304] (out of scope)
+  model.visual.blocks.0.attn.qkv.weight [2304, 768] (out of scope)
+  model.visual.blocks.0.mlp.linear_fc1.bias [3072] (out of scope)
+  model.visual.blocks.0.mlp.linear_fc1.weight [3072, 768] (out of scope)
+  model.visual.blocks.0.mlp.linear_fc2.bias [768] (out of scope)
+  model.visual.blocks.0.mlp.linear_fc2.weight [768, 3072] (out of scope)
+  model.visual.blocks.0.norm1.bias [768] (out of scope)
+  model.visual.blocks.0.norm1.weight [768] (out of scope)
+  model.visual.blocks.0.norm2.bias [768] (out of scope)
+  model.visual.blocks.0.norm2.weight [768] (out of scope)
+  model.visual.merger.linear_fc1.bias [3072] (out of scope)
+  model.visual.merger.linear_fc1.weight [3072, 3072] (out of scope)
+  model.visual.merger.linear_fc2.bias [1024] (out of scope)
+  model.visual.merger.linear_fc2.weight [1024, 3072] (out of scope)
+  model.visual.merger.norm.bias [768] (out of scope)
+  model.visual.merger.norm.weight [768] (out of scope)
+  model.visual.patch_embed.proj.bias [768] (out of scope)
+  model.visual.patch_embed.proj.weight [768, 3, 2, 16, 16] (out of scope)
+  model.visual.pos_embed.weight [2304, 768] (out of scope)
+  mtp.fc.weight [1024, 2048] (out of scope)
+  mtp.layers.0.input_layernorm.weight [1024] (out of scope)
+  mtp.layers.0.mlp.down_proj.weight [1024, 3584] (out of scope)
+  mtp.layers.0.mlp.gate_proj.weight [3584, 1024] (out of scope)
+  mtp.layers.0.mlp.up_proj.weight [3584, 1024] (out of scope)
+  mtp.layers.0.post_attention_layernorm.weight [1024] (out of scope)
+  mtp.layers.0.self_attn.k_norm.weight [256] (out of scope)
+  mtp.layers.0.self_attn.k_proj.weight [512, 1024] (out of scope)
+  mtp.layers.0.self_attn.o_proj.weight [1024, 2048] (out of scope)
+  mtp.layers.0.self_attn.q_norm.weight [256] (out of scope)
+  mtp.layers.0.self_attn.q_proj.weight [4096, 1024] (out of scope)
+  mtp.layers.0.self_attn.v_proj.weight [512, 1024] (out of scope)
+  mtp.norm.weight [1024] (out of scope)
+  mtp.pre_fc_norm_embedding.weight [1024] (out of scope)
+  mtp.pre_fc_norm_hidden.weight [1024] (out of scope)
+  ... the same names for blocks 0..23; 488 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /lambda/nfs/dspy-wsp-is/runs/hour/work/practice/trainset.jsonl (7,275 examples). Input fields: question. Label fields: answer. Choose whichever serve your experiments.
+
+3. A forward-pass tool with a budget of 8 forward passes in total. A forward pass is one of two things, and each counts as one pass whatever its size:
+ (a) GENERATION: the program runs on up to 256 items (examples x samples) with the evaluation's settings, and every answer to a practice example is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "generate", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored), "n": samples per item (items x n <= 256; with "both" <= 128 per model), "max_tokens": per LM call (optional), "activations": {"layers": [hidden-state indices 0..24], "mlp_layers": [block indices 0..23]} (optional)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many samples improved or worsened). The sampling seed of every item is fixed, in every pass and for both models. You get the mean score, the mean output length, the share of items with an LM call cut at max_tokens and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every LM call's full prompt and completion) are in /lambda/nfs/dspy-wsp-is/runs/hour/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). With "activations", for every LM call the residual stream at the requested indices (0 = embeddings, l = after block l-1) and the inputs of the listed blocks' MLP output projections are saved, taken at the last prompt token and averaged over the call's first 8,192 completion tokens, with each record's score: /lambda/nfs/dspy-wsp-is/runs/hour/work/gen_<k>_acts/ (index.json lists the rows; with "both" one folder per model).
+ (b) TEACHER-FORCED: the model reads up to 1,024 texts of up to 32,768 tokens each, at most 524,288 tokens in total (no generation). Reply with a ```forward block containing JSON:
+ {"type": "teacher_forced", "model": "original" or "edited", "texts": ["raw text", ...] or "chats": [[{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}], ...], "return": {"token_logprobs": true, "topk": k (at most 50), "hidden_states": [indices 0..24], "mlp_act": [block indices], "attn_layers": [block indices; at most 2 texts of at most 2,048 tokens]}}
+ The results are .npy files (with meta.json) in /lambda/nfs/dspy-wsp-is/runs/hour/work/fwd_<k>/, right-padded to the longest text. To score the program's own answers token by token, take an LM call's "prompt" and "completion" from a gen file and send prompt + completion as one raw text. Any request can also be written as JSON to a file in /lambda/nfs/dspy-wsp-is/runs/hour/work from Python (json.dump) and sent as {"file": "<path>"}; build long texts this way rather than typing them into the block. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: a wrong answer, an answer the program could not parse, or an LM call cut off at the token limit (often while the model repeats itself). The generation summary counts these; read some failing records, including the full prompt and completion of each LM call. Go after the largest category you can explain.
+2. Localize causally. That a component is more active on good answers is not enough (good answers come from easier and shorter examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n generations has a standard error of about 50/sqrt(n) percentage points: about 4.4 points at 128 generations, 2.2 at 512. Compare original and edited weights on the SAME examples: a generation pass with "model": "both" does this with the same random seeds and reports the paired difference with its standard error, which is usually much smaller than that of two separate measurements. Separate passes do not reproduce each other exactly, so never compare scores across passes and never repeat an identical request with unchanged edits. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it. Dense measurements are cheap: one teacher-forced pass can read many texts and gives a signal on every token. Edits that change a tensor by a fraction of a percent usually have effects too small to see; test strengths large enough to matter and back off if they hurt.
+4. Plan your forward passes: for example one diagnostic generation with activations, teacher-forced passes for dense paired measurements, and a final paired generation ("model": "both") on examples you have not used, to confirm.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays (print short excerpts of generated texts, at most about 300 characters each, and token ids rather than raw vocabulary dumps); keep /lambda/nfs/dspy-wsp-is/runs/hour/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /lambda/nfs/dspy-wsp-is/runs/hour/work/edited to /lambda/nfs/dspy-wsp-is/runs/hour/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model other than through the forward-pass tool: do not implement or simulate the network's computation on any input in the kernel; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 8 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /lambda/nfs/dspy-wsp-is/runs/hour/work/edited when you finish are submitted, so leave there the edit with the best measured paired gain (on examples not used to choose it), even if the gain is not statistically significant. Then reply without a code block, saying what you changed, the evidence for it, its measured gain with its standard error, and why you expect it to help.
+
+YOUR NOTEBOOK (notes.md):
+Original diagnostic: 8/8 sampled items cut at 2048; repeated self-questioning and no boxed answer. Pass 3/4 block-23 channel 9,46 half/zero probes had paired gain 0 and all remained cut; that edit was removed.
+Teacher-forced two transcripts: MLP activity near 'Wait' broad, but block 3 channel 382 had the largest consistently enhanced per-channel mean abs values (0.627 and 0.482 difference near vs far), motivating a single-channel causal probe. Correlational only.
+Current edit: zero block-3 mlp.down_proj column 382 only. Pass 6 planned paired against original on train_5238/train_912/train_204/train_6074, max_tokens=2048.
+
+
+YOUR CURRENT EDIT:
+model.language_model.layers.3.mlp.down_proj.weight: 1,024 of 3,670,016 entries changed, relative change 0.0171
+
+[forward passes used: 6 of 8; Python runs used: 20 of 300]
+
+RESULT of forward pass 6:
+```
+{
+ "type": "generate",
+ "model": "both",
+ "generations": 4,
+ "files": [
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_6_original.jsonl",
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_6_edited.jsonl"
+ ],
+ "original": {
+  "graded": 4,
+  "score": 0.0,
+  "score_se_over_items": 0.0,
+  "mean_output_tokens": 2048.0,
+  "cut_share": 1.0,
+  "failures": {
+   "cut_at_max_tokens": 4,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  }
+ },
+ "edited": {
+  "graded": 4,
+  "score": 0.25,
+  "score_se_over_items": 0.25,
+  "mean_output_tokens": 1845.75,
+  "cut_share": 0.75,
+  "failures": {
+   "cut_at_max_tokens": 3,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  }
+ },
+ "paired": {
+  "items": 4,
+  "original": 0.0,
+  "edited": 0.25,
+  "gain": 0.25,
+  "se": 0.25,
+  "improved": 1,
+  "worsened": 0
+ },
+ "seconds": 15.9
+}
+```
+[forward passes used: 6 of 8; Python runs used: 20 of 300]

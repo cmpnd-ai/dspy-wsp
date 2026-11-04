@@ -70,7 +70,7 @@ backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_76
                       chat_template_kwargs={"enable_thinking": True})
 ```
 
-`examples/math500_qwen_vllm.py` runs the paper's MATH setup on one GPU: 50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with 4 samples each.
+`examples/math500_qwen_vllm.py` runs the paper's MATH setup on one GPU: 50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with 4 samples each. `results/2026-11-04-math500-qwen-vllm-1h/` documents a one-hour proof-of-concept run on eight A100 GPUs, with the checks we ran before it.
 
 ## How a run works
 

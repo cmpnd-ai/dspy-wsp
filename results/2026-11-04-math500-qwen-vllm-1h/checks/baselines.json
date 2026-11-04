@@ -1,0 +1,16 @@
+{
+ "paper_prompt_256": {
+  "graded": 256,
+  "score": 0.0898,
+  "se": 0.0179,
+  "cut_share": 0.918,
+  "mean_output_tokens": 30631.4
+ },
+ "dspy_chat_adapter_256": {
+  "graded": 256,
+  "score": 0.0273,
+  "se": 0.0102,
+  "cut_share": 0.9727,
+  "mean_output_tokens": 32053.7
+ }
+}

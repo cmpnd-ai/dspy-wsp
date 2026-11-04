@@ -1,0 +1,49 @@
+RESULT of forward pass 3:
+```
+{
+ "type": "generate",
+ "model": "both",
+ "generations": 4,
+ "files": [
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_3_original.jsonl",
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_3_edited.jsonl"
+ ],
+ "original": {
+  "graded": 4,
+  "score": 0.0,
+  "score_se_over_items": 0.0,
+  "mean_output_tokens": 512.0,
+  "cut_share": 1.0,
+  "failures": {
+   "cut_at_max_tokens": 4,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  }
+ },
+ "edited": {
+  "graded": 4,
+  "score": 0.0,
+  "score_se_over_items": 0.0,
+  "mean_output_tokens": 512.0,
+  "cut_share": 1.0,
+  "failures": {
+   "cut_at_max_tokens": 4,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  }
+ },
+ "paired": {
+  "items": 4,
+  "original": 0.0,
+  "edited": 0.0,
+  "gain": 0.0,
+  "se": 0.0,
+  "improved": 0,
+  "worsened": 0
+ },
+ "seconds": 6.5
+}
+```
+[forward passes used: 3 of 8; Python runs used: 9 of 300]

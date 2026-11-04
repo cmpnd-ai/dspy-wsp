@@ -1,0 +1,6 @@
+OUTPUT of Python run 10 of at most 300:
+```
+saved edit model.language_model.layers.23.mlp.down_proj.weight: 2,048 of 3,670,016 entries changed, relative change 0.0220
+zeroed candidate channels; changed edit relative to original: 0.02197481319308281
+```
+[forward passes used: 3 of 8; Python runs used: 10 of 300]

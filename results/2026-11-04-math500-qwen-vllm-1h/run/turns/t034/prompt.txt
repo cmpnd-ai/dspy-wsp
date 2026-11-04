@@ -1,0 +1,7 @@
+OUTPUT of Python run 14 of at most 300:
+```
+Traceback (most recent call last):
+  File "<cell>", line 27, in <module>
+ValueError: operands could not be broadcast together with shapes (42,) (1726,) 
+```
+[forward passes used: 5 of 8; Python runs used: 14 of 300]

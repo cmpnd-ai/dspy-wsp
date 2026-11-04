@@ -1,0 +1,1 @@
+The block-3 channel edit showed a promising but very noisy result on four examples: one edited answer scored, while three calls still hit the token limit. I’ll inspect the paired completions and the scored example to see whether the edit changed the suspected repetition behavior or just helped by chance before deciding how to use the last two forward passes.

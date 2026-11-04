@@ -1,0 +1,29 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-04T23:23:38+00:00",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "writer": "openai/gpt-6-luna",
+  "budget": {
+   "max_passes": 8,
+   "max_code_runs": 300,
+   "passes_used": 8,
+   "code_runs_used": 24
+  },
+  "run_dir": "/lambda/nfs/dspy-wsp-is/runs/hour",
+  "validation": {
+   "items": 250,
+   "original": 0.084,
+   "edited": 0.088,
+   "gain": 0.004,
+   "se": 0.015520940641390724,
+   "improved": 8,
+   "worsened": 7
+  }
+ },
+ "changed_tensors": 0,
+ "changed_entries_total": 0,
+ "tensors": []
+}

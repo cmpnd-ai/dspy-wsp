@@ -1,0 +1,7 @@
+OUTPUT of Python run 17 of at most 300:
+```
+Traceback (most recent call last):
+  File "<cell>", line 22, in <module>
+IndexError: too many indices for array: array is 3-dimensional, but 4 were indexed
+```
+[forward passes used: 5 of 8; Python runs used: 17 of 300]

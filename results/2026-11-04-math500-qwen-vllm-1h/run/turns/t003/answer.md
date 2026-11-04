@@ -1,0 +1,1 @@
+I’ll inspect the practice set’s ID format and a few randomly selected questions and answers. This lets me choose valid problem IDs for the first diagnostic generation and see the kind of examples it will cover.

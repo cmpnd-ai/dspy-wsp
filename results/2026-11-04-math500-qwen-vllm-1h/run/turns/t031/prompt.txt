@@ -1,0 +1,5 @@
+OUTPUT of Python run 12 of at most 300:
+```
+texts 2 characters [4690, 4696] request ready
+```
+[forward passes used: 4 of 8; Python runs used: 12 of 300]

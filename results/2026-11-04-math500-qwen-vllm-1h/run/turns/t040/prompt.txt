@@ -1,0 +1,6 @@
+OUTPUT of Python run 20 of at most 300:
+```
+saved edit model.language_model.layers.3.mlp.down_proj.weight: 1,024 of 3,670,016 entries changed, relative change 0.0171
+edit model.language_model.layers.3.mlp.down_proj.weight column 382 zeroed; relative norm change 0.01713828556239605
+```
+[forward passes used: 5 of 8; Python runs used: 20 of 300]

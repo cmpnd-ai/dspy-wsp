@@ -1,0 +1,50 @@
+RESULT of forward pass 8:
+```
+{
+ "type": "generate",
+ "model": "both",
+ "generations": 8,
+ "files": [
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_8_original.jsonl",
+  "/lambda/nfs/dspy-wsp-is/runs/hour/work/gen_8_edited.jsonl"
+ ],
+ "original": {
+  "graded": 8,
+  "score": 0.25,
+  "score_se_over_items": 0.16366341767699427,
+  "mean_output_tokens": 26990.375,
+  "cut_share": 0.75,
+  "failures": {
+   "cut_at_max_tokens": 6,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  }
+ },
+ "edited": {
+  "graded": 8,
+  "score": 0.125,
+  "score_se_over_items": 0.125,
+  "mean_output_tokens": 29562.625,
+  "cut_share": 0.875,
+  "failures": {
+   "cut_at_max_tokens": 7,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  }
+ },
+ "paired": {
+  "items": 8,
+  "original": 0.25,
+  "edited": 0.125,
+  "gain": -0.125,
+  "se": 0.22658174179374144,
+  "improved": 1,
+  "worsened": 2
+ },
+ "seconds": 230.0
+}
+```
+That was your last forward pass. Make your final choice: leave the edit you submit in /lambda/nfs/dspy-wsp-is/runs/hour/work/edited, then reply without a code block.
+[forward passes used: 8 of 8; Python runs used: 23 of 300]

@@ -1,0 +1,2 @@
+The session continues until all 8 forward passes are used (7 left); replying without a code block does not end it. Reply with one ```python or ```forward block.
+[forward passes used: 1 of 8; Python runs used: 1 of 300]

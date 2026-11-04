@@ -1,0 +1,27 @@
+RESULT of forward pass 5:
+```
+{
+ "type": "teacher_forced",
+ "model": "original",
+ "texts": 2,
+ "tokens": 3363,
+ "dir": "/lambda/nfs/dspy-wsp-is/runs/hour/work/fwd_5",
+ "files": {
+  "token_ids.npy": [
+   2,
+   1768
+  ],
+  "lengths.npy": [
+   2
+  ],
+  "mlp_act.npy": [
+   2,
+   24,
+   1768,
+   3584
+  ]
+ },
+ "seconds": 10.0
+}
+```
+[forward passes used: 5 of 8; Python runs used: 12 of 300]

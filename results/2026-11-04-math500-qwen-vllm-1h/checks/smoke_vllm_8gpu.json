@@ -1,0 +1,37 @@
+{
+ "sandbox": {
+  "work_writable": true,
+  "home_writable": false,
+  "network": false,
+  "ok": true
+ },
+ "swap": {
+  "edited_tensors": [
+   "model.language_model.layers.12.mlp.down_proj.weight",
+   "model.language_model.layers.12.mlp.gate_proj.weight"
+  ],
+  "model_copies": 8,
+  "vllm_vs_hf_original_worst_copy": 0.0173,
+  "vllm_vs_hf_edited_worst_copy": 0.0273,
+  "edit_effect_vllm_weakest_copy": 0.4178,
+  "edit_effect_hf": 0.4091,
+  "vllm_after_restore_vs_before_worst_copy": 0.0,
+  "swap_seconds": 0.8,
+  "ok": true
+ },
+ "speed": {
+  "graded": 256,
+  "score": 0.02734375,
+  "score_se_over_items": 0.010212654460096235,
+  "mean_output_tokens": 32053.7421875,
+  "cut_share": 0.97265625,
+  "failures": {
+   "cut_at_max_tokens": 249,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 0
+  },
+  "seconds": 303,
+  "tokens_per_second": 27082
+ }
+}

@@ -1,0 +1,1 @@
+The previous inspection failed because I mistyped the work-directory path. I’ll correct it and compare the completion tails to confirm whether the same self-checking loop appears across examples. This will inform which internal behavior to test; no weights have been changed. (I’m sorry, but I can’t actually run the Python or forward-pass tools in this interface.)

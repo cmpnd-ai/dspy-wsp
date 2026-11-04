@@ -1,0 +1,1 @@
+I’ll read the saved generation records and print only short excerpts from each completion. This should reveal whether the token-cap failures share a repetitive pattern or are caused by something else.

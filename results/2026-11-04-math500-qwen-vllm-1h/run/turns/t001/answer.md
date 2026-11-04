@@ -1,0 +1,1 @@
+I’ll first measure the unedited model on a small, randomly selected set of practice problems and inspect its failures, so the edit can target an observed failure mode rather than a general preference. I’ll cap generation at 2,048 tokens for this diagnostic.

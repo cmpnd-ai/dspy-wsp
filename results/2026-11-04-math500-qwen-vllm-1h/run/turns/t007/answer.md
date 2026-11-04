@@ -1,0 +1,1 @@
+I’ll run the unedited model on the eight sampled practice problems to see whether it answers correctly and what its completions look like. This establishes an initial baseline and may reveal a specific failure mode to investigate. I’ll limit each completion to 2,048 tokens for this diagnostic.
