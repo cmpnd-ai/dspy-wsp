@@ -49,7 +49,7 @@ print(compiled.wsp_report["validation"]["paired"])
 A backend holds the student model, swaps edits in and out, and runs every forward pass.
 
 - **`HFBackend`** runs transformers in-process on CUDA, MPS or CPU. It generates one answer at a time, so it suits small models and short answers.
-- **`MLXBackend`** runs mlx-lm on Apple silicon. It decodes up to `batch_size` answers together, and the forward-pass tool runs that many programs at once to fill the batch. Each answer samples from its own seed. It also supports the presence penalty in Qwen's recommended sampling settings. On an M2 Max it generates about 650 tokens per second across a batch of 32 answers from Qwen3.5-0.8B, which is several times faster than `HFBackend` on the same machine.
+- **`MLXBackend`** runs mlx-lm on Apple silicon. It decodes up to `batch_size` answers together, and the forward-pass tool runs that many programs at once to fill the batch. Each answer samples from its own seed. For models with linear-attention layers, such as Qwen3.5, it reads each prompt alone before adding it to the batch, because mlx-lm pads prompts that are read together and those layers carry the padding into their state. It also supports the presence penalty in Qwen's recommended sampling settings. On an M2 Max it generates about 650 tokens per second across a batch of 32 answers from Qwen3.5-0.8B, which is several times faster than `HFBackend` on the same machine.
 
 ```python
 from dspy_wsp import MLXBackend
