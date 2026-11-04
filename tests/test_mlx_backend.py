@@ -40,7 +40,6 @@ def test_describe_and_names(mlx):
     assert L1 in mlx.editable_names()
     assert mlx.dims()["intermediate"] == 64
     assert mlx.attention_layers() == [0, 1]
-    assert mlx.prefill_batch_size == 8  # softmax attention only, so prompts may be read together
 
 
 def test_teacher_forced_matches_hf(mlx, hf):

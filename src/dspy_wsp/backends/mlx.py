@@ -118,8 +118,7 @@ class MLXBackend(WeightBackend):
         presence_penalty: subtracted from the logits of tokens already generated.
         chat_template_kwargs: passed to the chat template, e.g. {"enable_thinking": True}.
         split_thinking: return text before "</think>" as reasoning, not as the answer.
-        prefill_batch_size: how many prompts are read together before decoding. Models with
-            linear-attention layers (such as Qwen3.5) always read one prompt at a time.
+        prefill_batch_size: how many prompts are read together before decoding.
     """
 
     def __init__(
@@ -203,10 +202,6 @@ class MLXBackend(WeightBackend):
         self._inner = self._find_inner()
         self._vocab = int(self.text_config.get("vocab_size") or self.tokenizer.vocab_size)
         self._eos = sorted(set(self.tokenizer.eos_token_ids))
-        if self.prefill_batch_size > 1 and self._has_recurrent_state():
-            # mlx-lm left-pads prompts read together, and linear-attention layers carry the padding
-            # into their state. Reading each prompt alone keeps answers identical to unbatched ones.
-            self.prefill_batch_size = 1
         self._gen = BatchGenerator(
             self.model,
             max_tokens=self.max_tokens,
@@ -218,12 +213,6 @@ class MLXBackend(WeightBackend):
         # On long runs that registration can abort the process, and a small model gains little from it.
         mx.set_wired_limit(0)
         mx.eval(self.model.parameters())
-
-    def _has_recurrent_state(self) -> bool:
-        """Whether any layer keeps a recurrent state (linear attention, SSM) instead of only a KV cache."""
-        from mlx_lm.models.cache import ArraysCache, make_prompt_cache
-
-        return any(isinstance(c, ArraysCache) for c in make_prompt_cache(self.model))
 
     def _loop(self) -> None:
         try:
