@@ -143,7 +143,9 @@ def check_speed(backend, n: int) -> dict:
     summary = ForwardTool.summarize(rows)
     summary["seconds"] = round(time.time() - t)
     summary["tokens_per_second"] = round(sum(r["output_tokens"] for r in rows) / max(1, summary["seconds"]))
-    ForwardTool._write_rows(OUT.parent / "smoke_vllm" / "rows.jsonl", rows)
+    rows_path = OUT.parent / "smoke_vllm" / "rows.jsonl"
+    rows_path.parent.mkdir(parents=True, exist_ok=True)
+    ForwardTool._write_rows(rows_path, rows)
     return summary
 
 

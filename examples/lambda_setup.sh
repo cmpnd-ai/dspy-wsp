@@ -22,4 +22,10 @@ command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -e ".[examples,vllm,dev]"
+
+# FlashInfer compiles its sampling kernels on first use, which needs nvcc and ninja.
+# Its prebuilt kernels avoid that. (`vllm download-kernels` does the same with pip, which uv venvs lack.)
+fi_version=$(.venv/bin/python -c "import importlib.metadata as m; print(m.version('flashinfer-python'))")
+cuda_label=$(.venv/bin/python -c "import torch; print('cu' + torch.version.cuda.replace('.', ''))")
+uv pip install --python .venv/bin/python --index-url "https://flashinfer.ai/whl/${cuda_label}" "flashinfer-jit-cache==${fi_version}+${cuda_label}"
 .venv/bin/python -c "import torch, vllm; print('torch', torch.__version__, 'cuda', torch.cuda.is_available(), 'vllm', vllm.__version__)"

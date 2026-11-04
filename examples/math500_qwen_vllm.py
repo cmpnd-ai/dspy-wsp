@@ -9,6 +9,7 @@ This is the paper's Experiment 8 setup: thinking on, the model card's sampling
     apt install bubblewrap
     python examples/math500_qwen_vllm.py --baseline 500   # the unedited model only; no writer, no API cost
     python examples/math500_qwen_vllm.py --dp 8 --gpu-mem 0.8   # 8 GPUs, one model copy each
+    python examples/math500_qwen_vllm.py --passes 3 --pass-size 128 --val-size 32 --val-samples 1 --run-dir runs/short   # a short end-to-end check
     OPENAI_API_KEY=... python examples/math500_qwen_vllm.py
 
 One H100 runs a pass in roughly 10 to 15 minutes. Rerun the script to resume.
@@ -70,22 +71,26 @@ def baseline(n: int, gpu_mem: float, dp: int) -> None:
     print(f"rows: {out}")
 
 
-def main(gpu_mem: float, dp: int) -> None:
+def main(args) -> None:
+    run_dir = Path(args.run_dir)
+    limits = Limits()  # the paper's pass sizes: 512 answers, or 256 per model for "both"
+    if args.pass_size:
+        limits = Limits(max_generations=args.pass_size, max_generations_both=args.pass_size // 2)
     optimizer = WeightSpace(
         metric=metric,
         writer_lm=dspy.LM("openai/gpt-6-luna"),
-        backend=student(gpu_mem, dp),
-        max_passes=MAX_PASSES,
-        limits=Limits(),  # the paper's pass sizes: 512 answers, or 256 per model for "both"
+        backend=student(args.gpu_mem, args.dp),
+        max_passes=args.passes,
+        limits=limits,
         task_description="The program solves competition math problems; the answer field holds the final answer in \\boxed{}.",
-        val_samples=VAL_SAMPLES,
-        run_dir=RUN_DIR,
+        val_samples=args.val_samples,
+        run_dir=run_dir,
         resume=True,
     )
-    compiled = optimizer.compile(dspy.Predict(MathQA), trainset=practice_set(), valset=math500(500))
+    compiled = optimizer.compile(dspy.Predict(MathQA), trainset=practice_set(), valset=math500(args.val_size))
     print(compiled.wsp_patch.summary())
     print(compiled.wsp_report["validation"]["paired"])
-    compiled.save(str(RUN_DIR / "program.json"))
+    compiled.save(str(run_dir / "program.json"))
 
 
 if __name__ == "__main__":
@@ -95,5 +100,10 @@ if __name__ == "__main__":
     parser.add_argument("--baseline", type=int, metavar="N", help="only score the unedited model on N MATH-500 problems")
     parser.add_argument("--gpu-mem", type=float, default=0.6, help="vLLM's share of each GPU's memory")
     parser.add_argument("--dp", type=int, default=1, help="model copies, one per GPU (vLLM data parallelism)")
+    parser.add_argument("--passes", type=int, default=MAX_PASSES, help="forward passes the writer may use")
+    parser.add_argument("--pass-size", type=int, help="answers per pass (default: the paper's 512, or 256 per model for 'both')")
+    parser.add_argument("--val-size", type=int, default=500, help="MATH-500 problems in the final check")
+    parser.add_argument("--val-samples", type=int, default=VAL_SAMPLES, help="samples per problem in the final check")
+    parser.add_argument("--run-dir", default=str(RUN_DIR))
     args = parser.parse_args()
-    baseline(args.baseline, args.gpu_mem, args.dp) if args.baseline else main(args.gpu_mem, args.dp)
+    baseline(args.baseline, args.gpu_mem, args.dp) if args.baseline else main(args)
