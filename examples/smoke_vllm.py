@@ -3,12 +3,14 @@
     cd examples
     ../.venv/bin/python smoke_vllm.py            # 64 MATH-500 problems
     ../.venv/bin/python smoke_vllm.py --n 128 --gpu-mem 0.8
+    ../.venv/bin/python smoke_vllm.py --dp 8   # one model copy per GPU
 
 1. Sandbox: the writer's kernel runs under bubblewrap. The check confirms that code
    inside can write its work folder but not the rest of the disk, and has no network.
 2. Weight swap: vLLM's prompt log-probs must match the Hugging Face model's on the
    original weights, on edited weights, and again after restoring. The edit touches a
-   fused layer (gate_proj) and an unfused one (down_proj).
+   fused layer (gate_proj) and an unfused one (down_proj). With --dp, every model copy
+   is checked on its own.
 3. Speed: the unedited model answers n problems with the full run's settings. The
    report gives the score, the share cut off at the token limit and tokens per second.
 
@@ -68,15 +70,16 @@ print(res)
     return res
 
 
-def vllm_prompt_logprobs(backend, texts: list[str]) -> list[np.ndarray]:
-    """Log-prob of each token given the ones before it (position 0 is NaN), from vLLM."""
+def vllm_prompt_logprobs(backend, texts: list[str], rank: int | None = None) -> list[np.ndarray]:
+    """Log-prob of each token given the ones before it (position 0 is NaN), from vLLM's model copy `rank`."""
     from vllm import SamplingParams
 
     params = SamplingParams(max_tokens=1, temperature=0.0, prompt_logprobs=0, detokenize=False)
 
     async def one(ids):
         final = None
-        async for out in backend._engine.generate({"prompt_token_ids": ids}, params, request_id=f"smoke-{time.time_ns()}"):
+        rid = f"smoke-{time.time_ns()}"
+        async for out in backend._engine.generate({"prompt_token_ids": ids}, params, request_id=rid, data_parallel_rank=rank):
             final = out
         return [np.nan] + [float(d[t].logprob) for d, t in zip(final.prompt_logprobs[1:], ids[1:])]
 
@@ -92,7 +95,7 @@ def mean_gap(a: list[np.ndarray], b: list[np.ndarray]) -> float:
     return float(np.nanmean(np.concatenate([np.abs(x - y) for x, y in zip(a, b)])))
 
 
-def check_swap(backend) -> dict:
+def check_swap(backend, dp: int) -> dict:
     names = backend.editable_names()
     pick = [n for n in names if re.search(r"layers\.12\.mlp\.(down|gate)_proj\.weight$", n)]
     rng = np.random.default_rng(0)
@@ -101,24 +104,34 @@ def check_swap(backend) -> dict:
         w = backend.reader.get_f32(n)
         edits[n] = w + rng.normal(0, w.std(), size=w.shape).astype(np.float32)
 
-    v0, h0 = vllm_prompt_logprobs(backend, TEXTS), hf_logprobs(backend, TEXTS)
+    ranks = list(range(dp)) if dp > 1 else [None]
+
+    def per_rank():
+        return [vllm_prompt_logprobs(backend, TEXTS, r) for r in ranks]
+
+    v0, h0 = per_rank(), hf_logprobs(backend, TEXTS)
     t = time.time()
     backend.set_weights(edits)
     swap_seconds = time.time() - t
-    v1, h1 = vllm_prompt_logprobs(backend, TEXTS), hf_logprobs(backend, TEXTS)
+    v1, h1 = per_rank(), hf_logprobs(backend, TEXTS)
     backend.set_weights(None)
-    v2 = vllm_prompt_logprobs(backend, TEXTS)
+    v2 = per_rank()
     res = {
         "edited_tensors": pick,
-        "vllm_vs_hf_original": round(mean_gap(v0, h0), 4),
-        "vllm_vs_hf_edited": round(mean_gap(v1, h1), 4),
-        "edit_effect_vllm": round(mean_gap(v0, v1), 4),
+        "model_copies": len(ranks),
+        "vllm_vs_hf_original_worst_copy": round(max(mean_gap(v, h0) for v in v0), 4),
+        "vllm_vs_hf_edited_worst_copy": round(max(mean_gap(v, h1) for v in v1), 4),
+        "edit_effect_vllm_weakest_copy": round(min(mean_gap(a, b) for a, b in zip(v0, v1)), 4),
         "edit_effect_hf": round(mean_gap(h0, h1), 4),
-        "vllm_after_restore_vs_before": round(mean_gap(v0, v2), 4),
+        "vllm_after_restore_vs_before_worst_copy": round(max(mean_gap(a, b) for a, b in zip(v0, v2)), 4),
         "swap_seconds": round(swap_seconds, 1),
     }
-    agree = max(res["vllm_vs_hf_original"], res["vllm_vs_hf_edited"])
-    res["ok"] = len(pick) == 2 and res["edit_effect_vllm"] > 5 * agree and res["vllm_after_restore_vs_before"] <= agree
+    agree = max(res["vllm_vs_hf_original_worst_copy"], res["vllm_vs_hf_edited_worst_copy"])
+    res["ok"] = (
+        len(pick) == 2
+        and res["edit_effect_vllm_weakest_copy"] > 5 * agree
+        and res["vllm_after_restore_vs_before_worst_copy"] <= agree
+    )
     return res
 
 
@@ -137,7 +150,8 @@ def check_speed(backend, n: int) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--n", type=int, default=64, help="MATH-500 problems for the speed check")
-    parser.add_argument("--gpu-mem", type=float, default=0.6, help="vLLM's share of GPU memory")
+    parser.add_argument("--gpu-mem", type=float, default=0.6, help="vLLM's share of each GPU's memory")
+    parser.add_argument("--dp", type=int, default=1, help="model copies, one per GPU (vLLM data parallelism)")
     args = parser.parse_args()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     report: dict = {}
@@ -148,8 +162,8 @@ def main() -> None:
 
     report["sandbox"] = check_sandbox()
     save("sandbox")
-    backend = student(args.gpu_mem)
-    report["swap"] = check_swap(backend)
+    backend = student(args.gpu_mem, args.dp)
+    report["swap"] = check_swap(backend, args.dp)
     save("swap")
     report["speed"] = check_speed(backend, args.n)
     save("speed")
