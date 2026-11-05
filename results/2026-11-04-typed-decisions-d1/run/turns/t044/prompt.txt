@@ -1,0 +1,192 @@
+OUTPUT of Python run 24 of at most 300:
+```
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 96.8508
+Variables: [('examples', 'list', None), ('records', 'list', None), ('meta', 'dict', None), ('features', 'function', None), ('rows', 'list', None), ('delta_all', 'ndarray', (1024,)), ('prior_delta', 'ndarray', (1024,)), ('context_delta', 'ndarray', (1024,))]
+Functions: ['load', 'load_original', 'save_edit', 'drop_edit', 'edited', 'tok']
+Cue meta: {
+ "rows": [
+  {
+   "request": 0,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "outcome",
+   "type": "choice
+```
+[forward passes used: 18 of 25; Python runs used: 24 of 300]

@@ -1,0 +1,5 @@
+OUTPUT of Python run 19 of at most 300:
+```
+All-practice paired gain 0.08933333333333333 0.007395930630421113
+```
+[forward passes used: 14 of 25; Python runs used: 19 of 300]

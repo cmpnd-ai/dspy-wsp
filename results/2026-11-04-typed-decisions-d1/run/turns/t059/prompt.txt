@@ -1,0 +1,6 @@
+OUTPUT of Python run 33 of at most 300:
+```
+Final hidden inputs max difference: 0.0
+Max logit-change reconstruction error: 4.5776367e-05
+```
+[forward passes used: 24 of 25; Python runs used: 33 of 300]

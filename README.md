@@ -72,6 +72,26 @@ backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_76
 
 `examples/math500_qwen_vllm.py` runs the paper's MATH setup on one GPU: 50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with 4 samples each. `results/2026-11-04-math500-qwen-vllm-1h/` documents a one-hour proof-of-concept run on eight A100 GPUs, with the checks we ran before it.
 
+## Decision models
+
+`WeightSpace` also edits System One decision models: models that read a state and typed questions (Choice, Noul and Score) and return a probability for every option, with no text generation. Two are supported, each with our own loader in MLX and in PyTorch:
+
+- `D1Backend` runs Liquid AI's d1-omni-600M (text path).
+- `NanoJevBackend` runs NanoJev (a Qwen3-0.6B backbone with a decision head).
+
+The backend runs a local `/v1/systemone` server, and a DSPy program calls it through DSPy's TypeSafe client, as it would call TypeSafe's hosted Jev. Give the program's signatures `Choice`, `Noul` or `Score` outputs from `dspy.experimental`.
+
+```python
+from dspy_wsp import D1Backend, WeightSpace
+
+backend = D1Backend(framework="mlx")
+optimizer = WeightSpace(metric=metric, writer_lm=dspy.LM("openai/gpt-6.1-sol"), backend=backend,
+                        max_passes=25, holdout=300, holdout_key=lambda ex: ex.workflow)
+compiled = optimizer.compile(program, trainset=train, valset=test)
+```
+
+For a decision model, the writer gets `decide` passes, which run the program and score it, and `read` passes, which return each option's logit and the decision head's inputs. It may recompute the head from those reads and derive edits in closed form. `holdout` moves training examples to a validation set that the writer can score edits on but never see. `examples/typed_decisions.py` runs the Typed Decisions benchmark. `results/2026-11-04-typed-decisions-d1/` documents a run in which one closed-form edit to d1-omni-600M's scorer raised test accuracy from 53.4% to 60.6%.
+
 ## How a run works
 
 The writer works in turns. Each turn it explains its next step and sends exactly one block:

@@ -1,0 +1,11 @@
+OUTPUT of Python run 12 of at most 300:
+```
+Fit-only three-fold accuracy: {0.01: np.float64(0.6293), 0.1: np.float64(0.6333333333333333), 1: np.float64(0.6355333333333333), 3: np.float64(0.6248666666666666), 10: np.float64(0.6138)}
+Chosen ridge 1 reserved test prediction (np.float64(0.6413), np.float64(0.08), np.float64(0.0109))
+Largest changed neurons [(129, np.float32(-3.7853808)), (273, np.float32(3.587797)), (765, np.float32(-3.258852)), (732, np.float32(3.0532985)), (634, np.float32(3.0394294)), (19, np.float32(2.9356115)), (564, np.float32(-2.9247887)), (922, np.float32(2.8687565)), (284, np.float32(-2.8238604)), (454, np.float32(2.772556)), (248, np.float32(2.6507716)), (702, np.float32(-2.4933817))]
+dose 0.5 fit (np.float64(0.6209), np.float64(0.0511), np.float64(0.0071)) test (np.float64(0.6076), np.float64(0.0462), np.float64(0.0072))
+dose 1 fit (np.float64(0.6556), np.float64(0.0858), np.float64(0.0099)) test (np.float64(0.6413), np.float64(0.08), np.float64(0.0109))
+dose 1.5 fit (np.float64(0.612), np.float64(0.0422), np.float64(0.0129)) test (np.float64(0.5871), np.float64(0.0258), np.float64(0.0129))
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 36.1882
+```
+[forward passes used: 6 of 25; Python runs used: 12 of 300]

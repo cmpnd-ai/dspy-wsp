@@ -1,0 +1,9 @@
+OUTPUT of Python run 10 of at most 300:
+```
+ridge 10 norm 10.511 fit (np.float64(0.6302), np.float64(0.0604), np.float64(0.0087)) test (np.float64(0.6249), np.float64(0.0636), np.float64(0.0094))
+ridge 100 norm 3.457 fit (np.float64(0.5916), np.float64(0.0218), np.float64(0.0066)) test (np.float64(0.5898), np.float64(0.0284), np.float64(0.0067))
+ridge 1000 norm 0.778 fit (np.float64(0.5756), np.float64(0.0058), np.float64(0.0037)) test (np.float64(0.568), np.float64(0.0067), np.float64(0.0038))
+ridge 10000 norm 0.206 fit (np.float64(0.5702), np.float64(0.0004), np.float64(0.001)) test (np.float64(0.5613), np.float64(0.0), np.float64(0.0013))
+Original norm 0.352796 temperature 1.399897813796997 1.7301137447357178
+```
+[forward passes used: 6 of 25; Python runs used: 10 of 300]

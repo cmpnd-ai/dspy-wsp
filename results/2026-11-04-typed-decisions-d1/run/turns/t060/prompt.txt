@@ -1,0 +1,44 @@
+RESULT of forward pass 25:
+```
+{
+ "type": "decide",
+ "validation": true,
+ "model": "both",
+ "items": 300,
+ "note": "validation runs report aggregate scores only",
+ "original": {
+  "graded": 300,
+  "score": 0.5753333333333334,
+  "score_se_over_items": 0.012284924128068692,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 286
+  }
+ },
+ "edited": {
+  "graded": 300,
+  "score": 0.656,
+  "score_se_over_items": 0.013059848515786676,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 256
+  }
+ },
+ "paired": {
+  "items": 300,
+  "original": 0.5753333333333334,
+  "edited": 0.656,
+  "gain": 0.08066666666666666,
+  "se": 0.012603138231165914,
+  "improved": 142,
+  "worsened": 60
+ },
+ "seconds": 147.9
+}
+```
+That was your last forward pass. Make your final choice: leave the edit you submit in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1/work/edited, then reply without a code block.
+[forward passes used: 25 of 25; Python runs used: 33 of 300]

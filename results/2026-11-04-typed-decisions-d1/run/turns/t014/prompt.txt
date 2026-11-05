@@ -1,0 +1,9 @@
+OUTPUT of Python run 6 of at most 300:
+```
+{'layers': [], 'conventions': {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "the head's raw score per option, before calibration", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the row's tokens", 'head_inputs': "the scorer's input at each option's <mask> (after the head's transformer layers)", 'trunk_markers': "the trunk's normed output at each option's <mask> (the head's input there)"}, 'model': 'original', 'files': {'option_mask.npy': [900, 5], 'option_logits.npy': [900, 5], 'head_inputs.npy': [900, 5, 1024], 'trunk_markers.npy': [900, 5, 1024], 'probabilities.npy': [900, 5]}}
+Reconstruction error 1.9073486e-06
+Raw/logit examples [[-2.5605  2.1123 -0.1178 -3.9403     nan]
+ [-0.5327  0.1674     nan     nan     nan]] [[-2.5605  2.1123 -0.1178 -3.9403     nan]
+ [-0.5327  0.1674     nan     nan     nan]]
+```
+[forward passes used: 6 of 25; Python runs used: 6 of 300]

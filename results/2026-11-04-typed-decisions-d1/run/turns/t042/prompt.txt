@@ -1,0 +1,7 @@
+OUTPUT of Python run 23 of at most 300:
+```
+Relevant variables: ['WORK', 'pathlib', 'work', 'baseline_request', 'fit_ids', 'test_ids', 'req', 'meta', 'features', 'reqs', 'fit', 'deltas', 'delta', 'fit_eids', 'cue_requests', 'delta_all', 'prior_delta', 'context_delta']
+Current edits: ['head.scorer.3.weight']
+Files: ['all_part0.json', 'all_part1.json', 'baseline_request.json', 'best_1', 'best_all', 'candidate_full', 'cues_edited.json', 'cues_original.json', 'edited', 'fwd_11', 'fwd_12', 'fwd_2', 'fwd_3', 'fwd_4', 'fwd_5', 'fwd_6', 'gen_1.jsonl', 'gen_13_edited.jsonl', 'gen_13_original.jsonl', 'gen_14_edited.jsonl', 'gen_14_original.jsonl', 'gen_16_edited.jsonl', 'gen_16_original.jsonl', 'gen_17_edited.jsonl', 'gen_17_original.jsonl', 'gen_7_edited.jsonl', 'gen_7_original.jsonl', 'gen_8_edited.jsonl', 'gen_8_original.jsonl', 'gen_9_edited.jsonl', 'gen_9_original.jsonl', 'notes.md', 'practice', 'read_batch_0.json', 'read_batch_1.json', 'read_batch_2.json', 'read_batch_3.json', 'read_batch_4.json', 'readout_delta.npy', 'readout_delta_all.npy', 'test_both.json']
+```
+[forward passes used: 17 of 25; Python runs used: 23 of 300]

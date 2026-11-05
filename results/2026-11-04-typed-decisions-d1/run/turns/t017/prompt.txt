@@ -1,0 +1,5 @@
+OUTPUT of Python run 9 of at most 300:
+```
+<class 'list'> [{'state': {'instructions': 'Answer each question about this agent trace observability record.', 'input_fields': '1. `state` (dict): The record to judge.', 'inputs': {'state': {'agent': {'autonomy': 'unsupervised', 'model': 'internal-agent-v1'}, 'constraints': ['Never modify production without an ap
+```
+[forward passes used: 6 of 25; Python runs used: 9 of 300]

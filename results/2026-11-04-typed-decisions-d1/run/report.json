@@ -1,0 +1,243 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1",
+ "final_answer": "Submitted the full correction to **`head.scorer.3.weight` only**. All other tensors remain unchanged.\n\nThe evidence localizes a repairable failure to the final scorer readout: its existing contextual features support better decisions than the original output weights extract. I derived an additive correction using closed-form ridge regression on practice-only scorer features\u2014no gradients or backbone changes.\n\n**Measured results** (\u00b1 paired standard error):\n- **Independent practice test, initial 450-case fit:** +8.00 \u00b1 1.09 percentage points.\n- **Final refit, all 900 practice cases:** +8.93 \u00b1 0.74 points, measured in-sample.\n- **Final held-out validation, 300 cases:** **57.53% \u2192 65.60%**, a gain of **8.07 \u00b1 1.26 points**; 142 cases improved and 60 worsened.\n\nCausal checks support a contextual readout repair rather than global sharpening: half-strength and excessive-strength edits performed worse, a prior-only ablation produced essentially no validation gain, and a context-only ablation retained a significant benefit. Recorded head inputs stayed identical, while the changed logits matched the readout calculation within 0.000046.\n\nThe full validated edit is left in `edited`. The independent practice and validation gains support expecting improvement on unseen records, though the repair does not fix every question or cue response.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 33
+ },
+ "turns": 60,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 10,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6453333333333333,
+    "score_se_over_items": 0.013498200328727367,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 256
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.6453333333333333,
+    "gain": 0.07,
+    "se": 0.013021720984236467,
+    "improved": 133,
+    "worsened": 63
+   }
+  },
+  {
+   "pass": 15,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.656,
+    "score_se_over_items": 0.013059848515786676,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 256
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.656,
+    "gain": 0.08066666666666666,
+    "se": 0.012603138231165914,
+    "improved": 142,
+    "worsened": 60
+   }
+  },
+  {
+   "pass": 20,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5760000000000001,
+    "score_se_over_items": 0.012839459801026005,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 280
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.5760000000000001,
+    "gain": 0.0006666666666666647,
+    "se": 0.012617283304200104,
+    "improved": 93,
+    "worsened": 90
+   }
+  },
+  {
+   "pass": 21,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.602,
+    "score_se_over_items": 0.013034043410447047,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 276
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.602,
+    "gain": 0.02666666666666667,
+    "se": 0.009874726287312964,
+    "improved": 82,
+    "worsened": 56
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.656,
+    "score_se_over_items": 0.013059848515786676,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 256
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.656,
+    "gain": 0.08066666666666666,
+    "se": 0.012603138231165914,
+    "improved": 142,
+    "worsened": 60
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.5335,
+   "score_se_over_items": 0.01069955963771887,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 384
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.606,
+   "score_se_over_items": 0.011779511544651436,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 355
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.5335,
+   "edited": 0.606,
+   "gain": 0.0725,
+   "se": 0.0104825610044985,
+   "improved": 150,
+   "worsened": 63
+  }
+ },
+ "patch": "1 tensors, 1,024 entries changed\n  head.scorer.3.weight float32[1, 1024]: 1,024 entries (dense), relative change 64.5672"
+}

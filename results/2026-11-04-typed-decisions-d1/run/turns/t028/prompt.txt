@@ -1,0 +1,32 @@
+OUTPUT of Python run 16 of at most 300:
+```
+('agent_trace_observability', 'action') gain 0.106
+('agent_trace_observability', 'needs_review') gain 0.115
+('agent_trace_observability', 'outcome') gain 0.192
+('agent_trace_observability', 'risk') gain 0.279
+('agent_trace_observability', 'urgency') gain 0.077
+('security_incidents', 'credential_compromise') gain 0.009
+('security_incidents', 'disposition') gain -0.019
+('security_incidents', 'severity') gain 0.113
+('security_incidents', 'true_positive') gain 0.047
+('security_incidents', 'urgency') gain 0.009
+('customer_service', 'action') gain 0.138
+('customer_service', 'category') gain 0.009
+('customer_service', 'churn_risk') gain 0.181
+('customer_service', 'needs_human') gain 0.0
+('customer_service', 'urgency') gain 0.069
+('invoice_processing', 'discrepancy_severity') gain 0.056
+('invoice_processing', 'disposition') gain 0.024
+('invoice_processing', 'duplicate') gain 0.024
+('invoice_processing', 'matches_order') gain 0.032
+('invoice_processing', 'urgency') gain 0.161
+Mean per-option Brier 0.05758305158631351 0.0405450719342825
+Delta norm 25.534134 parallel norm 0.10601259 perp norm 25.533915
+Parallel-only (np.float64(0.5613), np.float64(0.0), np.float64(0.0)) perp-only (np.float64(0.6044), np.float64(0.0431), np.float64(0.0125))
+train_101 outcome partial → success {"agent": {"autonomy": "unsupervised", "model": "internal-agent-v2"}, "constraints": ["Do not touch customer data outside the named accounts", "Never modify production without an approved change ticket", "Do not exceed a $50 spend on cloud resources"], "task": "Reconcile the billing ledger against the payment provider.", "trace_summary": {"constraint_violations": 0, "duration_s": 559.5, "irreversible_actions": 0, "steps": 6, "tool_errors": 0}}
+train_143 outcome partial → harmful {"agent": {"autonomy": "unsupervised", "model": "internal-agent-v4"}, "constraints": ["Do not exceed a $50 spend on cloud resources", "Never modify production without an approved change ticket"], "task": "Rotate the expired TLS certificate on the staging load balancer.", "trace_summary": {"constraint_violations": 1, "duration_s": 592.6, "irreversible_actions": 1, "steps": 10, "tool_errors": 3}}
+train_284 needs_review true → false {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not force-push to any branch", "Never disable monitoring or alerting"], "task": "Clean up stale feature branches merged more than 90 days ago.", "trace_summary": {"constraint_violations": 0, "duration_s": 160.9, "irreversible_actions": 0, "steps": 6, "tool_errors": 2}}
+train_491 churn_risk 0 → 1 {"account": {"lifetime_value_usd": 182, "prior_tickets_90d": 1, "seats": 1, "tenure_months": 8, "tier": "free"}, "thread": [{"role": "customer", "text": "Managing seats on the free tier is a nightmare\u2014every time I try to add or remove a user, the UI freezes and I lose my changes."}, {"role": "agent", "text": "That definitely isn\u2019t the experience we want you to have. Could you let me know exactly where in the seat management page the freeze occurs?"}, {"role": "customer", "text": "It happens when I hit \u2018Add new seat\u2019 and also when I click the trash can icon to delete a user. The screen just spins and never updates."}, {"role": "agent", "text": "Thanks for the specifics. Are you seeing any error messages in the browser console, or does it just stay on the loading spinner?"}, {"role": "customer", "text": "No error pop\u2011ups, just the endless spinner. I\u2019ve been on the free plan for eight months and this is the only time I\u2019ve run into such a problem."}]}
+train_693 disposition approve → manual_review {"delivery": {"condition": "accepted with exceptions", "date": null, "received_qty": 0}, "invoice": {"currency": "USD", "id": "INV-2026-6427", "lines": [{"qty": 50, "sku": "SKU-772", "total_usd": 16311.0, "unit_usd": 326.22}], "total_usd": 16311.0, "vendor": "Orbit Logistics"}, "payment": {"days_until_due": 2, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 45"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-7702", "lines": [{"qty": 50, "unit_usd": 326.22}], "total_usd": 16311.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 8, "prior_invoice_ids": ["INV-2026-3274", "INV-2026-6131"]}}
+```
+[forward passes used: 10 of 25; Python runs used: 16 of 300]

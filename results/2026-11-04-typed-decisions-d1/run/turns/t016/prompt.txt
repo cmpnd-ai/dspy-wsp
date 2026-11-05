@@ -1,0 +1,10 @@
+OUTPUT of Python run 8 of at most 300:
+```
+Requested first ['train_560', 'train_308', 'train_168', 'train_267', 'train_518']
+Baseline-filter first ['train_3', 'train_8', 'train_9', 'train_20', 'train_22']
+requests.json 450704
+meta.json 128906
+['option_mask.npy', 'requests.json', 'head_inputs.npy', 'trunk_markers.npy', 'probabilities.npy', 'option_logits.npy', 'meta.json']
+[(0, 'action', ['continue', 'human_review', 'observe', 'stop']), (1, 'action', ['continue', 'human_review', 'observe', 'stop']), (2, 'action', ['continue', 'human_review', 'observe', 'stop']), (3, 'action', ['continue', 'human_review', 'observe', 'stop']), (4, 'action', ['continue', 'human_review', 'observe', 'stop']), (5, 'action', ['continue', 'human_review', 'observe', 'stop'])]
+```
+[forward passes used: 6 of 25; Python runs used: 8 of 300]

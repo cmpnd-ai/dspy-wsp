@@ -1,0 +1,91 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-smoke",
+ "final_answer": "**Final submission: original weights, with no edits retained.**\n\nI tested a closed-form correction to `head.scorer.3.weight` targeting repeated option-selection biases, including \u201cpartial\u201d trace outcomes and underestimated invoice urgency. Offline scorer reconstruction verified that the intervention changed the intended option margins.\n\n- **Practice, 51 records:** accuracy improved by **6.27 percentage points \u00b1 3.47 pp paired SE**.\n- **Untouched validation, 50 records:** accuracy fell from **58% to 50%**, a change of **\u22128.00 pp \u00b1 3.02 pp paired SE**.\n\nThe correction did not generalize, so I removed it. No weight change demonstrated a confirmed benefit.",
+ "budget": {
+  "max_passes": 3,
+  "max_code_runs": 300,
+  "passes_used": 3,
+  "code_runs_used": 14
+ },
+ "turns": 19,
+ "conversations": 1,
+ "validation_runs": [
+  {
+   "pass": 3,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 50,
+    "score": 0.58,
+    "score_se_over_items": 0.026341555592265396,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 49
+    }
+   },
+   "edited": {
+    "graded": 50,
+    "score": 0.5,
+    "score_se_over_items": 0.031943828249996996,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 50
+    }
+   },
+   "paired": {
+    "items": 50,
+    "original": 0.58,
+    "edited": 0.5,
+    "gain": -0.08,
+    "se": 0.03023715784073818,
+    "improved": 10,
+    "worsened": 24
+   }
+  }
+ ],
+ "validation_size": 50,
+ "validation": {
+  "original": {
+   "graded": 40,
+   "score": 0.515,
+   "score_se_over_items": 0.03028708788093851,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 40
+   }
+  },
+  "edited": {
+   "graded": 40,
+   "score": 0.515,
+   "score_se_over_items": 0.03028708788093851,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 40
+   }
+  },
+  "paired": {
+   "items": 40,
+   "original": 0.515,
+   "edited": 0.515,
+   "gain": 0.0,
+   "se": 0.0,
+   "improved": 0,
+   "worsened": 0
+  }
+ },
+ "patch": "empty patch (no weights changed)"
+}

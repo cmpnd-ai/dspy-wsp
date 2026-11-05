@@ -1,0 +1,7 @@
+OUTPUT of Python run 20 of at most 300:
+```
+Prior/context norms 7.710445315602977 21.434409389090668
+Prior-only predicted (np.float64(0.5818), np.float64(0.0204), np.float64(0.011)) context-only (np.float64(0.6027), np.float64(0.0413), np.float64(0.0083))
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 21.8553
+```
+[forward passes used: 15 of 25; Python runs used: 20 of 300]

@@ -1,0 +1,8 @@
+OUTPUT of Python run 11 of at most 300:
+```
+ridge 0.01 norm 149.76 [(0.25, (np.float64(0.6062), np.float64(0.0364), np.float64(0.0054))), (0.5, (np.float64(0.6444), np.float64(0.0747), np.float64(0.0079))), (1, (np.float64(0.6902), np.float64(0.1204), np.float64(0.0108))), (1.5, (np.float64(0.6236), np.float64(0.0538), np.float64(0.0135)))]
+ridge 0.1 norm 64.89 [(0.25, (np.float64(0.5987), np.float64(0.0289), np.float64(0.0051))), (0.5, (np.float64(0.6302), np.float64(0.0604), np.float64(0.0075))), (1, (np.float64(0.6796), np.float64(0.1098), np.float64(0.0109))), (1.5, (np.float64(0.6204), np.float64(0.0507), np.float64(0.0133)))]
+ridge 1 norm 25.53 [(0.25, (np.float64(0.588), np.float64(0.0182), np.float64(0.0047))), (0.5, (np.float64(0.6209), np.float64(0.0511), np.float64(0.0071))), (1, (np.float64(0.6556), np.float64(0.0858), np.float64(0.0099))), (1.5, (np.float64(0.612), np.float64(0.0422), np.float64(0.0129)))]
+ridge 3 norm 17.0 [(0.25, (np.float64(0.5818), np.float64(0.012), np.float64(0.0042))), (0.5, (np.float64(0.6098), np.float64(0.04), np.float64(0.0065))), (1, (np.float64(0.6462), np.float64(0.0764), np.float64(0.0095))), (1.5, (np.float64(0.6027), np.float64(0.0329), np.float64(0.0119)))]
+```
+[forward passes used: 6 of 25; Python runs used: 11 of 300]

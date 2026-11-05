@@ -1,0 +1,7 @@
+OUTPUT of Python run 29 of at most 300:
+```
+saved edit head.scorer.3.weight: 512 of 1,024 entries changed, relative change 64.0577
+Correction cosine to original readout: 0.0017784034
+Largest correction neuron indices: [129, 732, 273, 850, 19, 901, 765, 922, 454, 564, 284, 634]
+```
+[forward passes used: 21 of 25; Python runs used: 29 of 300]

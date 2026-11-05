@@ -1,0 +1,8 @@
+OUTPUT of Python run 31 of at most 300:
+```
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 64.5672
+edited
+Scorer feature callable: <function features at 0x10d08a3e0>
+Cached arrays: [('h', (900, 5, 1024)), ('H', (900, 5, 1024)), ('Z', (4500, 5, 1024)), ('X', (4500, 5, 1024)), ('Y', (4500, 5)), ('w0', (1024,)), ('delta', (1024,)), ('dd', (1024,)), ('parallel', (1024,)), ('perp', (1024,)), ('delta_all', (1024,)), ('means', (71, 1024)), ('vt', (71, 1024)), ('basis', (51, 1024)), ('prior_delta', (1024,)), ('context_delta', (1024,)), ('impact', (1024,)), ('rank', (1024,)), ('h0', (75, 4, 1024)), ('h1', (75, 4, 1024)), ('sparse_delta', (1024,)), ('origw', (1024,)), ('complement_delta', (1024,))]
+```
+[forward passes used: 23 of 25; Python runs used: 31 of 300]
