@@ -93,6 +93,9 @@ def main() -> None:
     parser.add_argument("--wsp-run", type=Path, required=True, help="a finished WeightSpace run folder (its patch and practice split)")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
+    # ReAnchor reruns the program many times on cached answers. DSPy's call history keeps a copy of every
+    # request and answer on the client and on each predictor, which grows to tens of GB here.
+    dspy.configure(disable_history=True)
     out = args.out or args.wsp_run.parent / f"reanchor_{args.model}"
     out.mkdir(parents=True, exist_ok=True)
 
