@@ -19,6 +19,7 @@ from dspy_wsp.edits import DEFAULT_PROTECTED, EditStore, is_protected
 from dspy_wsp.forward import ForwardTool, Limits, _jsonable, copy_program
 from dspy_wsp.kernel import Kernel
 from dspy_wsp.patch import Patch
+from dspy_wsp.search import GEPASearch, run_gepa
 from dspy_wsp.session import Session
 from dspy_wsp.tensors import TensorReader
 
@@ -64,6 +65,10 @@ class WeightSpace(Teleprompter):
         fallback_if_worse: if the final check on valset shows a negative gain, return
             the original weights (an addition to the paper's protocol, off by default).
         resume: continue the run in run_dir if one is there.
+        search: None runs one conversation. GEPASearch(...) runs GEPA's population search: each round,
+            the writer gets a short session that starts from a candidate edit, and GEPA keeps the
+            children that beat their parents. It needs a decision backend and a holdout, and
+            max_passes counts every pass, the writer's and GEPA's. It cannot resume yet.
     """
 
     def __init__(
@@ -92,6 +97,7 @@ class WeightSpace(Teleprompter):
         resume: bool = False,
         holdout: int | float = 0,
         holdout_key: Callable | None = None,
+        search: GEPASearch | None = None,
     ):
         super().__init__()
         self.metric = metric
@@ -123,6 +129,14 @@ class WeightSpace(Teleprompter):
         self.val_samples = val_samples
         self.fallback_if_worse = fallback_if_worse
         self.resume = resume
+        self.search = search
+        if search is not None:
+            if not self.decision:
+                raise ValueError("GEPA search needs a decision backend")
+            if not holdout:
+                raise ValueError("GEPA search needs a holdout: it selects candidates on the validation set")
+            if max_passes < search.min_passes():
+                raise ValueError(f"max_passes={max_passes} cannot pay for {search.min_rounds} GEPA rounds; give at least {search.min_passes()}")
 
     def compile(self, student: dspy.Module, *, trainset: list[dspy.Example], teacher=None, valset: list[dspy.Example] | None = None, **kwargs) -> dspy.Module:
         """Run a weight-space session and return a copy of `student` whose LM runs the edited weights.
@@ -173,6 +187,8 @@ class WeightSpace(Teleprompter):
             shapes = {n: shape for n, shape in shapes.items() if n in editable}
         build = prompts.build_decision_task_prompt if self.decision else prompts.build_task_prompt
         extra = {"n_validation": len(validation)} if self.decision else {}
+        if self.search is not None:
+            extra["search_round"] = True
         task_prompt = build(
             **extra,
             model_description=self.backend.describe(),
@@ -194,7 +210,7 @@ class WeightSpace(Teleprompter):
             n_practice=len(practice),
             input_keys=sorted(first.inputs().keys()),
             label_keys=sorted(k for k in first.labels().keys() if k != "id"),
-            max_passes=self.max_passes,
+            max_passes=self.search.passes_per_proposal if self.search else self.max_passes,
             limits=self.limits,
             n_layers=self.backend.dims().get("layers"),
             require_explanations=self.require_explanations,
@@ -207,25 +223,40 @@ class WeightSpace(Teleprompter):
             tokenizer_dir=getattr(self.backend, "tokenizer_dir", None) if self.decision else None,
             memory_bytes=self.kernel_memory_bytes, sandbox=self.sandbox, threads=self.kernel_threads,
         )
-        session = Session(
-            writer_lm=self.writer_lm, kernel=kernel, forward_tool=forward, budget=budget, run_dir=run_dir,
-            work_dir=work, task_prompt=task_prompt, edit_store=edit_store, handoff_every=self.handoff_every,
-            require_explanations=self.require_explanations, max_turns=self.max_turns,
-        )
-        try:
-            kernel.start()
-            final_answer = session.run(resume=self.resume)
-        finally:
-            kernel.close()
+        search_report = None
+        if self.search is not None:
+            if self.resume and (run_dir / "rounds").exists():
+                raise ValueError(f"{run_dir} holds a GEPA search, which cannot resume yet; use a new run_dir")
+            try:
+                kernel.start()
+                edits, final_answer, search_report = run_gepa(
+                    self.search, writer_lm=self.writer_lm, kernel=kernel, forward=forward, budget=budget, run_dir=run_dir,
+                    work_dir=work, round_prompt=task_prompt, edit_store=edit_store, seed=self.seed,
+                    handoff_every=self.handoff_every, require_explanations=self.require_explanations, max_turns=self.max_turns,
+                )
+            finally:
+                kernel.close()
+            report = {"run_dir": str(run_dir), "final_answer": final_answer, "budget": budget.to_dict(), "search": search_report}
+        else:
+            session = Session(
+                writer_lm=self.writer_lm, kernel=kernel, forward_tool=forward, budget=budget, run_dir=run_dir,
+                work_dir=work, task_prompt=task_prompt, edit_store=edit_store, handoff_every=self.handoff_every,
+                require_explanations=self.require_explanations, max_turns=self.max_turns,
+            )
+            try:
+                kernel.start()
+                final_answer = session.run(resume=self.resume)
+            finally:
+                kernel.close()
 
-        edits = edit_store.load_all()
-        report = {
-            "run_dir": str(run_dir),
-            "final_answer": final_answer,
-            "budget": budget.to_dict(),
-            "turns": session.turn,
-            "conversations": session.conversation,
-        }
+            edits = edit_store.load_all()
+            report = {
+                "run_dir": str(run_dir),
+                "final_answer": final_answer,
+                "budget": budget.to_dict(),
+                "turns": session.turn,
+                "conversations": session.conversation,
+            }
         if self.decision:
             report["validation_runs"] = forward.validation_log
             report["validation_size"] = len(validation)

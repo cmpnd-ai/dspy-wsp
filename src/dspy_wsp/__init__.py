@@ -13,6 +13,7 @@ __version__ = "0.1.0"
 
 _EXPORTS = {
     "WeightSpace": "dspy_wsp.optimizer",
+    "GEPASearch": "dspy_wsp.search",
     "HFBackend": "dspy_wsp.backends.hf",
     "MLXBackend": "dspy_wsp.backends.mlx",
     "VLLMBackend": "dspy_wsp.backends.vllm",

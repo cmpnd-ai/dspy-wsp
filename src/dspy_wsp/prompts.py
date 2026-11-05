@@ -77,15 +77,15 @@ WHAT YOU HAVE.
 Tensor names, with block 0 standing for every block:
 $tensor_listing
 
-2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": $practice_file ($n_practice examples). Input fields: $input_keys. Label fields: $label_keys. Choose whichever serve your experiments. A separate validation set of $n_validation examples is held out from you; you can only score edits on it, as described below.
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": $practice_file ($n_practice examples). Input fields: $input_keys. Label fields: $label_keys. Choose whichever serve your experiments. A separate validation set of $n_validation examples is held out from you; $validation_access
 
 3. $forward_section
 
 HOW TO WORK.
 1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
 2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
-3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to $max_reads questions.
-4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it$confirm_rule. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to $max_reads questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and $confirm_fit: an edit that fits the practice examples closely may not carry over.
 5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep $work_dir/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy $work_dir/edited to $work_dir/best_1/).$explain
 
 RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
@@ -94,11 +94,11 @@ HOW THE SESSION RUNS. $ending"""
 )
 
 FORWARD_DECISION = Template(
-    """A forward-pass tool with a budget of $max_passes forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+    """A forward-pass tool with a budget of $max_passes forward passes $budget_scope. A forward pass is one of three things, and each counts as one pass whatever its size:
  (a) DECIDE: the program runs on up to $max_gen practice items (with "both", up to $max_both per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
  {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
  "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in $work_dir/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
- (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set ($n_validation examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (b) $validation_pass
  (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
  {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..$n_layers] (optional)}
  "from" takes the requests recorded in an earlier decide pass. At most $max_reads questions per pass. The results are .npy files in $work_dir/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
@@ -106,18 +106,39 @@ Any request can also be written as JSON to a file in $work_dir from Python (json
 )
 
 
-def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None, n_validation: int, work_dir: str, require_explanations: bool, **fields) -> str:
-    """The task prompt for a decision model: `build_task_prompt`'s fields, with decide, read and validation passes."""
+VALIDATION_PASS = """VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set ($n_validation examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it."""
+ROUND_VALIDATION_PASS = "VALIDATION is not available to you in this run: the search scores the edit you leave in $work_dir/edited on the held-out validation set ($n_validation examples) after the round."
+
+
+def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None, n_validation: int, work_dir: str, require_explanations: bool,
+                               search_round: bool = False, **fields) -> str:
+    """The task prompt for a decision model: `build_task_prompt`'s fields, with decide, read and validation passes.
+
+    With `search_round`, the prompt describes one round of a population search: the writer has no validation
+    passes, the budget is the round's, and the round ends when the writer replies without a code block.
+    """
+    validation_pass = Template(ROUND_VALIDATION_PASS if search_round else VALIDATION_PASS).substitute(n_validation=n_validation, work_dir=work_dir)
     forward = FORWARD_DECISION.substitute(
         max_passes=max_passes, max_gen=limits.max_generations, max_both=limits.max_generations_both,
         n_validation=n_validation, n_layers=n_layers if n_layers is not None else "L", max_reads=f"{limits.max_reads:,}", work_dir=work_dir,
+        budget_scope="in this round" if search_round else "in total", validation_pass=validation_pass,
     )
-    ending = (
-        f"It continues until all {max_passes} forward passes are used (replying without a code block does not end it earlier); "
-        f"after that, make your final choice: the tensors in {work_dir}/edited when you finish are submitted, so leave there the edit "
-        "with the best paired gain confirmed on the validation set, or no edit if none was confirmed. "
-        "Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help."
-    )
+    if search_round:
+        ending = (
+            "This run is a population search. It keeps several candidate edits. Each round is a short session that starts from one "
+            f"candidate: its edit is in {work_dir}/edited and its notes are in {work_dir}/notes.md. The kernel and the other files in "
+            f"{work_dir} carry over from earlier rounds. Improve on the candidate you start from. The round ends when you reply without "
+            f"a code block, or after its {max_passes} forward passes; you may end it earlier. The tensors in {work_dir}/edited when the "
+            "round ends become a new candidate. The search scores it on the cases you are shown, and on the validation set if it beats "
+            "the candidate you started from. When you finish, reply without a code block, saying what you changed and the evidence for it."
+        )
+    else:
+        ending = (
+            f"It continues until all {max_passes} forward passes are used (replying without a code block does not end it earlier); "
+            f"after that, make your final choice: the tensors in {work_dir}/edited when you finish are submitted, so leave there the edit "
+            "with the best paired gain confirmed on the validation set, or no edit if none was confirmed. "
+            "Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help."
+        )
     return TASK_DECISION.substitute(
         **{k: v for k, v in fields.items() if k not in ("sampling", "task_description", "n_practice", "input_keys", "label_keys", "max_output")},
         task_description=f" {fields['task_description'].strip()}" if fields.get("task_description") else "",
@@ -131,6 +152,9 @@ def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None,
         forward_section=forward,
         explain=EXPLAIN if require_explanations else "",
         ending=ending,
+        validation_access="the search scores edits on it." if search_round else "you can only score edits on it, as described below.",
+        confirm_rule="" if search_round else ", and only after a validation run confirms it",
+        confirm_fit="the search confirms them on the validation set" if search_round else "confirm them on the validation set",
     )
 
 EXPLAIN = "\n6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun."

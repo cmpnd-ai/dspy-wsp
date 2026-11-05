@@ -38,6 +38,7 @@ class Session:
         require_explanations: bool = True,
         max_turns: int = 1000,
         max_nudges: int = 3,
+        pass_offset: int = 0,
     ):
         self.writer_lm = writer_lm
         self.kernel = kernel
@@ -51,6 +52,7 @@ class Session:
         self.require_explanations = require_explanations
         self.max_turns = max_turns
         self.max_nudges = max_nudges
+        self.pass_offset = pass_offset  # numbers this session's passes after earlier sessions' in the same work folder
         self.turn = 0
         self.conversation = 1
         self.since_handoff = 0
@@ -166,7 +168,7 @@ class Session:
                 if b.passes_left == 0:
                     out = f"No forward passes are left. Make your final choice: leave the edit you submit in {self.work_dir}/edited, then reply without a code block."
                 else:
-                    k = b.passes_used + 1
+                    k = self.pass_offset + b.passes_used + 1
                     out, counted = self.forward.handle(parsed.body, k)
                     if counted:
                         b.passes_used += 1

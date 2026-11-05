@@ -135,6 +135,7 @@ class ForwardTool:
         self.decision = getattr(backend, "kind", "llm") == "decision"
         self.validation = dict(validation or {})
         self.validation_log: list[dict] = []
+        self.allow_validation = True  # a population search turns this off: it scores candidates on validation itself
 
     # --- entry point ----------------------------------------------------------------
     def handle(self, body: str, k: int) -> tuple[str, bool]:
@@ -263,6 +264,8 @@ class ForwardTool:
             summary = self.generate(req, k)
             summary["type"] = "decide"
             return summary
+        if not self.allow_validation:
+            raise RequestError("validation passes are not available in this run: the search scores your edit on the validation set after the round")
         if not self.validation:
             raise RequestError("this run has no validation set")
         if req.get("problems") or req.get("inputs") or req.get("n", 1) != 1:
