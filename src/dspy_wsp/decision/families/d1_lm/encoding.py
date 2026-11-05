@@ -228,3 +228,28 @@ def load_calibration(folder: str | Path) -> float:
     """The checkpoint's temperature for choice, noul and score answers (`calibration.json`'s default)."""
     f = Path(folder) / "calibration.json"
     return float(json.loads(f.read_text()).get("default", 1.0)) if f.is_file() else 1.0
+
+
+# --- attention ---------------------------------------------------------------------------
+
+def masks(rows: Sequence[Row], width: int, window: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Which keys each query reads, [rows, query, key], for the two kinds of attention layer; and the real tokens.
+
+    Full attention: a state token reads every token, every token reads the state, and a question's tokens
+    read each other both ways. Sliding-window attention: causal, over the last `window` tokens.
+    Convolution layers are causal and need only `real`.
+    """
+    b = len(rows)
+    real = np.zeros((b, width), bool)
+    group = np.full((b, width), -1)
+    state = np.zeros((b, 1, 1), int)
+    for r, row in enumerate(rows):
+        real[r, : len(row.ids)] = True
+        group[r, : len(row.ids)] = row.question_of
+        state[r] = row.state_len
+    q = np.arange(width)[None, :, None]
+    k = np.arange(width)[None, None, :]
+    keys = real[:, None, :]
+    full = keys & ((q < state) | (k < state) | (group[:, :, None] == group[:, None, :]))
+    sliding = keys & (k <= q) & (k > q - window)
+    return full, np.broadcast_to(sliding, (b, width, width)).copy(), real
