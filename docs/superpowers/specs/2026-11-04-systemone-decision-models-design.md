@@ -74,9 +74,8 @@ There are four implementations: NanoJev and d1, each in PyTorch and in MLX. Each
 
 How each model handles question types:
 
-- d1 answers Choice, Noul and Score natively, and applies its calibration temperatures.
-- NanoJev answers Choice only. The backend sends a Noul as a Choice between yes and no. It sends a Score as a Choice over the levels, and computes the score from the level probabilities.
-- NanoJev's state has four sections (`essential`, `details`, `memory` and `logs`). A System One state goes into `essential`. Tank War fills all four sections itself.
+- d1 answers Choice, Noul and Score natively, and applies its calibration temperatures. It reads one sequence per question: the state, the question, and a marker token for each option.
+- NanoJev also answers all three types natively, using its own request format (`scripts/predict_toy_decisions.py` and `scripts/train_toy_decisions.py` in `TianyuCodings/NanoJev`). It reads one text path per option: `State:`, the question type and instructions, then `Candidate:` and the option. A Noul (NanoJev's `boolean`) has one path, and its logits are 0 for false and the head's output for true. A Score treats each level as a candidate. Only a Choice uses the set-attention correction. The state is formatted as NanoJev formats it, which writes a JSON object with Python's `str()`. Honing's four state sections (`essential`, `details`, `memory` and `logs`) belong to Tank War, which fills them itself.
 
 Each implementation needs a parity test against the reference code. On a fixed set of requests, including some from Typed Decisions, our probabilities must match the reference within a tolerance the builder chooses and records. The PyTorch and MLX versions must also match each other.
 
@@ -147,8 +146,6 @@ The user did not settle these. The builder may revisit them with a reason.
 - Accuracy as the reported metric, with Brier as feedback to the writer.
 - Default budget for a Typed Decisions run: 25 passes, with up to 900 items per `decide` pass and up to 1,024 requests per `read` pass. Validation passes count against the same budget.
 - The validation split: 300 of the 1,200 training cases, stratified by workflow, with aggregate-only results. The user asked for held-out validation data; the size and the aggregate-only rule are my call.
-- NanoJev answers Noul and Score questions as Choices.
-- A System One state goes into NanoJev's `essential` section.
 
 ## Left to the builder
 
