@@ -99,6 +99,17 @@ For a decision model, the writer gets `decide` passes, which run the program and
 
 In both runs the writer derived the edit in closed form from the decision head's inputs, confirmed it on 300 held-out validation cases, and never saw the test cases. Each run took between 75 and 110 minutes.
 
+WeightSpace also combines with `dspy.experimental.ReAnchor`, which fits how a program turns probabilities into answers (Noul thresholds, Score cut points and Choice weights) without changing weights. Scored on the answers NanoJev's program returns, on the same 400 test cases:
+
+| NanoJev | Decided accuracy | Paired gain over plain |
+|---|---|---|
+| Plain | 39.2% | |
+| ReAnchor | 50.7% | +11.6 ± 1.3 points |
+| WeightSpace | 51.3% | +12.1 ± 1.2 points |
+| WeightSpace + ReAnchor | 55.7% | +16.6 ± 1.4 points |
+
+See [the comparison](results/2026-11-04-typed-decisions-nanojev/reanchor/) for how the two methods divide the gain.
+
 ## How a run works
 
 The writer works in turns. Each turn it explains its next step and sends exactly one block:

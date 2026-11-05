@@ -84,6 +84,10 @@ Under the dataset scorer's protocol, the edited model improved on every measure:
 | Original weights | 38.8% | 0.558 | 0.311 | 0.143 |
 | Edited weights | 55.2% | 0.324 | 0.172 | 0.042 |
 
+## With ReAnchor
+
+`reanchor/` compares this edit with `dspy.experimental.ReAnchor`, which fits how the program turns probabilities into answers without changing weights. On the program's decided answers, ReAnchor alone gains +11.6 points and this edit alone +12.1 points. Together they gain +16.6 points, from 39.2% to 55.7%.
+
 ## Files
 
 - `run/report.json` has the budget used, both validation runs, the final check and the patch summary.
