@@ -170,6 +170,30 @@ The harness follows the paper's rules:
 
 Every turn is written to disk. Pass `resume=True` with the same `run_dir` to continue an interrupted run.
 
+### Population search
+
+By default, a run is one long conversation. For decision models, `search=GEPASearch(...)` runs GEPA's population search instead. The writer still works in the Python kernel with the same tools. The search keeps a population of candidate edits and runs in rounds:
+
+1. GEPA picks a parent from its Pareto frontier over the validation examples.
+2. GEPA scores the parent on a minibatch of practice examples.
+3. The writer gets a short session that starts from the parent's edit and notes, with the minibatch's feedback and a small budget of forward passes. The edit it leaves becomes the child.
+4. GEPA scores the child on the same minibatch. If the child scores higher, GEPA scores it on the validation set and adds it to the population.
+
+```python
+from dspy_wsp import GEPASearch, WeightSpace
+
+optimizer = WeightSpace(metric=metric, writer_lm=writer, backend=backend, max_passes=51, holdout=300,
+                        search=GEPASearch(min_rounds=10, minibatch_size=8, passes_per_proposal=2))
+```
+
+- `max_passes` counts every pass: the writer's passes and each of GEPA's scorings. A round costs at most `3 + passes_per_proposal` passes.
+- `WeightSpace` refuses a `max_passes` that can't pay for `min_rounds` rounds.
+- Writers can't run validation passes in a round, because GEPA uses the validation set to select candidates.
+- Each round is written to `rounds.jsonl` and `progress.md` when it ends. Every candidate's edit and notes are kept in `candidates/`.
+- A GEPA run can't resume yet.
+
+The example scripts take `--search gepa --rounds 10`. To compare the two searches, give the conversation the same `--passes`.
+
 ## What you get back
 
 ```

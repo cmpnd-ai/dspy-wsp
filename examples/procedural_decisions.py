@@ -29,7 +29,7 @@ from collections import Counter
 from pathlib import Path
 
 import dspy
-from typed_decisions import baseline, make_backend, optimize, run_name
+from typed_decisions import baseline, make_backend, make_search, optimize, run_name
 from typed_decisions_reanchor import compare
 
 DATASET = "tasksource/procedural-typed-decisions"
@@ -80,19 +80,23 @@ def main() -> None:
     parser.add_argument("--revision", help="the repo revision (aliases default to the tested one)")
     parser.add_argument("--framework", choices=["mlx", "torch"], default="mlx")
     parser.add_argument("--step", required=True, choices=["baseline-protocol", "baseline-program", "optimize", "compare"])
-    parser.add_argument("--passes", type=int, default=25)
+    parser.add_argument("--passes", type=int, help="the forward-pass budget (default: 25, or what --rounds needs with GEPA)")
+    parser.add_argument("--search", choices=["conversation", "gepa"], default="conversation")
+    parser.add_argument("--rounds", type=int, default=10, help="with --search gepa: the rounds the budget must pay for")
     args = parser.parse_args()
 
     train, test = splits()
     name = run_name(args.model)
-    run_dir = RUNS / name
+    search = make_search(args.search, args.rounds) if args.step == "optimize" else None
+    run_dir = RUNS / (f"{name}-gepa" if search else name)
     if args.step == "compare":
         compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{name}", train, test, revision=args.revision)
         return
     backend = make_backend(args.model, args.framework, args.revision)
     try:
         if args.step == "optimize":
-            optimize(backend, train, test, run_dir=run_dir, passes=args.passes, holdout=300, task=TASK)
+            passes = args.passes or (search.min_passes() if search else 25)
+            optimize(backend, train, test, run_dir=run_dir, passes=passes, holdout=300, task=TASK, search=search)
         else:
             kind = args.step.removeprefix("baseline-")
             baseline(backend, kind, train, test, RUNS / f"baseline_{name}_{kind}.json")

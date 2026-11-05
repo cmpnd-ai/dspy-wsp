@@ -11,6 +11,7 @@ through DSPy's TypeSafe client, and lets a writer edit its weights.
     python examples/typed_decisions.py --baseline program         # through the DSPy program
     OPENAI_API_KEY=... python examples/typed_decisions.py --smoke  # a short end-to-end run
     OPENAI_API_KEY=... python examples/typed_decisions.py          # 25 passes, final check on the test split
+    OPENAI_API_KEY=... python examples/typed_decisions.py --search gepa --rounds 10   # GEPA's population search
 
 The writer practices on 900 training cases and validates on the other 300; the
 400 test cases are used only in the final check. Accuracy follows the dataset's
@@ -22,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import math
 import sys
 import time
@@ -31,7 +33,7 @@ from pathlib import Path
 import dspy
 from dspy.experimental import Choice, Noul, Score
 
-from dspy_wsp import Limits, WeightSpace
+from dspy_wsp import GEPASearch, Limits, WeightSpace
 
 DATASET = "LocalLLaMA/typed-decisions"
 RUNS = Path("runs/typed-decisions")
@@ -182,7 +184,9 @@ def main() -> None:
     parser.add_argument("--framework", choices=["mlx", "torch"])
     parser.add_argument("--baseline", choices=["protocol", "program"], help="only score the unedited model on the test split")
     parser.add_argument("--smoke", action="store_true", help="3 passes on a 250-case subset, a 40-case final check")
-    parser.add_argument("--passes", type=int, default=25)
+    parser.add_argument("--passes", type=int, help="the forward-pass budget (default: 25, or what --rounds needs with GEPA)")
+    parser.add_argument("--search", choices=["conversation", "gepa"], default="conversation")
+    parser.add_argument("--rounds", type=int, default=10, help="with --search gepa: the rounds the budget must pay for")
     parser.add_argument("--run-dir", type=Path)
     args = parser.parse_args()
 
@@ -199,7 +203,9 @@ def main() -> None:
             out.write_text(json.dumps(result, indent=1))
             print(json.dumps(result, indent=1))
             return
-        passes, holdout, valset, limits = args.passes, VALIDATION, test, Limits(max_generations=900, max_generations_both=450, max_reads=1024)
+        search = make_search(args.search, args.rounds)
+        passes = args.passes or (search.min_passes() if search else 25)
+        holdout, valset, limits = VALIDATION, test, Limits(max_generations=900, max_generations_both=450, max_reads=1024)
         if args.smoke:
             by_wf: dict = {}
             for ex in train:
@@ -208,15 +214,28 @@ def main() -> None:
             by_wf = {}
             for ex in test:
                 by_wf.setdefault(ex.workflow, []).append(ex)
-            passes, holdout, valset = 3, 50, [ex for exs in by_wf.values() for ex in exs[:10]]
+            holdout, valset = 50, [ex for exs in by_wf.values() for ex in exs[:10]]
             limits = Limits(max_generations=64, max_generations_both=64, max_reads=256)
-        run_dir = args.run_dir or RUNS / f"{run_name(args.model)}{'-smoke' if args.smoke else ''}"
-        optimize(backend, train, valset, run_dir=run_dir, passes=passes, limits=limits, holdout=holdout, task=TASK)
+            search = GEPASearch(min_rounds=2, passes_per_proposal=1) if search else None
+            passes = search.min_passes() if search else 3
+        suffix = ("-gepa" if search else "") + ("-smoke" if args.smoke else "")
+        run_dir = args.run_dir or RUNS / f"{run_name(args.model)}{suffix}"
+        optimize(backend, train, valset, run_dir=run_dir, passes=passes, limits=limits, holdout=holdout, task=TASK, search=search)
     finally:
         backend.close()
 
 
-def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK):
+def make_search(kind: str, rounds: int) -> GEPASearch | None:
+    """GEPA's population search with `rounds` guaranteed rounds, or None for one conversation."""
+    if kind == "conversation":
+        return None
+    log = logging.getLogger("dspy_wsp.search")  # one line per round
+    log.setLevel(logging.INFO)
+    log.addHandler(logging.StreamHandler())
+    return GEPASearch(min_rounds=rounds)
+
+
+def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK, search=None):
     """Run WeightSpace with the writer on a decision benchmark whose examples carry `workflow`, `state`, `questions` and `gold`."""
     optimizer = WeightSpace(
         metric=metric,
@@ -230,6 +249,7 @@ def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout
         sandbox="none" if sys.platform == "darwin" else "auto",  # bubblewrap is Linux-only
         run_dir=run_dir,
         resume=True,
+        search=search,
     )
     compiled = optimizer.compile(TypedDecisions(train), trainset=train, valset=valset)
     print(compiled.wsp_patch.summary())
