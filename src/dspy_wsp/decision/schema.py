@@ -98,7 +98,7 @@ def make_answer(q: Question, probs: Sequence[float]) -> dict:
     if len(probs) != len(keys) or not all(math.isfinite(p) and p >= 0 for p in probs) or abs(sum(probs) - 1) > 1e-4:
         raise ValueError(f"expected a distribution over {len(keys)} options, got {probs}")
     if q.type == "noul":
-        return {"type": "noul", "noul": probs[1]}
+        return {"type": "noul", "noul": probs[1], "probabilities": {"false": probs[0], "true": probs[1]}}
     distribution = dict(zip(keys, probs))
     if q.type == "choice":
         return {"type": "choice", "choice": max(keys, key=distribution.get), "probabilities": distribution, "confidence": choice_confidence(probs)}

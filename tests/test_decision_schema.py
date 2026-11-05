@@ -39,7 +39,7 @@ def test_make_answer_shapes():
     noul = parse_question({"type": "noul", "instructions": "Is it?"})
     assert noul.option_keys == ["false", "true"]
     n = make_answer(noul, [0.25, 0.75])
-    assert n == {"type": "noul", "noul": pytest.approx(0.75)}
+    assert n == {"type": "noul", "noul": pytest.approx(0.75), "probabilities": {"false": pytest.approx(0.25), "true": pytest.approx(0.75)}}
 
 
 @pytest.mark.parametrize(
