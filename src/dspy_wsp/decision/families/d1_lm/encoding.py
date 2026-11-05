@@ -64,7 +64,7 @@ class Tokenizer:
         added = self._tok.get_added_tokens_decoder().values()
         self.specials = sorted({t.content for t in added if t.special and len(t.content) > 1 and BREAK not in t.content},
                                key=len, reverse=True)
-        self._pattern = re.compile("|".join(map(re.escape, self.specials))) if self.specials else None
+        self.pattern = re.compile("|".join(map(re.escape, self.specials))) if self.specials else None
 
     def encode(self, text: str) -> list[int]:
         return self._tok.encode(text, add_special_tokens=False).ids
@@ -81,11 +81,11 @@ class Tokenizer:
 
 def plain(tok: Tokenizer, text: str) -> str:
     """`text` with every special-token string broken, so it encodes as ordinary text."""
-    if tok._pattern is None:
+    if tok.pattern is None:
         return text
     n = 1
     while n:  # again, for a match that overlapped one broken before it
-        text, n = tok._pattern.subn(lambda m: m[0][0] + BREAK + m[0][1:], text)
+        text, n = tok.pattern.subn(lambda m: m[0][0] + BREAK + m[0][1:], text)
     return text
 
 
@@ -271,4 +271,4 @@ def masks(rows: Sequence[Row], width: int, window: int) -> tuple[np.ndarray, np.
     keys = real[:, None, :]
     full = keys & ((q < state) | (k < state) | (group[:, :, None] == group[:, None, :]))
     sliding = keys & (k <= q) & (k > q - window)
-    return full, np.broadcast_to(sliding, (b, width, width)).copy(), real
+    return full, sliding, real

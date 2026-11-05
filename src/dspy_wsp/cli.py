@@ -24,7 +24,10 @@ def main(argv=None) -> int:
     a.add_argument("patch")
     a.add_argument("out")
     c = sub.add_parser("check", help="check that a decision model loads, answers, batches and takes edits")
-    c.add_argument("model", help='an alias ("d1", "nanojev"), a Hugging Face repo id or a local folder')
+    from dspy_wsp.decision.families import FAMILIES
+
+    aliases = ", ".join(f'"{a}"' for f in FAMILIES for a in f.aliases)
+    c.add_argument("model", help=f"an alias ({aliases}), a Hugging Face repo id or a local folder")
     c.add_argument("--revision")
     c.add_argument("--framework", choices=["mlx", "torch"])
     c.add_argument("--json", action="store_true", help="print the report as JSON")

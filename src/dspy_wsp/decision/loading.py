@@ -67,7 +67,8 @@ def detect_family(model: str, revision: str | None = None) -> str:
 
 def load_decision_backend(model: str, *, revision: str | None = None, framework: str | None = None,
                           device: str | None = None, max_length: int | None = None):
-    """A decision backend for `model`: an alias ("d1", "nanojev"), a Hugging Face repo id or a local folder."""
+    """A decision backend for `model`: an alias in `ALIASES` ("d1", "nanojev", "d1-2b"), a Hugging Face repo id or a
+    local folder."""
     repo, revision = resolve_model(model, revision)
     name = detect_family(repo, revision)
     cls = backend_class(next(f for f in FAMILIES if f.name == name))
