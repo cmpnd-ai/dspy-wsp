@@ -1,0 +1,21 @@
+{
+ "arm": "gepa",
+ "seed": 0,
+ "candidates": 12,
+ "best_val": 83.3984375,
+ "episodes_used": 6272,
+ "astra_calls": 37,
+ "astra_tokens": {
+  "calls": 37,
+  "in": 502996,
+  "cached": 177209,
+  "out": 656468,
+  "reasoning": 608122
+ },
+ "astra_usd": 36.26,
+ "compile_seconds": 19268,
+ "test_mean": 85.608,
+ "test_se": 1.127987008210064,
+ "test_episodes": 1000,
+ "test_seconds": 86.5
+}
