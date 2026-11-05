@@ -79,6 +79,14 @@ class DecisionBackend(WeightBackend):
     def _row_tokens(self, row) -> int:
         return len(row[0])
 
+    def _encode_request(self, state: Any, questions: Mapping[str, Question]) -> list[tuple[Any, list[str]]]:
+        """The network's rows for one request, each with the names of the questions it answers, in order."""
+        return [(self._encode(state, q), [name]) for name, q in questions.items()]
+
+    def _row_outputs(self, output, n: int) -> list:
+        """One item per question from the network's output for one row (`logits` or `capture`)."""
+        return [output]
+
     def _model_tensor(self, name: str) -> bool:
         """Whether a checkpoint tensor belongs to the loaded network."""
         return True
@@ -94,7 +102,12 @@ class DecisionBackend(WeightBackend):
                     break
             decides = [it for it in items if it[0] == "decide"]
             if decides:
-                self._decide(decides)
+                try:
+                    self._decide(decides)
+                except BaseException as e:  # noqa: BLE001 - fail the waiting callers, keep the worker alive
+                    for _, _, fut in decides:
+                        if not fut.done():
+                            fut.set_exception(e)
             for kind, payload, fut in items:
                 if kind == "stop":
                     fut.set_result(None)
@@ -109,12 +122,13 @@ class DecisionBackend(WeightBackend):
         rows, owners = [], []
         for _, (state, questions), fut in items:
             try:
-                encoded = [self._encode(state, q) for q in questions.values()]
+                encoded = self._encode_request(state, questions)
+                tokens = sum(self._row_tokens(row) for row, _ in encoded)
             except Exception as e:  # noqa: BLE001 - a bad request fails alone
                 fut.set_exception(e if isinstance(e, RequestError) else RequestError(str(e)))
                 continue
-            owners.append((fut, questions, len(rows), len(encoded), sum(self._row_tokens(r) for r in encoded)))
-            rows.extend(encoded)
+            owners.append((fut, questions, len(rows), encoded, tokens))
+            rows.extend(row for row, _ in encoded)
         if not rows:
             return
         try:
@@ -123,8 +137,11 @@ class DecisionBackend(WeightBackend):
             for fut, *_ in owners:
                 fut.set_exception(e)
             return
-        for fut, questions, start, n, tokens in owners:
-            answers = {name: make_answer(q, self._probabilities(z, q)) for (name, q), z in zip(questions.items(), logits[start : start + n])}
+        for fut, questions, start, encoded, tokens in owners:
+            by_name = {}
+            for (_, names), out in zip(encoded, logits[start : start + len(encoded)]):
+                by_name.update(zip(names, self._row_outputs(out, len(names))))
+            answers = {name: make_answer(q, self._probabilities(by_name[name], q)) for name, q in questions.items()}
             fut.set_result({"answers": answers, "usage": {"input_tokens": tokens, "output_tokens": 0}})
 
     def _call(self, fn):
@@ -225,24 +242,32 @@ class DecisionBackend(WeightBackend):
         L = self.dims()["layers"]
         if any(not isinstance(l, int) or not 0 <= l <= L for l in layers):
             raise RequestError(f"layers must be integers from 0 to {L}")
-        rows, index = [], []
+        rows, plan = [], []  # plan: (request, its questions, its encoded rows)
         for i, req in enumerate(requests):
-            for name, q in req["questions"].items():
-                q = q if isinstance(q, Question) else parse_question(q)
-                rows.append(self._encode(req.get("state", ""), q))
-                index.append({"request": i, "question": name, "type": q.type, "options": q.option_keys})
+            questions = {name: q if isinstance(q, Question) else parse_question(q) for name, q in req["questions"].items()}
+            encoded = self._encode_request(req.get("state", ""), questions)
+            plan.append((i, questions, encoded))
+            rows.extend(row for row, _ in encoded)
         caps = self._call(lambda: self.net.capture(rows, layers))
+        flat, index, at = [], [], 0
+        for i, questions, encoded in plan:
+            by_name = {}
+            for (_, names), cap in zip(encoded, caps[at : at + len(encoded)]):
+                by_name.update(zip(names, self._row_outputs(cap, len(names))))
+            at += len(encoded)
+            for name, q in questions.items():
+                flat.append((by_name[name], q))
+                index.append({"request": i, "question": name, "type": q.type, "options": q.option_keys})
         k = max(len(r["options"]) for r in index)
-        arrays: dict[str, np.ndarray] = {"option_mask": np.zeros((len(rows), k), bool)}
-        for j, (cap, meta) in enumerate(zip(caps, index)):
+        arrays: dict[str, np.ndarray] = {"option_mask": np.zeros((len(flat), k), bool)}
+        for j, ((cap, q), meta) in enumerate(zip(flat, index)):
             n = len(meta["options"])
             arrays["option_mask"][j, :n] = True
-            q = rows[j][-1]
             cap = {**cap, "probabilities": np.array(self._probabilities(cap["logits"], q), np.float32)}
             for key, value in cap.items():
                 name = "option_logits" if key == "logits" else key
                 if name not in arrays:
-                    shape = (len(rows), k) + value.shape[1:] if key != "hidden_mean" else (len(rows),) + value.shape
+                    shape = (len(flat), k) + value.shape[1:] if key != "hidden_mean" else (len(flat),) + value.shape
                     arrays[name] = np.full(shape, np.nan, np.float32)
                 if key == "hidden_mean":
                     arrays[name][j] = value

@@ -126,3 +126,66 @@ def test_mlx_cache_stays_under_limit(d1_dir):
         assert b._call(mx.get_cache_memory) <= MLX_CACHE_LIMIT
     finally:
         b.close()
+
+
+class _Packed(D1Backend):
+    """Every question of a request in one row, to exercise request-level encoding."""
+
+    def _encode_request(self, state, questions):
+        return [([self._encode(state, q) for q in questions.values()], list(questions))]
+
+    def _row_tokens(self, row):
+        return sum(len(r[0]) for r in row)
+
+    def _row_outputs(self, output, n):
+        assert len(output) == n
+        return output
+
+    def _load_network(self):
+        net = super()._load_network()
+
+        class Loop:
+            def logits(self, rows):
+                return [net.logits(r) for r in rows]
+
+            def capture(self, rows, layers):
+                return [net.capture(r, layers) for r in rows]
+
+            def __getattr__(self, name):
+                return getattr(net, name)
+
+        return Loop()
+
+
+def test_request_rows_can_hold_several_questions(d1_dir):
+    plain = D1Backend(str(d1_dir), revision=None, framework="torch")
+    packed = _Packed(str(d1_dir), revision=None, framework="torch")
+    try:
+        assert packed.system_one(STATE, QUESTIONS)["answers"] == plain.system_one(STATE, QUESTIONS)["answers"]
+        a, meta = packed.read([{"state": STATE, "questions": QUESTIONS}])
+        b, _ = plain.read([{"state": STATE, "questions": QUESTIONS}])
+        assert [r["question"] for r in meta["rows"]] == list(QUESTIONS)
+        assert np.allclose(a["option_logits"], b["option_logits"], equal_nan=True)
+    finally:
+        plain.close()
+        packed.close()
+
+
+def test_an_error_after_encoding_fails_the_call_and_keeps_the_worker(d1_dir):
+    from concurrent.futures import ThreadPoolExecutor
+
+    class Broken(D1Backend):
+        def _row_outputs(self, output, n):
+            raise ValueError("broken readout")
+
+    b = Broken(str(d1_dir), revision=None, framework="torch")
+    pool = ThreadPoolExecutor(1)
+    call = pool.submit(b.system_one, STATE, QUESTIONS)
+    try:
+        with pytest.raises(ValueError, match="broken readout"):
+            call.result(timeout=20)
+        assert b._worker.is_alive()
+    finally:
+        pool.shutdown(wait=False)
+        if b._worker.is_alive():
+            b.close()
