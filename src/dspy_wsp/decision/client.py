@@ -34,9 +34,15 @@ class DecisionTypeSafe(TypeSafe, BaseLM):
         return client
 
     def copy(self, **kwargs):
-        clone = super().copy(**kwargs)
+        settings = {"model": self.model, "api_key": self.api_key, "base_url": self.base_url, "cache": self.cache,
+                    "timeout": self.timeout, "callbacks": self.callbacks, **kwargs}
+        clone = type(self)(**settings)
         clone._backend = self._backend
         return clone
+
+    def _request(self, state, questions):
+        # The cache key includes the weights, so a cached answer never outlives an edit.
+        return {**super()._request(state, questions), "weights": self._backend.weights_fingerprint}
 
     def _finish(self, request, response, cache_hit):
         _local.usage = response.get("usage", {})

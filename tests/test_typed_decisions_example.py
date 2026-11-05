@@ -70,3 +70,37 @@ def test_program_runs_on_a_decision_backend(tmp_path):
         assert noul_q["type"] == "noul" and noul_q["criteria"]["true"] == "A human should look."
     finally:
         backend.close()
+
+
+def test_decided_metric_reads_decided_answers():
+    import typed_decisions_reanchor as tr
+
+    pred = dspy.Prediction(
+        action=dspy.experimental.Choice[tuple(QUESTIONS["action"]["criteria"].items())](value="stop", confidence=0.5, probabilities={"continue": 0.5, "stop": 0.2, "review": 0.3}),
+        needs_review=dspy.experimental.Noul(value=False, confidence=0.6, probability=0.4),
+        risk=dspy.experimental.Score[("Benign.", "Low.", "Moderate.")](value=1.4, level=1, confidence=0.5, probabilities={0: 0.1, 1: 0.4, 2: 0.5}),
+    )
+    # decided answers: stop (gold continue) wrong, false right, level 1 right.
+    # most likely options: continue right, false right, level 2 (gold 1) wrong.
+    assert tr.decided_metric(example(), pred) == pytest.approx(2 / 3)
+    assert td.metric(example(), pred).score == pytest.approx(2 / 3)
+    assert [tr.decided(pred[q]) for q in ("action", "needs_review", "risk")] == ["stop", "false", "1"]
+
+
+def test_reanchor_runs_on_a_decision_backend(tmp_path):
+    import typed_decisions_reanchor as tr
+    from dspy.experimental import ReAnchor
+
+    from dspy_wsp.backends.decision import D1Backend
+
+    backend = D1Backend(str(build_d1(tmp_path / "d1")), revision=None, framework="torch")
+    try:
+        cases = [example(steps=i) for i in range(12)]
+        program = td.TypedDecisions(cases)
+        program.set_lm(backend.lm(cache=True))
+        optimizer = ReAnchor(metric=tr.decided_metric, num_threads=4)
+        tuned = optimizer.compile(program, trainset=cases)
+        assert optimizer.report["train_score"] >= optimizer.report["train_score_before"]
+        assert tuned is not program
+    finally:
+        backend.close()

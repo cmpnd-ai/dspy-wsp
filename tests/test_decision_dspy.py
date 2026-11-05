@@ -86,3 +86,17 @@ def test_save_and_load_rebuilds_backend(backend, d1_dir, tmp_path):
     got = loaded(state=STATE)
     assert got.action.probabilities == pytest.approx(expected.action.probabilities, abs=1e-5)
     loaded.lm._backend.close()
+
+
+def test_cached_client_keys_on_weights(backend):
+    r = TensorReader(backend.weights_dir)
+    lm = backend.lm(cache=True)
+    assert lm.cache and backend.lm(cache=True) is lm and backend.lm() is not lm
+    program = dspy.Predict(Triage)
+    program.lm = lm
+    before = program(state=STATE).action.probabilities
+    with backend.using({EDIT: r.get_f32(EDIT) * -3.0 + 0.5}):
+        edited = program(state=STATE).action.probabilities
+        assert backend.weights_fingerprint != "original"
+    again = program(state=STATE).action.probabilities
+    assert edited != before and again == before

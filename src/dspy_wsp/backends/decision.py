@@ -149,7 +149,24 @@ class DecisionBackend(WeightBackend):
             raise KeyError(f"{unknown[0]} does not map to a parameter of the loaded network")
         self._call(lambda: self._swap(edits))
 
+    @property
+    def weights_fingerprint(self) -> str:
+        """A hash of the current edits ("original" with none); part of every cache key, so cached answers match the weights."""
+        return getattr(self, "_fingerprint", "original")
+
+    def _fingerprint_of(self, edits) -> str:
+        import hashlib
+
+        if not edits:
+            return "original"
+        h = hashlib.sha256()
+        for name in sorted(edits):
+            h.update(name.encode())
+            h.update(np.ascontiguousarray(np.asarray(edits[name], dtype=np.float32)).tobytes())
+        return h.hexdigest()[:16]
+
     def _swap(self, edits) -> None:
+        self._fingerprint = self._fingerprint_of(edits)
         if self.framework == "torch":
             import torch
 
@@ -262,7 +279,8 @@ class DecisionBackend(WeightBackend):
     def pooled_activations(self, pairs, **kw):
         raise NotImplementedError("decision models have no text reads; use read()")
 
-    def lm(self):
+    def lm(self, cache: bool = False):
+        """DSPy's TypeSafe client for this backend. With cache=True, identical requests on the same weights reuse answers."""
         if self._client is None:
             from dspy_wsp.decision.client import DecisionTypeSafe
             from dspy_wsp.decision.server import SystemOneServer
@@ -270,7 +288,8 @@ class DecisionBackend(WeightBackend):
             self._server = SystemOneServer(self)
             self._server.start()
             self._client = DecisionTypeSafe.for_backend(self)
-        return self._client
+            self._cached_client = self._client.copy(cache=True)
+        return self._cached_client if cache else self._client
 
     def close(self) -> None:
         if self._server is not None:
