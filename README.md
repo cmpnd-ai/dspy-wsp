@@ -110,14 +110,25 @@ WeightSpace also combines with `dspy.experimental.ReAnchor`, which fits how a pr
 
 See [the comparison](results/2026-11-04-typed-decisions-nanojev/reanchor/) for how the two methods divide the gain.
 
-On three balanced, rule-based tasks from Procedural Typed Decisions, overnight on the same laptop, the same kind of edit gave larger gains (400 test cases):
+On three balanced, rule-based tasks from Procedural Typed Decisions, overnight on the same laptop, the same kind of edit gave larger gains on 400 test cases:
 
-| Model | Original | WeightSpace | ReAnchor (decided) | WeightSpace + ReAnchor (decided) | Run |
-|---|---|---|---|---|---|
-| d1-omni-600M | 52.3% | 72.3% (+20.0 ± 2.3) | 58.7% | 69.9% | [results](results/2026-11-04-procedural-decisions/) |
-| NanoJev | 49.3% | 72.3% (+23.1 ± 2.3) | 52.8% | 71.3% | [results](results/2026-11-04-procedural-decisions/) |
+| Model | Tensor edited | Original | Edited | Paired gain | Improved / worse | Run |
+|---|---|---|---|---|---|---|
+| d1-omni-600M | `head.scorer.3.weight` (1,024 weights) | 52.3% | 72.3% | +20.0 ± 2.3 points | 179 / 54 | [results](results/2026-11-04-procedural-decisions/) |
+| NanoJev (Qwen3-0.6B) | `scalar.weight` (1,024 weights) | 49.3% | 72.3% | +23.1 ± 2.3 points | 193 / 54 | [results](results/2026-11-04-procedural-decisions/) |
 
-There, edits that only shifted option preferences gained nothing, so the gains come from how the head reads each record.
+These tasks have balanced labels. Edits that only shifted option preferences gained nothing, so the gains come from how the head reads each record.
+
+Scored on the answers each program returns, on the same 400 test cases:
+
+| Version | d1-omni-600M | NanoJev |
+|---|---|---|
+| Plain | 52.3% | 47.8% |
+| ReAnchor | 58.7% (+6.4 ± 2.2) | 52.8% (+5.0 ± 1.7) |
+| WeightSpace | 64.2% (+11.9 ± 2.3) | 68.4% (+20.6 ± 2.3) |
+| WeightSpace + ReAnchor | 69.9% (+17.7 ± 2.4) | 71.3% (+23.4 ± 2.3) |
+
+Fit an edit on the same requests the model will serve. The writer fit each edit through the DSPy program's requests. NanoJev's edit also raised accuracy under the dataset's own request format, from 48.9% to 66.5%. d1's edit moved accuracy under that format only from 55.0% to 55.8%.
 
 ## How a run works
 
