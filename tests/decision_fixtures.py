@@ -14,16 +14,17 @@ CORPUS = [
     "true false yes no choice score noul state question option decision billing technical urgent",
     '{"task": "refund", "status": "open", "steps": 7, "errors": 1}',
 ] * 30
+D1_LM_CORPUS = CORPUS + ["yes Yes YES no No NO QUESTION Options Reply with the option code only"] * 40
 
 
-def build_tokenizer(folder: Path, specials: list[str], bos: str, pad: str, eos: str | None = None) -> None:
+def build_tokenizer(folder: Path, specials: list[str], bos: str, pad: str, eos: str | None = None, corpus: list[str] = CORPUS) -> None:
     from tokenizers import Tokenizer, decoders, models, pre_tokenizers, trainers
 
     tok = Tokenizer(models.BPE(unk_token=None))
     tok.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
     tok.decoder = decoders.ByteLevel()
     trainer = trainers.BpeTrainer(vocab_size=400, special_tokens=specials, initial_alphabet=pre_tokenizers.ByteLevel.alphabet())
-    tok.train_from_iterator(CORPUS, trainer)
+    tok.train_from_iterator(corpus, trainer)
     folder.mkdir(parents=True, exist_ok=True)
     tok.save(str(folder / "tokenizer.json"))
     cfg = {"bos_token": bos, "pad_token": pad}
@@ -108,4 +109,13 @@ def build_nanojev(folder: Path) -> Path:
             if p.dim() > 1:
                 p.normal_(0, 0.2)
     save_file({k: v.contiguous() for k, v in model.state_dict().items()}, str(folder / "best.safetensors"))
+    return folder
+
+
+D1_LM_SPECIALS = ["<|pad|>", "<|startoftext|>", "<|im_start|>", "<|im_end|>", "<think>", "</think>"]
+
+
+def build_d1_lm_tokenizer(folder: Path) -> Path:
+    """A ChatML byte-level tokenizer in which yes, Yes, no and No are single tokens."""
+    build_tokenizer(folder, D1_LM_SPECIALS, bos="<|startoftext|>", pad="<|pad|>", eos="<|im_end|>", corpus=D1_LM_CORPUS)
     return folder
