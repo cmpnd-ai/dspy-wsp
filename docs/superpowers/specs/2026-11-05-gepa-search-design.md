@@ -88,3 +88,6 @@ Tests use the tiny d1-omni fixture and the scripted writer that the existing opt
 - The writer may finish a round early. Unused round passes return to the master budget.
 - Validation passes are refused inside rounds.
 - Each child inherits its parent's notes and the shared kernel.
+- GEPA skips the writer session when the parent scores perfectly on its minibatch, because a child can't beat it there.
+- A writer failure, or a scoring where every example fails, stops the search. The run finishes with the best candidate so far.
+- `code_runs_per_proposal` defaults to 30, so 10 rounds fit the default 300 Python runs.

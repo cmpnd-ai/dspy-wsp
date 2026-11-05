@@ -39,7 +39,7 @@ class GEPASearch:
     min_rounds: int = 10
     minibatch_size: int = 8
     passes_per_proposal: int = 2
-    code_runs_per_proposal: int = 40
+    code_runs_per_proposal: int = 30
 
     @property
     def round_cost(self) -> int:
@@ -93,6 +93,7 @@ class _Search:
         self.row: dict = {}
         self.rows: list[dict] = []
         self.history_start = len(getattr(writer_lm, "history", None) or [])
+        self.error: Exception | None = None  # set when the search must stop: GEPA swallows exceptions and retries
         self.t0 = time.time()
 
     # --- candidates -------------------------------------------------------------------
@@ -113,9 +114,16 @@ class _Search:
 
         cid = candidate["edit"]
         items = [(i, self.examples[i]) for i in batch]
-        with self.forward.backend.using(self.edits_of(cid)):
-            rows = self.forward.run_items(self.program, items, 1, cid)
-        self.budget.passes_used += 1
+        try:
+            with self.forward.backend.using(self.edits_of(cid)):
+                rows = self.forward.run_items(self.program, items, 1, cid)
+        except Exception as e:
+            self.error = self.error or e
+            raise
+        finally:
+            self.budget.passes_used += 1
+        if rows and all("error" in r for r in rows):
+            self.error = self.error or RuntimeError(f"every example failed when scoring {cid}, e.g. {rows[0]['error']}")
         scores = [float(r.get("score", 0.0)) for r in rows]
         mean = sum(scores) / max(1, len(scores))
         on_validation = bool(batch) and batch[0] in self.forward.validation
@@ -142,6 +150,8 @@ class _Search:
 
     # --- the proposer ------------------------------------------------------------------
     def propose(self, candidate, reflective_dataset, components_to_update):
+        if self.error is not None:  # GEPA retries a failed proposal at once; don't start another session
+            raise self.error
         parent = candidate["edit"]
         self.round += 1
         n = self.round
@@ -162,9 +172,18 @@ class _Search:
             edit_store=self.edit_store, handoff_every=self.handoff_every, require_explanations=self.require_explanations,
             max_turns=self.max_turns, max_nudges=0, pass_offset=self.budget.passes_used,
         )
-        answer = session.run()
+        failure = None
+        try:
+            answer = session.run()
+        except Exception as e:  # e.g. the writer's API failed after its retries
+            failure = e
         self.budget.passes_used += b.passes_used
         self.budget.code_runs_used += b.code_runs_used
+        if failure is not None:
+            self.error = failure
+            self.row["error"] = f"{type(failure).__name__}: {failure}"
+            self._write_row(accepted=False)
+            raise failure
         note = ""
         try:
             self.edit_store.load_all()
@@ -179,19 +198,21 @@ class _Search:
 
     # --- stop rule and logging ------------------------------------------------------------
     def should_stop(self, gepa_state=None) -> bool:
-        return self.budget.passes_left < self.s.round_cost or self.budget.code_runs_left == 0
+        return self.error is not None or self.budget.passes_left < self.s.round_cost or self.budget.code_runs_left == 0
 
     def on_candidate_selected(self, event) -> None:
         self.row = {"round": self.round + 1, "parent": event["candidate"]["edit"], "parent_minibatch": None,
                     "child": None, "child_minibatch": None, "child_val": None}
 
     def on_iteration_end(self, event) -> None:
-        if not self.row.get("child"):
-            self.row = {}
-            return
+        if self.row.get("child"):
+            self._write_row(accepted=bool(event["proposal_accepted"]))
+        self.row = {}
+
+    def _write_row(self, accepted: bool) -> None:
         writer = self._writer_usage()
         best = max(self.val_scores.items(), key=lambda kv: kv[1]) if self.val_scores else (None, None)
-        row = {**self.row, "accepted": bool(event["proposal_accepted"]), "best": best[0], "best_val": best[1],
+        row = {**self.row, "accepted": accepted, "best": best[0], "best_val": best[1],
                "passes_used": self.budget.passes_used, "code_runs_used": self.budget.code_runs_used,
                **writer, "seconds": round(time.time() - self.t0, 1)}
         self.rows.append(row)
@@ -203,7 +224,6 @@ class _Search:
                     row["round"], row["parent"], row["child"], row["parent_minibatch"], row["child_minibatch"],
                     "accepted" if row["accepted"] else "rejected", val, row["best"], row["best_val"] or 0,
                     row["passes_used"], self.budget.max_passes)
-        self.row = {}
 
     def _writer_usage(self) -> dict:
         entries = (getattr(self.writer_lm, "history", None) or [])[self.history_start:]
@@ -243,12 +263,14 @@ def run_gepa(settings: GEPASearch, *, writer_lm, kernel, forward, budget: Budget
         res = optimize(
             seed_candidate={"edit": seed_id}, trainset=sorted(forward.practice), valset=sorted(forward.validation),
             adapter=search, custom_candidate_proposer=search.propose, candidate_selection_strategy="pareto",
-            reflection_minibatch_size=settings.minibatch_size, skip_perfect_score=False, use_merge=False,
+            reflection_minibatch_size=settings.minibatch_size, skip_perfect_score=True, use_merge=False,
             stop_callbacks=[search.should_stop], callbacks=[search], seed=seed,
             run_dir=str(Path(run_dir) / "gepa_state"), raise_on_exception=False, display_progress_bar=False,
         )
     finally:
         forward.allow_validation = True
+    if search.error is not None:
+        logger.error("the GEPA search stopped early after %d rounds: %s", search.round, search.error)
     best = res.best_candidate["edit"]
     restore_candidate(search.cands / best, search.work_dir)
     answer_path = search.cands / best / "answer.md"
@@ -261,6 +283,7 @@ def run_gepa(settings: GEPASearch, *, writer_lm, kernel, forward, budget: Budget
         "candidates": [{"id": c, "parent": search.parent_of.get(c), "val": search.val_scores.get(c)}
                        for c in sorted(p.name for p in search.cands.iterdir())],
         "rounds_log": str(Path(run_dir) / "rounds.jsonl"),
+        **({"error": f"{type(search.error).__name__}: {search.error}"} if search.error is not None else {}),
         **search._writer_usage(),
     }
     return search.edits_of(best), answer_path.read_text() if answer_path.exists() else "", report

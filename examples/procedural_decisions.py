@@ -88,7 +88,7 @@ def main() -> None:
     train, test = splits()
     name = run_name(args.model)
     search = make_search(args.search, args.rounds) if args.step == "optimize" else None
-    run_dir = RUNS / (f"{name}-gepa" if search else name)
+    run_dir = RUNS / (f"{name}-gepa" if args.search == "gepa" else name)
     if args.step == "compare":
         compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{name}", train, test, revision=args.revision)
         return

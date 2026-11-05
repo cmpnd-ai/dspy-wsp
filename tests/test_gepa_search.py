@@ -33,8 +33,8 @@ def backend(d1_dir):
 
 
 def edited_metric(backend):
-    """Scores 1 for any edited model and 0 for the original, so acceptance is predictable."""
-    return lambda example, pred, trace=None: float(bool(backend.current_edits))
+    """Scores 0.5 for any edited model and 0 for the original, so acceptance is predictable and no parent is perfect."""
+    return lambda example, pred, trace=None: 0.5 * bool(backend.current_edits)
 
 
 def make(backend, tmp_path, replies, **search):
@@ -97,8 +97,8 @@ def test_gepa_logs(backend, tmp_path):
     rows = [json.loads(line) for line in open(run / "rounds.jsonl")]
     assert [r["round"] for r in rows][:2] == [1, 2]
     assert rows[0]["parent"] == "c000" and rows[0]["child"] == "c001"
-    assert rows[0]["accepted"] and rows[0]["child_val"] == 1.0 and rows[0]["best_val"] == 1.0
-    assert rows[0]["parent_minibatch"] == 0.0 and rows[0]["child_minibatch"] == 1.0
+    assert rows[0]["accepted"] and rows[0]["child_val"] == 0.5 and rows[0]["best_val"] == 0.5
+    assert rows[0]["parent_minibatch"] == 0.0 and rows[0]["child_minibatch"] == 0.5
     assert not rows[1]["accepted"] and rows[1]["parent"] == "c001" and rows[1]["child_val"] is None
     assert all(r["passes_used"] <= opt.max_passes for r in rows)
     progress = (run / "progress.md").read_text()
@@ -125,3 +125,70 @@ def test_restore_candidate_without_notes_clears_them(tmp_path):
     (work / "notes.md").write_text("child notes")
     restore_candidate(cand, work)
     assert not (work / "notes.md").exists() and (work / "edited").is_dir()
+
+
+class FailingWriter:
+    """A writer that replies from a script, then raises, as an API outage would."""
+
+    def __init__(self, replies):
+        self.replies = list(replies)
+        self.calls = 0
+
+    def __call__(self, messages):
+        self.calls += 1
+        if not self.replies:
+            raise ConnectionError("the writer's API is down")
+        return [self.replies.pop(0)]
+
+
+def make_with(backend, tmp_path, writer, metric=None, **search):
+    s = GEPASearch(**(dict(min_rounds=2, minibatch_size=2, passes_per_proposal=1, code_runs_per_proposal=5) | search))
+    return WeightSpace(metric=metric or edited_metric(backend), writer_lm=writer, backend=backend, max_passes=s.min_passes(),
+                       sandbox="none", run_dir=tmp_path / "run", kernel_timeout=60, holdout=0.25,
+                       holdout_key=lambda ex: ex.workflow, search=s)
+
+
+def test_writer_failure_stops_the_search_and_counts_its_passes(backend, tmp_path):
+    writer = FailingWriter([EDIT, DECIDE])
+    compiled = make_with(backend, tmp_path, writer).compile(Program(), trainset=trainset())
+    search = compiled.wsp_report["search"]
+    assert "API is down" in search["error"] and search["rounds"] == 1 and search["best"] == "c000"
+    assert writer.calls == 3  # no second session after the failure
+    assert compiled.wsp_report["budget"]["passes_used"] == 3  # seed validation, parent minibatch, the writer's pass
+    assert compiled.wsp_report["budget"]["code_runs_used"] == 1
+    rows = [json.loads(line) for line in open(tmp_path / "run" / "rounds.jsonl")]
+    assert len(rows) == 1 and "API is down" in rows[0]["error"]
+
+
+def test_perfect_parent_costs_no_writer_session(backend, tmp_path):
+    writer, engine = scripted_writer([EDIT, FINAL])
+    opt = make_with(backend, tmp_path, writer, metric=lambda example, pred, trace=None: 1.0)
+    compiled = opt.compile(Program(), trainset=trainset())
+    assert engine.received == [] and compiled.wsp_report["search"]["rounds"] == 0
+    assert compiled.wsp_report["budget"]["passes_used"] <= opt.max_passes
+
+
+class Broken(dspy.Module):
+    def forward(self, workflow, state):
+        raise RuntimeError("the backend is gone")
+
+
+def test_search_stops_when_every_example_fails(backend, tmp_path):
+    writer, engine = scripted_writer([EDIT, FINAL])
+    compiled = make_with(backend, tmp_path, writer).compile(Broken(), trainset=trainset())
+    assert "every example failed" in compiled.wsp_report["search"]["error"]
+    assert engine.received == [] and compiled.wsp_report["budget"]["passes_used"] == 1
+
+
+def test_code_run_budget_must_pay_for_the_rounds(backend):
+    s = GEPASearch(min_rounds=10, code_runs_per_proposal=40)
+    with pytest.raises(ValueError, match="max_code_runs"):
+        WeightSpace(metric=edited_metric(backend), writer_lm=None, backend=backend, max_passes=51, holdout=10, search=s)
+    assert GEPASearch().code_runs_per_proposal * GEPASearch().min_rounds <= 300
+
+
+def test_round_prompt_states_the_round_limits(backend, tmp_path):
+    opt, _ = make(backend, tmp_path, [FINAL, FINAL])
+    opt.compile(Program(), trainset=trainset())
+    first = (tmp_path / "run" / "rounds" / "r01" / "turns" / "t001" / "prompt.txt").read_text()
+    assert "run code up to 5 times" in first and "budget of 1 forward passes in this round" in first

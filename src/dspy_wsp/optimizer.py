@@ -137,6 +137,9 @@ class WeightSpace(Teleprompter):
                 raise ValueError("GEPA search needs a holdout: it selects candidates on the validation set")
             if max_passes < search.min_passes():
                 raise ValueError(f"max_passes={max_passes} cannot pay for {search.min_rounds} GEPA rounds; give at least {search.min_passes()}")
+            if max_code_runs < search.min_rounds * search.code_runs_per_proposal:
+                raise ValueError(f"max_code_runs={max_code_runs} cannot pay for {search.min_rounds} GEPA rounds of "
+                                 f"{search.code_runs_per_proposal} Python runs; give at least {search.min_rounds * search.code_runs_per_proposal}")
 
     def compile(self, student: dspy.Module, *, trainset: list[dspy.Example], teacher=None, valset: list[dspy.Example] | None = None, **kwargs) -> dspy.Module:
         """Run a weight-space session and return a copy of `student` whose LM runs the edited weights.
@@ -205,7 +208,7 @@ class WeightSpace(Teleprompter):
             work_dir=str(work),
             timeout=int(self.kernel_timeout),
             max_output=self.max_output,
-            max_code_runs=self.max_code_runs,
+            max_code_runs=self.search.code_runs_per_proposal if self.search else self.max_code_runs,
             tensor_listing=prompts.tensor_listing(shapes, protected=lambda n: is_protected(n, protected)),
             n_practice=len(practice),
             input_keys=sorted(first.inputs().keys()),

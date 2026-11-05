@@ -128,9 +128,10 @@ def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None,
             "This run is a population search. It keeps several candidate edits. Each round is a short session that starts from one "
             f"candidate: its edit is in {work_dir}/edited and its notes are in {work_dir}/notes.md. The kernel and the other files in "
             f"{work_dir} carry over from earlier rounds. Improve on the candidate you start from. The round ends when you reply without "
-            f"a code block, or after its {max_passes} forward passes; you may end it earlier. The tensors in {work_dir}/edited when the "
-            "round ends become a new candidate. The search scores it on the cases you are shown, and on the validation set if it beats "
-            "the candidate you started from. When you finish, reply without a code block, saying what you changed and the evidence for it."
+            f"a code block. You may end it before its {max_passes} forward passes are used, and you may still run Python after they are. "
+            f"The tensors in {work_dir}/edited when the round ends become a new candidate. The search scores it on the practice examples "
+            "shown below and, if it beats the candidate you started from there, on the validation set. Aim for edits that hold beyond "
+            "those examples. When you finish, reply without a code block, saying what you changed and the evidence for it."
         )
     else:
         ending = (
