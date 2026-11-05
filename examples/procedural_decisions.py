@@ -29,7 +29,7 @@ from collections import Counter
 from pathlib import Path
 
 import dspy
-from typed_decisions import baseline, make_backend, optimize
+from typed_decisions import baseline, make_backend, optimize, run_name
 from typed_decisions_reanchor import compare
 
 DATASET = "tasksource/procedural-typed-decisions"
@@ -76,24 +76,26 @@ def splits() -> tuple[list[dspy.Example], list[dspy.Example]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="d1", choices=["d1", "nanojev"])
+    parser.add_argument("--model", default="d1", help='"d1", "nanojev", a Hugging Face repo id or a local checkpoint folder')
+    parser.add_argument("--revision", help="the repo revision (aliases default to the tested one)")
     parser.add_argument("--framework", choices=["mlx", "torch"], default="mlx")
     parser.add_argument("--step", required=True, choices=["baseline-protocol", "baseline-program", "optimize", "compare"])
     parser.add_argument("--passes", type=int, default=25)
     args = parser.parse_args()
 
     train, test = splits()
-    run_dir = RUNS / args.model
+    name = run_name(args.model)
+    run_dir = RUNS / name
     if args.step == "compare":
-        compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{args.model}", train, test)
+        compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{name}", train, test, revision=args.revision)
         return
-    backend = make_backend(args.model, args.framework)
+    backend = make_backend(args.model, args.framework, args.revision)
     try:
         if args.step == "optimize":
             optimize(backend, train, test, run_dir=run_dir, passes=args.passes, holdout=300, task=TASK)
         else:
             kind = args.step.removeprefix("baseline-")
-            baseline(backend, kind, train, test, RUNS / f"baseline_{args.model}_{kind}.json")
+            baseline(backend, kind, train, test, RUNS / f"baseline_{name}_{kind}.json")
     finally:
         backend.close()
 

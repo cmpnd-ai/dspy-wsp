@@ -74,21 +74,42 @@ backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_76
 
 ## Decision models
 
-`WeightSpace` also edits System One decision models: models that read a state and typed questions (Choice, Noul and Score) and return a probability for every option, with no text generation. Two are supported, each with our own loader in MLX and in PyTorch:
+`WeightSpace` also edits System One decision models: models that read a state and typed questions (Choice, Noul and Score) and return a probability for every option, with no text generation. Two families are supported, each with our own loader in MLX and in PyTorch:
 
-- `D1Backend` runs Liquid AI's d1-omni-600M (text path).
-- `NanoJevBackend` runs NanoJev (a Qwen3-0.6B backbone with a decision head).
+- `D1Backend` runs Liquid AI's d1 models (text path), e.g. d1-omni-600M.
+- `NanoJevBackend` runs NanoJev models (a Qwen3 backbone with a decision head).
+
+`load_decision_backend` opens a model by alias, Hugging Face repo id or local folder. It reads the checkpoint's config to pick the family, and it refuses other architectures with a message that names the supported ones. The aliases `"d1"` and `"nanojev"` open the checkpoints we tested, at pinned revisions.
+
+```python
+from dspy_wsp import load_decision_backend
+
+backend = load_decision_backend("nanojev")                      # C-Tianyu/NanoJev at the tested revision
+backend = load_decision_backend("someone/nanojev-finetune")     # any checkpoint of a supported family
+backend = load_decision_backend("/path/to/checkpoint", framework="torch")
+```
+
+Before you run a new checkpoint, check it:
+
+```bash
+dspy-wsp check someone/nanojev-finetune
+```
+
+The check loads the model, confirms that its tensors map to our network, and answers sample Choice, Noul and Score questions. It confirms that the answers are valid distributions and that a request gives the same answer alone and in a batch. Finally, it edits one tensor, confirms that the answers move, and confirms that restoring the tensor restores them. `check_decision_model` runs the same check from Python.
 
 The backend runs a local `/v1/systemone` server, and a DSPy program calls it through DSPy's TypeSafe client, as it would call TypeSafe's hosted Jev. Give the program's signatures `Choice`, `Noul` or `Score` outputs from `dspy.experimental`.
 
 ```python
-from dspy_wsp import D1Backend, WeightSpace
+from dspy_wsp import WeightSpace, load_decision_backend
 
-backend = D1Backend(framework="mlx")
+backend = load_decision_backend("d1", framework="mlx")
 optimizer = WeightSpace(metric=metric, writer_lm=dspy.LM("openai/gpt-6.1-sol"), backend=backend,
                         max_passes=25, holdout=300, holdout_key=lambda ex: ex.workflow)
 compiled = optimizer.compile(program, trainset=train, valset=test)
+compiled.wsp_patch.write_checkpoint(backend.weights_dir, "edited-d1/")
 ```
+
+`write_checkpoint` copies the model's folder, including its subfolders and the model's own code files, with the edited tensors substituted and checked against their hashes. The result has the same layout as the base folder, so the model's own code and `load_decision_backend` both open it. The example scripts take `--model` with an alias, repo id or folder, and they save the edited checkpoint in the run folder's `checkpoint/`.
 
 For a decision model, the writer gets `decide` passes, which run the program and score it, and `read` passes, which return each option's logit and the decision head's inputs. It may recompute the head from those reads and derive edits in closed form. `holdout` moves training examples to a validation set that the writer can score edits on but never see. `examples/typed_decisions.py` runs the Typed Decisions benchmark. Two runs on a MacBook Pro with MLX, with `openai/gpt-6.1-sol` as the writer and 25 passes each, gave these results on the 400 held-out test cases:
 

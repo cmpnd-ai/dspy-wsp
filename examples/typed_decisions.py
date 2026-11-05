@@ -163,21 +163,22 @@ def program_baseline(backend, cases: list[dspy.Example], train: list[dspy.Exampl
 
 
 # --- the run ----------------------------------------------------------------------------
-def make_backend(model: str, framework: str | None):
-    if model == "d1":
-        from dspy_wsp.backends.decision import D1Backend
+def make_backend(model: str, framework: str | None, revision: str | None = None):
+    """A backend for an alias ("d1", "nanojev"), a Hugging Face repo id or a local checkpoint folder."""
+    from dspy_wsp.decision.loading import load_decision_backend
 
-        return D1Backend(framework=framework)
-    if model == "nanojev":
-        from dspy_wsp.backends.decision import NanoJevBackend
+    return load_decision_backend(model, revision=revision, framework=framework)
 
-        return NanoJevBackend(framework=framework)
-    raise ValueError(f"unknown model {model!r}")
+
+def run_name(model: str) -> str:
+    """A folder name for a model's runs: the alias, or the repo or folder's last part."""
+    return model if "/" not in model else Path(model.rstrip("/")).name.lower()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="d1", choices=["d1", "nanojev"])
+    parser.add_argument("--model", default="d1", help='"d1", "nanojev", a Hugging Face repo id or a local checkpoint folder')
+    parser.add_argument("--revision", help="the repo revision (aliases default to the tested one)")
     parser.add_argument("--framework", choices=["mlx", "torch"])
     parser.add_argument("--baseline", choices=["protocol", "program"], help="only score the unedited model on the test split")
     parser.add_argument("--smoke", action="store_true", help="3 passes on a 250-case subset, a 40-case final check")
@@ -186,14 +187,14 @@ def main() -> None:
     args = parser.parse_args()
 
     train, test = load_split("train"), load_split("test")
-    backend = make_backend(args.model, args.framework)
+    backend = make_backend(args.model, args.framework, args.revision)
     try:
         if args.baseline:
             t = time.time()
             fn = protocol_baseline if args.baseline == "protocol" else lambda b, c: program_baseline(b, c, train)
             result = {"model": backend.model_id, "framework": backend.framework, "baseline": args.baseline, **fn(backend, test),
                       "seconds": round(time.time() - t, 1)}
-            out = RUNS / f"baseline_{args.model}_{args.baseline}.json"
+            out = RUNS / f"baseline_{run_name(args.model)}_{args.baseline}.json"
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(json.dumps(result, indent=1))
             print(json.dumps(result, indent=1))
@@ -209,7 +210,7 @@ def main() -> None:
                 by_wf.setdefault(ex.workflow, []).append(ex)
             passes, holdout, valset = 3, 50, [ex for exs in by_wf.values() for ex in exs[:10]]
             limits = Limits(max_generations=64, max_generations_both=64, max_reads=256)
-        run_dir = args.run_dir or RUNS / f"{args.model}{'-smoke' if args.smoke else ''}"
+        run_dir = args.run_dir or RUNS / f"{run_name(args.model)}{'-smoke' if args.smoke else ''}"
         optimize(backend, train, valset, run_dir=run_dir, passes=passes, limits=limits, holdout=holdout, task=TASK)
     finally:
         backend.close()
@@ -234,6 +235,9 @@ def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout
     print(compiled.wsp_patch.summary())
     print(json.dumps(compiled.wsp_report["validation"]["paired"], indent=1))
     compiled.save(str(Path(run_dir) / "program.json"))
+    if len(compiled.wsp_patch):
+        out = compiled.wsp_patch.write_checkpoint(backend.weights_dir, Path(run_dir) / "checkpoint")
+        print(f"edited checkpoint: {out}")
     return compiled
 
 

@@ -197,7 +197,10 @@ class Patch:
                 raise PatchError(f"{t.name} is not in {base}")
             by_file.setdefault(reader.index[t.name], []).append(t)
         for f in sorted(base.iterdir()):
+            if f.name.startswith("."):
+                continue
             if f.is_dir():
+                shutil.copytree(f, out / f.name, dirs_exist_ok=True)  # e.g. NanoJev's backbone_config/ and tokenizer/
                 continue
             if f.name in by_file:
                 from safetensors import safe_open

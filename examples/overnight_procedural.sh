@@ -2,6 +2,7 @@
 # Run the Procedural Typed Decisions suite for each model in turn: two baselines, a WeightSpace run,
 # and the ReAnchor comparison. A watchdog stops any step whose process grows above 20 GB.
 #   examples/overnight_procedural.sh d1 nanojev
+# A model may also be a Hugging Face repo id or a local checkpoint folder.
 # Run it from the repository root. Logs go to examples/runs/procedural-decisions/.
 set -u
 root=${0:A:h:h}
@@ -25,7 +26,7 @@ watch_memory() {
 for model in "$@"; do
   for step in baseline-protocol baseline-program optimize compare; do
     echo "=== $(date) start $model $step" >> $logs/overnight.log
-    caffeinate -i ../.venv/bin/python procedural_decisions.py --model $model --step $step > $logs/${model}_${step}.log 2>&1 &
+    caffeinate -i ../.venv/bin/python procedural_decisions.py --model $model --step $step > $logs/${model:t:l}_${step}.log 2>&1 &
     pid=$!
     watch_memory $pid "$model $step" &
     wait $pid

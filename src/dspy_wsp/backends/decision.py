@@ -323,7 +323,8 @@ class D1Backend(DecisionBackend):
     """Liquid AI's d1 decision models (text only). Defaults to d1-omni-600M at a pinned revision."""
 
     family = "d1"
-    download_patterns = ["config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json", "LICENSE"]
+    # The model's own code (*.py) is downloaded, never run, so a saved checkpoint loads with it.
+    download_patterns = ["config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json", "LICENSE", "*.py"]
 
     def __init__(self, model: str = "LiquidAI/d1-omni-600M", *, revision: str | None = "02b55d7076f15129e59ab3f94783f32c4b088674", framework: str | None = None, device: str | None = None, max_length: int | None = None):
         super().__init__(model, revision=revision, framework=framework, device=device, max_length=max_length)

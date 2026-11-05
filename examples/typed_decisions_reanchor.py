@@ -25,7 +25,7 @@ from pathlib import Path
 
 import dspy
 from dspy.experimental import Choice, Noul, ReAnchor, Score
-from typed_decisions import TypedDecisions, load_split, make_backend, metric, predicted_probabilities
+from typed_decisions import TypedDecisions, load_split, make_backend, metric, predicted_probabilities, run_name
 
 from dspy_wsp import stats
 from dspy_wsp.patch import Patch
@@ -86,14 +86,14 @@ def summary(result: dict) -> dict:
             "probability_accuracy": stats.mean(p), "probability_se": stats.standard_error(p), "by_type": result["by_type"]}
 
 
-def compare(model: str, framework: str | None, wsp_run: Path, out: Path, train: list, test: list) -> dict:
+def compare(model: str, framework: str | None, wsp_run: Path, out: Path, train: list, test: list, revision: str | None = None) -> dict:
     """Score plain, ReAnchor, WeightSpace and both on `test`; ReAnchor fits on the WeightSpace run's practice cases."""
     # ReAnchor reruns the program many times on cached answers. DSPy's call history keeps a copy of every
     # request and answer on the client and on each predictor, which grows to tens of GB here.
     dspy.configure(disable_history=True)
     out.mkdir(parents=True, exist_ok=True)
     practice, validation = split_from_run(wsp_run, train)
-    backend = make_backend(model, framework)
+    backend = make_backend(model, framework, revision)
     edits = {n: t.float().numpy() for n, t in Patch.load(wsp_run / "patch").edited_tensors(backend.reader).items()}
     results, fitted, timings = {}, {}, {}
     try:
@@ -133,12 +133,14 @@ def compare(model: str, framework: str | None, wsp_run: Path, out: Path, train: 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="nanojev", choices=["d1", "nanojev"])
+    parser.add_argument("--model", default="nanojev", help='"d1", "nanojev", a Hugging Face repo id or a local checkpoint folder')
+    parser.add_argument("--revision")
     parser.add_argument("--framework", choices=["mlx", "torch"])
     parser.add_argument("--wsp-run", type=Path, required=True, help="a finished WeightSpace run folder (its patch and practice split)")
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
-    compare(args.model, args.framework, args.wsp_run, args.out or args.wsp_run.parent / f"reanchor_{args.model}", load_split("train"), load_split("test"))
+    compare(args.model, args.framework, args.wsp_run, args.out or args.wsp_run.parent / f"reanchor_{run_name(args.model)}", load_split("train"), load_split("test"),
+            revision=args.revision)
 
 
 if __name__ == "__main__":
