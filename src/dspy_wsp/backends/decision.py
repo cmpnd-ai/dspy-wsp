@@ -26,6 +26,9 @@ from dspy_wsp.decision.schema import Question, RequestError, make_answer, parse_
 from dspy_wsp.tensors import TensorReader
 
 
+MLX_CACHE_LIMIT = 1 << 30  # bytes of freed MLX buffers kept for reuse
+
+
 class DecisionBackend(WeightBackend):
     """Shared machinery; a subclass supplies the model family's encoding and network."""
 
@@ -130,6 +133,12 @@ class DecisionBackend(WeightBackend):
         return fut.result()
 
     def _load(self) -> None:
+        if self.framework == "mlx":
+            import mlx.core as mx
+
+            # MLX keeps freed buffers for reuse. Batches of many different shapes grow that cache
+            # without bound (32 GB after 30 NanoJev cases), so cap it.
+            mx.set_cache_limit(MLX_CACHE_LIMIT)
         self.net = self._load_network()
         self._params = self._named_params()
         self._param_for = {n: n for n in self.reader.names if n in self._params and self._model_tensor(n)}

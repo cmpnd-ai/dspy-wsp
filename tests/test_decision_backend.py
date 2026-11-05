@@ -113,3 +113,16 @@ def test_bad_request_fails_alone(backend):
     with pytest.raises(RequestError):
         backend.system_one(STATE, {"x": {"type": "choice", "instructions": "?", "criteria": {"only": "one"}}})
     assert backend.system_one(STATE, QUESTIONS)["answers"]
+
+
+def test_mlx_cache_stays_under_limit(d1_dir):
+    mx = pytest.importorskip("mlx.core")
+    from dspy_wsp.backends.decision import MLX_CACHE_LIMIT
+
+    b = D1Backend(str(d1_dir), revision=None, framework="mlx")
+    try:
+        for i in range(20):
+            b.system_one({"steps": i, "note": "word " * (i * 7)}, QUESTIONS)
+        assert b._call(mx.get_cache_memory) <= MLX_CACHE_LIMIT
+    finally:
+        b.close()
