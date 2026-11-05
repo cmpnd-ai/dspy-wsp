@@ -22,8 +22,9 @@ dependencies = [
 hf = ["transformers>=4.45", "huggingface_hub>=0.24"]
 mlx = ["mlx-lm>=0.32", "huggingface_hub>=0.24"]
 vllm = ["vllm>=0.32", "transformers>=4.45", "huggingface_hub>=0.24"]
+decision = ["dspy[typesafe]>=3.4,<3.5", "typesafe-sdk==0.7.5", "tokenizers>=0.20", "huggingface_hub>=0.24", "mlx>=0.30; sys_platform == 'darwin' and platform_machine == 'arm64'"]
 examples = ["transformers>=4.45", "huggingface_hub>=0.24", "datasets>=2.14", "math-verify>=0.7"]
-dev = ["pytest>=8", "transformers>=4.45", "huggingface_hub>=0.24", "mlx-lm>=0.32; sys_platform == 'darwin' and platform_machine == 'arm64'"]
+dev = ["pytest>=8", "transformers>=4.45", "huggingface_hub>=0.24", "typesafe-sdk==0.7.5", "requests>=2.31", "mlx-lm>=0.32; sys_platform == 'darwin' and platform_machine == 'arm64'"]
 
 [project.scripts]
 dspy-wsp = "dspy_wsp.cli:main"

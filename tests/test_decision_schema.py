@@ -27,19 +27,19 @@ def test_score_confidence_values():
 def test_make_answer_shapes():
     choice = parse_question({"type": "choice", "instructions": "Which?", "criteria": {"a": "A", "b": "B", "c": "C"}})
     a = make_answer(choice, [0.2, 0.7, 0.1])
-    assert a["choice"] == "b" and set(a) == {"choice", "probabilities", "confidence"}
+    assert a["choice"] == "b" and set(a) == {"type", "choice", "probabilities", "confidence"}
     assert list(a["probabilities"]) == ["a", "b", "c"]
 
     score = parse_question({"type": "score", "instructions": "How much?", "criteria": ["low", "mid", "high"]})
     s = make_answer(score, [0.1, 0.3, 0.6])
     assert set(s["probabilities"]) == {"0", "1", "2"}
     assert s["score"] == pytest.approx(0.3 + 1.2)
-    assert set(s) == {"score", "probabilities", "confidence"}
+    assert set(s) == {"type", "score", "probabilities", "confidence", "legend"} and s["legend"]["2"] == "high"
 
     noul = parse_question({"type": "noul", "instructions": "Is it?"})
     assert noul.option_keys == ["false", "true"]
     n = make_answer(noul, [0.25, 0.75])
-    assert n == {"noul": pytest.approx(0.75)}
+    assert n == {"type": "noul", "noul": pytest.approx(0.75)}
 
 
 @pytest.mark.parametrize(
