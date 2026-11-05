@@ -531,7 +531,7 @@ class D1LMBackend(DecisionBackend):
 
         self.config = json.loads((self._dir / "config.json").read_text())
         self.tok = encoding.Tokenizer(self._dir)
-        self.temperature = encoding.load_calibration(self._dir)
+        self.calibration = encoding.load_calibration(self._dir)
         self.set_size = int(self.config.get("d1_set_size", encoding.SET_SIZE))
         self.scheme = int(self.config.get("d1_codes", 1))
         self.max_length = int(max_length or 16_384)
@@ -567,7 +567,7 @@ class D1LMBackend(DecisionBackend):
     def _probabilities(self, logits, q):
         from dspy_wsp.decision.families.d1_lm import encoding
 
-        return encoding.probabilities(logits, self.temperature)
+        return encoding.probabilities(logits, self.calibration.temperature(q))
 
     def _model_tensor(self, name):
         return name.startswith("model.language_model.")
@@ -597,8 +597,8 @@ class D1LMBackend(DecisionBackend):
             f"{self.set_size} questions, each ending at the assistant header and an empty <think></think> block (its answer "
             "position). In the full-attention blocks, state tokens read every token and each question reads the state and "
             "itself; the convolution and sliding-window blocks read only earlier tokens. Options are coded A, B, C "
-            "(choice), 0, 1, 2 (score) or yes/no (noul). The answer is a softmax, at temperature "
-            f"{self.temperature:g}, of the scores at the answer position for the option tokens: the final normed hidden state "
+            "(choice), 0, 1, 2 (score) or yes/no (noul). The answer is a softmax, at the calibration temperature (default "
+            f"{self.calibration.default:g}, per question type where one is set), of the scores at the answer position for the option tokens: the final normed hidden state "
             "(after `embedding_norm`) times each option token's row of `embed_tokens` (the output layer is tied to the "
             "embedding); an option scores its best form. There is no separate head: the embedding and the final norm are "
             f"protected, so edits land in the blocks. The last write into the residual stream is "

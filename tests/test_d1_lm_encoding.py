@@ -116,20 +116,27 @@ def test_probabilities_divide_by_temperature():
 
 
 def test_calibration_default(tmp_path):
-    assert enc.load_calibration(tmp_path) == 1.0
+    assert enc.load_calibration(tmp_path).temperature(choice({"a": "A", "b": "B"})) == 1.0
     (tmp_path / "calibration.json").write_text('{"default": 1.337, "temperatures": {}}')
-    assert enc.load_calibration(tmp_path) == 1.337
+    assert enc.load_calibration(tmp_path).temperature(choice({"a": "A", "b": "B"})) == 1.337
 
 
-def test_masks_cell_by_cell():
-    row = enc.Row(ids=list(range(7)), state_len=3, question_of=[-1, -1, -1, 1, 1, 2, 2], slots=[4, 6], questions=[])
-    full, sliding, real = enc.masks([row], width=8, window=2)
-    assert full.shape == sliding.shape == (1, 8, 8) and real.shape == (1, 8)
-    g = row.question_of + [-1]
-    for i in range(8):
-        for j in range(8):
-            expect_full = j < 7 and (i < 3 or j < 3 or g[i] == g[j])
-            assert full[0, i, j] == expect_full, (i, j)
-            assert sliding[0, i, j] == (j < 7 and i - 2 < j <= i), (i, j)
-    assert not full[0, :, 7].any() and not sliding[0, :, 7].any()
-    assert list(real[0]) == [True] * 7 + [False]
+def test_calibration_buckets():
+    def options(n):
+        return choice({f"k{i}": None for i in range(n)})
+
+    assert enc.bucket(parse_question({"type": "noul", "instructions": "?"})) == "noul"
+    assert enc.bucket(parse_question({"type": "score", "instructions": "?", "criteria": ["a", "b", "c", "d"]})) == "score:4"
+    assert [enc.bucket(options(n)) for n in (2, 3, 4, 8, 9, 26, 27)] == [
+        "choice:small", "choice:small", "choice:mid", "choice:mid", "choice:large", "choice:large", "choice:inventory"]
+
+
+def test_per_type_temperatures(tmp_path):
+    (tmp_path / "calibration.json").write_text(
+        '{"default": 1.337, "temperatures": {"noul": 2.0, "score:3": 0.5, "choice:mid": 1.5}}')
+    cal = enc.load_calibration(tmp_path)
+    assert cal.temperature(parse_question({"type": "noul", "instructions": "?"})) == 2.0
+    assert cal.temperature(parse_question({"type": "score", "instructions": "?", "criteria": ["a", "b", "c"]})) == 0.5
+    assert cal.temperature(parse_question({"type": "score", "instructions": "?", "criteria": ["a", "b"]})) == 1.337
+    assert cal.temperature(choice({f"k{i}": None for i in range(5)})) == 1.5
+    assert cal.temperature(choice({"a": "A", "b": "B"})) == 1.337

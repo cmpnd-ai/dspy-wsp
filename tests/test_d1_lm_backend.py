@@ -125,3 +125,22 @@ def test_chunks_bound_the_attention_masks(folder):
     sizes = [len(c) for c in net._chunks(rows)]
     assert sum(sizes) == 8
     assert all(n == 1 or n * width * width <= MASK_BUDGET for n in sizes)
+
+
+def test_backend_applies_per_type_temperatures(folder, tmp_path):
+    import json
+    import shutil
+
+    from dspy_wsp.decision.families.d1_lm import encoding as enc
+
+    hot = tmp_path / "hot"
+    shutil.copytree(folder, hot)
+    (hot / "calibration.json").write_text(json.dumps({"default": 1.337, "temperatures": {"noul": 4.0}}))
+    q = {"type": "noul", "instructions": "Is it urgent?"}
+    b = load_decision_backend(str(hot), framework="torch")
+    try:
+        arrays, _ = b.read([{"state": STATE, "questions": {"u": q}}])
+        p_true = b.system_one(STATE, {"u": q})["answers"]["u"]["noul"]
+    finally:
+        b.close()
+    assert p_true == pytest.approx(enc.probabilities(arrays["option_logits"][0], 4.0)[1], abs=1e-6)

@@ -226,10 +226,33 @@ def probabilities(scores: np.ndarray, temperature: float) -> list[float]:
     return (z / z.sum()).tolist()
 
 
-def load_calibration(folder: str | Path) -> float:
-    """The checkpoint's temperature for choice, noul and score answers (`calibration.json`'s default)."""
+def bucket(q: Question) -> str:
+    """The calibration bucket of a question: its type, and for a score its levels, for a choice its size."""
+    if q.type == "noul":
+        return "noul"
+    k = len(q.criteria)
+    if q.type == "score":
+        return f"score:{k}"
+    return "choice:small" if k <= 3 else "choice:mid" if k <= 8 else "choice:large" if k <= 26 else "choice:inventory"
+
+
+@dataclass
+class Calibration:
+    """`calibration.json`: a temperature per bucket where one was fitted, else the default."""
+
+    temperatures: dict[str, float] = field(default_factory=dict)
+    default: float = 1.0
+
+    def temperature(self, q: Question) -> float:
+        return float(self.temperatures.get(bucket(q), self.default))
+
+
+def load_calibration(folder: str | Path) -> Calibration:
     f = Path(folder) / "calibration.json"
-    return float(json.loads(f.read_text()).get("default", 1.0)) if f.is_file() else 1.0
+    if not f.is_file():
+        return Calibration()
+    d = json.loads(f.read_text())
+    return Calibration(dict(d.get("temperatures") or {}), float(d.get("default", 1.0)))
 
 
 # --- batching ----------------------------------------------------------------------------
