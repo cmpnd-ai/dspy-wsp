@@ -84,3 +84,29 @@ def test_capture_matches_logits(tok, torch_model):
     for cap, z in zip(caps, torch_model.logits(rs)):
         np.testing.assert_allclose(cap["logits"], z, atol=1e-6)
         assert cap["head_inputs"].shape == (len(z), 64) and cap["hidden_mean"].shape == (3, 64)
+
+
+@pytest.fixture(scope="module")
+def mlx_model(d1_dir):
+    pytest.importorskip("mlx.core")
+    from dspy_wsp.decision.d1_mlx import D1MLX
+
+    return D1MLX.from_dir(d1_dir)
+
+
+def test_mlx_param_names_match_checkpoint(d1_dir, mlx_model):
+    from mlx.utils import tree_flatten
+    from safetensors import safe_open
+
+    with safe_open(str(d1_dir / "model.safetensors"), "np") as f:
+        text = {k for k in f.keys() if d1.text_tensor(k)}
+    assert {k for k, _ in tree_flatten(mlx_model.parameters())} == text
+
+
+def test_mlx_matches_torch_logits(tok, torch_model, mlx_model):
+    rs = rows(tok, CHOICE, NOUL, SCORE) + rows(tok, CHOICE, state="a longer state " * 30)
+    for a, b in zip(torch_model.logits(rs), mlx_model.logits(rs)):
+        np.testing.assert_allclose(a, b, atol=1e-4)
+    for a, b in zip(torch_model.capture(rs, [1, 3]), mlx_model.capture(rs, [1, 3])):
+        for key in a:
+            np.testing.assert_allclose(a[key], b[key], atol=1e-4, err_msg=key)
