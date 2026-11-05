@@ -75,3 +75,37 @@ def build_d1(folder: Path) -> Path:
     state["audio.proj.weight"] = torch.zeros(4, 4)
     save_file(state, str(folder / "model.safetensors"))
     return folder
+
+
+NANOJEV_SPECIALS = ["<|endoftext|>", "<|im_start|>", "<|im_end|>"]
+
+
+def nanojev_backbone_config(vocab: int) -> dict:
+    return {
+        "model_type": "qwen3", "vocab_size": vocab, "hidden_size": 64, "intermediate_size": 128, "num_hidden_layers": 2,
+        "num_attention_heads": 4, "num_key_value_heads": 2, "head_dim": 16, "rms_norm_eps": 1e-6, "rope_theta": 1_000_000.0,
+        "max_position_embeddings": 4096, "tie_word_embeddings": False, "hidden_act": "silu", "attention_bias": False,
+    }
+
+
+def build_nanojev(folder: Path) -> Path:
+    """A tiny NanoJev checkpoint folder: run config, backbone config, tokenizer and random weights."""
+    from safetensors.torch import save_file
+    from tokenizers import Tokenizer
+
+    from dspy_wsp.decision.nanojev_torch import NanoJevTorch
+
+    build_tokenizer(folder / "tokenizer", NANOJEV_SPECIALS, bos="<|im_start|>", pad="<|endoftext|>", eos="<|im_end|>")
+    vocab = Tokenizer.from_file(str(folder / "tokenizer" / "tokenizer.json")).get_vocab_size()
+    (folder / "backbone_config").mkdir(parents=True, exist_ok=True)
+    backbone = nanojev_backbone_config(vocab)
+    (folder / "backbone_config" / "config.json").write_text(json.dumps(backbone))
+    (folder / "config.json").write_text(json.dumps({"set_head": "attention", "max_length": 512, "model": "tiny-qwen3"}))
+    torch.manual_seed(0)
+    model = NanoJevTorch(backbone, "attention")
+    with torch.no_grad():
+        for p in model.parameters():
+            if p.dim() > 1:
+                p.normal_(0, 0.2)
+    save_file({k: v.contiguous() for k, v in model.state_dict().items()}, str(folder / "best.safetensors"))
+    return folder

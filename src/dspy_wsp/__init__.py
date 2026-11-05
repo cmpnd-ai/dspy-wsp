@@ -17,6 +17,7 @@ _EXPORTS = {
     "MLXBackend": "dspy_wsp.backends.mlx",
     "VLLMBackend": "dspy_wsp.backends.vllm",
     "D1Backend": "dspy_wsp.backends.decision",
+    "NanoJevBackend": "dspy_wsp.backends.decision",
     "WeightBackend": "dspy_wsp.backends.base",
     "Patch": "dspy_wsp.patch",
     "Limits": "dspy_wsp.forward",

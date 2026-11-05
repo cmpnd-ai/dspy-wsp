@@ -73,6 +73,9 @@ class DecisionBackend(WeightBackend):
     def _probabilities(self, logits: np.ndarray, q: Question) -> list[float]:
         raise NotImplementedError
 
+    def _row_tokens(self, row) -> int:
+        return len(row[0])
+
     def _model_tensor(self, name: str) -> bool:
         """Whether a checkpoint tensor belongs to the loaded network."""
         return True
@@ -107,7 +110,7 @@ class DecisionBackend(WeightBackend):
             except Exception as e:  # noqa: BLE001 - a bad request fails alone
                 fut.set_exception(e if isinstance(e, RequestError) else RequestError(str(e)))
                 continue
-            owners.append((fut, questions, len(rows), len(encoded), sum(len(r[0]) for r in encoded)))
+            owners.append((fut, questions, len(rows), len(encoded), sum(self._row_tokens(r) for r in encoded)))
             rows.extend(encoded)
         if not rows:
             return
@@ -363,3 +366,81 @@ class D1Backend(DecisionBackend):
         return {**super().read_conventions(),
                 "head_inputs": "the scorer's input at each option's <mask> (after the head's transformer layers)",
                 "trunk_markers": "the trunk's normed output at each option's <mask> (the head's input there)"}
+
+
+class NanoJevBackend(DecisionBackend):
+    """NanoJev (a Qwen3-0.6B backbone with a decision head). Defaults to C-Tianyu/NanoJev at a pinned revision."""
+
+    family = "nanojev"
+    download_patterns = ["best.safetensors", "config.json", "backbone_config/*", "tokenizer/*"]
+    protected_description = "the tensors marked (out of scope) below (the token embedding and the backbone's final norm)"
+
+    def __init__(self, model: str = "C-Tianyu/NanoJev", *, revision: str | None = "047b927b30882a1138fc504821b82ac145a4b81a", framework: str | None = None, device: str | None = None, max_length: int | None = 8192):
+        super().__init__(model, revision=revision, framework=framework, device=device, max_length=max_length)
+
+    def _setup(self, max_length):
+        from dspy_wsp.decision import nanojev
+
+        self.run_config, self.backbone_config = nanojev.load_configs(self._dir)
+        self.tok = nanojev.Tokenizer(self._dir / "tokenizer")
+        self.max_length = int(max_length or self.run_config.get("max_length", 8192))
+
+    def _load_network(self):
+        if self.framework == "torch":
+            from dspy_wsp.decision.nanojev_torch import NanoJevTorch
+
+            return NanoJevTorch.from_dir(self._dir, device=self.device or "cpu", pad_token_id=self.tok.pad_token_id)
+        from dspy_wsp.decision.nanojev_mlx import NanoJevMLX
+
+        return NanoJevMLX.from_dir(self._dir, pad_token_id=self.tok.pad_token_id)
+
+    def _encode(self, state, q):
+        from dspy_wsp.decision import nanojev
+
+        paths, prefix = nanojev.encode(self.tok, state, q, self.max_length)
+        return paths, prefix, q
+
+    def _row_tokens(self, row) -> int:
+        return sum(len(p) for p in row[0])
+
+    def _probabilities(self, logits, q):
+        from dspy_wsp.decision import nanojev
+
+        return nanojev.probabilities(logits, q)
+
+    def default_protected(self):
+        return (r"^backbone\.embed_tokens\.weight$", r"^backbone\.norm\.weight$")
+
+    @property
+    def tokenizer_dir(self) -> Path:
+        return self._dir / "tokenizer"
+
+    def num_tokens(self, text: str) -> int:
+        return len(self.tok.encode(text))
+
+    def dims(self) -> dict:
+        c = self.backbone_config
+        return {"layers": c["num_hidden_layers"], "hidden": c["hidden_size"], "intermediate": c["intermediate_size"],
+                "heads": c["num_attention_heads"], "kv_heads": c["num_key_value_heads"], "vocab": c["vocab_size"]}
+
+    def describe(self) -> str:
+        c = self.backbone_config
+        n = sum(int(np.prod(self.reader.shape(k))) for k in self._param_for)
+        return (
+            f"{self.model_id} (NanoJev decision model): a Qwen3 backbone (`backbone.*`, {c['num_hidden_layers']} causal transformer "
+            f"blocks, width {c['hidden_size']}, MLP width {c['intermediate_size']}, {c['num_attention_heads']} attention heads, "
+            f"{c['num_key_value_heads']} key/value heads) and a decision head. Every option is read on its own text path: "
+            "'State:\n<state>\nQuestion type: <choice, score or boolean>\nQuestion:\n<instructions>\nCandidate:\n<option text>\nDecision:' "
+            "then EOS. The backbone's final hidden state at the EOS goes through a LayerNorm (`norm`) and a scalar head "
+            "(`scalar`, one weight per hidden unit and a bias) to give the option's logit. For choice questions, a set-attention "
+            "correction over the question's options (`set_project`, `set_attention`, `set_output`) adds to each logit. A noul "
+            "(boolean) has one path, \"The proposition is true.\", and logits [0, z] for [false, true]; a score's options are its "
+            f"level descriptions. A softmax per question gives the probabilities. {n:,} parameters in float32."
+        )
+
+    def read_conventions(self) -> dict:
+        return {**super().read_conventions(),
+                "head_inputs": "each option path's final hidden state after `norm` (the input to `scalar`)",
+                "path_ends": "each option path's final hidden state before `norm`",
+                "set_delta": "the set-attention correction added to each option's logit (choice questions; 0 otherwise)",
+                "hidden_mean": "hidden state after each listed layer (0 = embeddings, l = after block l-1, the last index after the final norm), averaged over the state and question tokens"}
