@@ -102,3 +102,26 @@ def test_alias():
     from dspy_wsp.decision.loading import ALIASES
 
     assert ALIASES["d1-2b"] == ("LiquidAI/d1-2B", "652f920e544ea37f81e4b0ce89b81d4ed0da90b1")
+
+
+def test_describe_names_the_norm_after_the_last_mlp(folder):
+    b = load_decision_backend(str(folder), framework="torch")
+    try:
+        text = b.describe()
+    finally:
+        b.close()
+    assert "writes straight into" not in text
+    assert "layers.5.post_ffn_norm" in text
+
+
+def test_chunks_bound_the_attention_masks(folder):
+    from dspy_wsp.decision.families.d1_lm import encoding as enc
+    from dspy_wsp.decision.families.d1_lm.encoding import MASK_BUDGET
+    from dspy_wsp.decision.families.d1_lm.torch import D1LMTorch
+
+    net = D1LMTorch.__new__(D1LMTorch)
+    width = 2000
+    rows = [enc.Row(list(range(width)), 10, [-1] * width, [width - 1], [], []) for _ in range(8)]
+    sizes = [len(c) for c in net._chunks(rows)]
+    assert sum(sizes) == 8
+    assert all(n == 1 or n * width * width <= MASK_BUDGET for n in sizes)

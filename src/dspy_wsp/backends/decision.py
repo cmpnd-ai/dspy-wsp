@@ -600,8 +600,10 @@ class D1LMBackend(DecisionBackend):
             f"{self.temperature:g}, of the scores at the answer position for the option tokens: the final normed hidden state "
             "(after `embedding_norm`) times each option token's row of `embed_tokens` (the output layer is tied to the "
             "embedding); an option scores its best form. There is no separate head: the embedding and the final norm are "
-            f"protected, so edits land in the blocks. `layers.{last}.feed_forward.w2.weight` writes straight into the hidden "
-            f"state the readout scores. {n:,} parameters in float32."
+            f"protected, so edits land in the blocks. The last write into the residual stream is "
+            f"`layers.{last}.feed_forward.w2.weight`; its output passes through `layers.{last}.post_ffn_norm` (an RMS norm "
+            "with a gain per dimension) before it joins the residual, and the sum passes through `embedding_norm` before the "
+            f"readout scores it. {n:,} parameters in float32."
         )
 
     def read_conventions(self) -> dict:

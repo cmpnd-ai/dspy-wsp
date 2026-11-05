@@ -232,6 +232,23 @@ def load_calibration(folder: str | Path) -> float:
     return float(json.loads(f.read_text()).get("default", 1.0)) if f.is_file() else 1.0
 
 
+# --- batching ----------------------------------------------------------------------------
+
+TOKEN_BUDGET = 16_384  # padded tokens per forward
+MASK_BUDGET = 1 << 24  # query-key cells per mask per forward: rows x width x width
+
+
+def batches(rows: Sequence[Row]):
+    """Row indices in batches, longest first, within both budgets; a row over a budget runs alone."""
+    order = sorted(range(len(rows)), key=lambda i: len(rows[i].ids), reverse=True)
+    while order:
+        size, longest = 1, len(rows[order[0]].ids)
+        while size < len(order) and (size + 1) * longest <= TOKEN_BUDGET and (size + 1) * longest**2 <= MASK_BUDGET:
+            size += 1
+        yield order[:size]
+        order = order[size:]
+
+
 # --- attention ---------------------------------------------------------------------------
 
 def masks(rows: Sequence[Row], width: int, window: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

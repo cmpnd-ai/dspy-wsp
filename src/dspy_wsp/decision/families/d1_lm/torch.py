@@ -18,7 +18,8 @@ from dspy_wsp.decision.families.d1_lm import encoding
 from dspy_wsp.decision.families.d1_lm.encoding import Row
 from dspy_wsp.decision.families.d1_lm.lfm3_torch import LanguageModel
 
-TOKEN_BUDGET = 16_384  # padded tokens per forward
+from dspy_wsp.decision.families.d1_lm.encoding import MASK_BUDGET, TOKEN_BUDGET  # noqa: F401 - the batch limits
+
 PREFIX = "model.language_model."
 
 
@@ -72,13 +73,7 @@ class D1LMTorch(nn.Module):
         return out
 
     def _chunks(self, rows: list[Row]):
-        order = sorted(range(len(rows)), key=lambda i: len(rows[i].ids), reverse=True)
-        while order:
-            size, longest = 1, len(rows[order[0]].ids)
-            while size < len(order) and (size + 1) * longest <= TOKEN_BUDGET:
-                size += 1
-            yield order[:size]
-            order = order[size:]
+        return encoding.batches(rows)
 
     def capture(self, rows: list[Row], layers: list[int]) -> list[list[dict[str, np.ndarray]]]:
         """Per row, per question: option logits, the answer position's hidden state (`head_inputs`, one copy per

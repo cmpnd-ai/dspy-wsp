@@ -70,7 +70,7 @@ class Attention(nn.Module):
         self.k_norm = RMSNorm(self.head_dim, cfg["norm_eps"])
         self.gate_proj = nn.Linear(d, self.heads, bias=False)
 
-    def forward(self, x, cos, sin, mask):
+    def forward(self, x, cos, sin, bias):
         b, t, _ = x.shape
         q = self.q_norm(self.q_proj(x).view(b, t, -1, self.head_dim)).transpose(1, 2)
         k = self.k_norm(self.k_proj(x).view(b, t, -1, self.head_dim)).transpose(1, 2)
@@ -78,7 +78,6 @@ class Attention(nn.Module):
         q, k = q * cos + _rotate_half(q) * sin, k * cos + _rotate_half(k) * sin
         groups = self.heads // self.kv_heads
         k, v = k.repeat_interleave(groups, dim=1), v.repeat_interleave(groups, dim=1)
-        bias = torch.zeros(mask.shape, dtype=q.dtype, device=q.device).masked_fill(~mask, torch.finfo(q.dtype).min)
         out = torch.cat([F.scaled_dot_product_attention(q[:, :, s : s + QUERY_CHUNK], k, v, attn_mask=bias[:, None, s : s + QUERY_CHUNK],
                                                         scale=self.head_dim**-0.5)
                          for s in range(0, t, QUERY_CHUNK)], dim=2)
@@ -162,6 +161,10 @@ class LanguageModel(nn.Module):
             freqs = pos[:, None] * getattr(self, f"inv_freq_{kind}")[None]
             emb = torch.cat((freqs, freqs), dim=-1)
             rope[kind] = (emb.cos()[None, None], emb.sin()[None, None])
+        def to_bias(mask):  # 0 where a query reads a key, the most negative float elsewhere
+            return torch.zeros(mask.shape, device=mask.device).masked_fill(~mask, torch.finfo(torch.float32).min)
+
+        full, sliding = to_bias(full), to_bias(sliding)
         for i, layer in enumerate(self.layers):
             h = layer(h, rope, full, sliding, real)
             if i + 1 in layers:

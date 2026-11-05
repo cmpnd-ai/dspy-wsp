@@ -138,3 +138,16 @@ def test_mlx_parameter_names(net, mlx_net):
     from mlx.utils import tree_flatten
 
     assert {k for k, _ in tree_flatten(mlx_net.parameters())} == set(dict(net.named_parameters()))
+
+
+def test_query_chunks_change_nothing(tok, net, mlx_net, monkeypatch):
+    from dspy_wsp.decision.families.d1_lm import lfm3_mlx, lfm3_torch
+
+    rows = _requests(tok)["two_lengths"]
+    whole_torch, whole_mlx = net.logits(rows), mlx_net.logits(rows)
+    monkeypatch.setattr(lfm3_torch, "QUERY_CHUNK", 7)
+    monkeypatch.setattr(lfm3_mlx, "QUERY_CHUNK", 5)
+    for whole, part in ((whole_torch, net.logits(rows)), (whole_mlx, mlx_net.logits(rows))):
+        for a, b in zip(whole, part):
+            for qa, qb in zip(a, b):
+                assert np.allclose(qa, qb, atol=1e-5)

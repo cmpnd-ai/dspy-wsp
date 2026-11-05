@@ -10,7 +10,7 @@ import mlx.core as mx
 import mlx.nn as nn
 import numpy as np
 
-from dspy_wsp.decision.families.d1_lm.lfm3_torch import inverse_frequencies
+from dspy_wsp.decision.families.d1_lm.lfm3_torch import QUERY_CHUNK, inverse_frequencies
 
 NEG = -1e9
 
@@ -65,7 +65,9 @@ class Attention(nn.Module):
         groups = self.heads // self.kv_heads
         if groups > 1:
             k, v = mx.repeat(k, groups, axis=1), mx.repeat(v, groups, axis=1)
-        y = mx.fast.scaled_dot_product_attention(q, k, v, scale=self.head_dim**-0.5, mask=bias)
+        y = mx.concatenate([mx.fast.scaled_dot_product_attention(q[:, :, s : s + QUERY_CHUNK], k, v, scale=self.head_dim**-0.5,
+                                                                 mask=bias[:, :, s : s + QUERY_CHUNK])
+                            for s in range(0, t, QUERY_CHUNK)], axis=2)
         gate = mx.sigmoid(self.gate_proj(x)).transpose(0, 2, 1)[..., None]
         return self.o_proj((y * gate).transpose(0, 2, 1, 3).reshape(b, t, -1))
 
