@@ -46,6 +46,7 @@ class Limits:
     max_topk: int = 50
     max_pass_bytes: int = 6 * 2**30
     pooled_answer_tokens: int = 8192
+    max_reads: int = 1024  # decision models: question rows per read pass
 
 
 class RequestError(ValueError):
@@ -86,6 +87,11 @@ def item_seed(base: int, item_id: str, sample: int) -> int:
     return int.from_bytes(h[:8], "big") % (2**31 - 1)
 
 
+def _aggregate(summary: dict) -> dict:
+    """A summary without fields that only describe text generation."""
+    return {k: v for k, v in summary.items() if k not in ("mean_output_tokens", "cut_share")}
+
+
 def _int_list(v, name: str, lo: int, hi: int | None) -> list[int]:
     if v is None:
         return []
@@ -112,6 +118,7 @@ class ForwardTool:
         work_dir: str | Path,
         limits: Limits | None = None,
         seed: int = 0,
+        validation: Mapping | None = None,  # id -> dspy.Example; decision runs only, aggregate results only
     ):
         self.backend = backend
         self.program = program
@@ -125,6 +132,9 @@ class ForwardTool:
         self.input_keys = sorted(first.inputs().keys()) if first is not None else []
         self._metric_arity = self._arity(metric)
         self.layers = backend.dims().get("layers")
+        self.decision = getattr(backend, "kind", "llm") == "decision"
+        self.validation = dict(validation or {})
+        self.validation_log: list[dict] = []
 
     # --- entry point ----------------------------------------------------------------
     def handle(self, body: str, k: int) -> tuple[str, bool]:
@@ -142,7 +152,14 @@ class ForwardTool:
         t0 = time.time()
         try:
             kind = req.get("type")
-            if kind == "generate":
+            if self.decision:
+                if kind == "decide":
+                    summary = self.decide(req, k)
+                elif kind == "read":
+                    summary = self.read(req, k)
+                else:
+                    raise RequestError('this is a decision model: "type" must be "decide" or "read"')
+            elif kind == "generate":
                 summary = self.generate(req, k)
             elif kind == "teacher_forced":
                 summary = self.teacher_forced(req, k)
@@ -235,6 +252,92 @@ class ForwardTool:
         else:
             summary.update(self.summarize(results[model]))
         return summary
+
+    # --- decision models ------------------------------------------------------------
+    def decide(self, req: dict, k: int) -> dict:
+        """Run the program on practice items (as `generate`), or on the whole validation set with aggregate results only."""
+        extra = {"max_tokens", "activations"} & set(req)
+        if extra:
+            raise RequestError(f"decide takes no {sorted(extra)}")
+        if not req.get("validation"):
+            summary = self.generate(req, k)
+            summary["type"] = "decide"
+            return summary
+        if not self.validation:
+            raise RequestError("this run has no validation set")
+        if req.get("problems") or req.get("inputs") or req.get("n", 1) != 1:
+            raise RequestError('a validation run takes no "problems", "inputs" or "n": it runs the whole validation set once')
+        model = req.get("model", "edited")
+        if model not in ("original", "edited", "both"):
+            raise RequestError('"model" must be "original", "edited" or "both"')
+        edits = self.edit_store.load_all() if model in ("edited", "both") else None
+        program = self._program(None)
+        items = list(self.validation.items())
+        runs = ["original", "edited"] if model == "both" else [model]
+        results = {}
+        for which in runs:
+            with self.backend.using(edits if which == "edited" else None):
+                results[which] = self.run_items(program, items, 1, which)
+        summary: dict = {"type": "decide", "validation": True, "model": model, "items": len(items),
+                         "note": "validation runs report aggregate scores only"}
+        if model == "both":
+            summary["original"] = _aggregate(self.summarize(results["original"]))
+            summary["edited"] = _aggregate(self.summarize(results["edited"]))
+            summary["paired"] = stats.paired(self._scores(results["original"]), self._scores(results["edited"]))
+        else:
+            summary.update(_aggregate(self.summarize(results[model])))
+        if model in ("edited", "both") and not edits:
+            summary["note"] += "; no edits are saved, so the edited model equals the original"
+        self.validation_log.append({"pass": k, "model": model, "edited_tensors": sorted(edits or {}),
+                                    **{key: summary[key] for key in ("score", "original", "edited", "paired") if key in summary}})
+        return summary
+
+    def read(self, req: dict, k: int) -> dict:
+        """What the decision model computes for given System One requests: logits, probabilities and head inputs."""
+        model = req.get("model", "original")
+        if model not in ("original", "edited"):
+            raise RequestError('"model" must be "original" or "edited"')
+        if ("requests" in req) == ("from" in req):
+            raise RequestError('give exactly one of "requests" or "from"')
+        requests = req["requests"] if "requests" in req else self._recorded_requests(req["from"])
+        if not isinstance(requests, list) or not requests:
+            raise RequestError('"requests" must be a non-empty list of {"state", "questions"} objects')
+        for r in requests:
+            if not isinstance(r, dict) or not isinstance(r.get("questions"), dict) or not r["questions"]:
+                raise RequestError('each request must be an object with "state" and a non-empty "questions" object')
+        n_rows = sum(len(r["questions"]) for r in requests)
+        if n_rows > self.limits.max_reads:
+            raise RequestError(f"{n_rows} questions; at most {self.limits.max_reads} per read pass")
+        layers = _int_list(req.get("layers"), "layers", 0, self.layers)
+        edits = self.edit_store.load_all() if model == "edited" else None
+        with self.backend.using(edits):
+            arrays, meta = self.backend.read(requests, layers)
+        folder = self.work_dir / f"fwd_{k}"
+        folder.mkdir(parents=True, exist_ok=True)
+        files = {}
+        for name, a in arrays.items():
+            np.save(folder / f"{name}.npy", a)
+            files[f"{name}.npy"] = list(a.shape)
+        meta.update(model=model, files=files)
+        (folder / "meta.json").write_text(json.dumps(meta, indent=1))
+        (folder / "requests.json").write_text(json.dumps(requests, default=str))
+        return {"type": "read", "model": model, "requests": len(requests), "questions": n_rows, "dir": str(folder), "files": files}
+
+    def _recorded_requests(self, src) -> list:
+        """The System One requests recorded for practice ids in an earlier decide pass."""
+        if not isinstance(src, dict) or not isinstance(src.get("pass"), int):
+            raise RequestError('"from" must be {"pass": <k>, "ids": [...], "model": "original" or "edited" (for a "both" pass)}')
+        k, which = src["pass"], src.get("model")
+        path = self.work_dir / (f"gen_{k}_{which}.jsonl" if which else f"gen_{k}.jsonl")
+        if not path.exists():
+            raise RequestError(f"no records for pass {k}" + ("" if which else ' (a "both" pass needs "model")') + "; validation runs keep no records")
+        wanted = src.get("ids")
+        rows = [json.loads(line) for line in path.open()]
+        if wanted is not None:
+            if not isinstance(wanted, list):
+                raise RequestError('"ids" must be a list')
+            rows = [r for r in rows if r["id"] in set(wanted)]
+        return [json.loads(c["prompt"]) for r in rows for c in r.get("calls", [])]
 
     def _program(self, max_tokens: int | None):
         lm = self.backend.lm()
