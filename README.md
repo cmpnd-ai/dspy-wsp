@@ -74,12 +74,13 @@ backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_76
 
 ## Decision models
 
-`WeightSpace` also edits System One decision models: models that read a state and typed questions (Choice, Noul and Score) and return a probability for every option, with no text generation. Two families are supported, each with our own loader in MLX and in PyTorch:
+`WeightSpace` also edits System One decision models: models that read a state and typed questions (Choice, Noul and Score) and return a probability for every option, with no text generation. Three families are supported, each with our own loader in MLX and in PyTorch. Each family's code is in its own folder under `src/dspy_wsp/decision/families/`:
 
-- `D1Backend` runs Liquid AI's d1 models (text path), e.g. d1-omni-600M.
-- `NanoJevBackend` runs NanoJev models (a Qwen3 backbone with a decision head).
+- `D1Backend` runs Liquid AI's d1-omni models (text path), e.g. d1-omni-600M: an encoder with a decision head.
+- `NanoJevBackend` runs NanoJev models: a Qwen3 backbone with a decision head.
+- `D1LMBackend` runs Liquid AI's d1 models built on LFM3, e.g. d1-2B. It reads each answer from the language model's output at the question's answer position, so it has no separate head. Its output layer is the token embedding, which stays protected, so the writer's edits land in the backbone. It reads text states and answers Choice, Noul and Score questions. It refuses d1-2B's other question types (text, number, date, box and multiple choice).
 
-`load_decision_backend` opens a model by alias, Hugging Face repo id or local folder. It reads the checkpoint's config to pick the family, and it refuses other architectures with a message that names the supported ones. The aliases `"d1"` and `"nanojev"` open the checkpoints we tested, at pinned revisions.
+`load_decision_backend` opens a model by alias, Hugging Face repo id or local folder. It reads the checkpoint's config to pick the family, and it refuses other architectures with a message that names the supported ones. The aliases `"d1"`, `"nanojev"` and `"d1-2b"` open the checkpoints we tested, at pinned revisions.
 
 ```python
 from dspy_wsp import load_decision_backend

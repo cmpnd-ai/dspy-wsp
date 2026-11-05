@@ -83,6 +83,13 @@ class DecisionBackend(WeightBackend):
         """The network's rows for one request, each with the names of the questions it answers, in order."""
         return [(self._encode(state, q), [name]) for name, q in questions.items()]
 
+    def _check_question(self, raw: Any) -> None:
+        """Refuse a question the family cannot answer, before it is parsed."""
+
+    def _parse_question(self, q: Any) -> Question:
+        self._check_question(q)
+        return q if isinstance(q, Question) else parse_question(q)
+
     def _row_outputs(self, output, n: int) -> list:
         """One item per question from the network's output for one row (`logits` or `capture`)."""
         return [output]
@@ -224,7 +231,7 @@ class DecisionBackend(WeightBackend):
     def system_one_batch(self, requests: Sequence[tuple[Any, Mapping[str, Any]]]) -> list[dict]:
         futures = []
         for state, questions in requests:
-            parsed = {name: q if isinstance(q, Question) else parse_question(q) for name, q in questions.items()}
+            parsed = {name: self._parse_question(q) for name, q in questions.items()}
             if not parsed:
                 raise RequestError("`questions` must be a non-empty object")
             fut: Future = Future()
@@ -244,7 +251,7 @@ class DecisionBackend(WeightBackend):
             raise RequestError(f"layers must be integers from 0 to {L}")
         rows, plan = [], []  # plan: (request, its questions, its encoded rows)
         for i, req in enumerate(requests):
-            questions = {name: q if isinstance(q, Question) else parse_question(q) for name, q in req["questions"].items()}
+            questions = {name: self._parse_question(q) for name, q in req["questions"].items()}
             encoded = self._encode_request(req.get("state", ""), questions)
             plan.append((i, questions, encoded))
             rows.extend(row for row, _ in encoded)
@@ -498,3 +505,108 @@ class NanoJevBackend(DecisionBackend):
                 "path_ends": "each option path's final hidden state before `norm`",
                 "set_delta": "the set-attention correction added to each option's logit (choice questions; 0 otherwise)",
                 "hidden_mean": "hidden state after each listed layer (0 = embeddings, l = after block l-1, the last index after the final norm), averaged over the state and question tokens"}
+
+
+class D1LMBackend(DecisionBackend):
+    """Liquid AI's d1 models built on LFM3 (text only): d1-2B by default, at a pinned revision.
+
+    The answer is read from the language model's output at each question's answer position, so there is no
+    separate head: edits land in the backbone.
+    """
+
+    family = "d1_lm"
+    # The model's own code (*.py) is downloaded, never run, so a saved checkpoint loads with it.
+    download_patterns = ["config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json", "chat_template.jinja",
+                         "calibration.json", "processor_config.json", "LICENSE", "*.py"]
+    protected_description = "the tensors marked (out of scope) below (the token embedding, which is also the output layer, and the final norm)"
+
+    def __init__(self, model: str = "LiquidAI/d1-2B", *, revision: str | None = "652f920e544ea37f81e4b0ce89b81d4ed0da90b1",
+                 framework: str | None = None, device: str | None = None, max_length: int | None = None):
+        super().__init__(model, revision=revision, framework=framework, device=device, max_length=max_length)
+
+    def _setup(self, max_length):
+        import json
+
+        from dspy_wsp.decision.families.d1_lm import encoding
+
+        self.config = json.loads((self._dir / "config.json").read_text())
+        self.tok = encoding.Tokenizer(self._dir)
+        self.temperature = encoding.load_calibration(self._dir)
+        self.set_size = int(self.config.get("d1_set_size", encoding.SET_SIZE))
+        self.scheme = int(self.config.get("d1_codes", 1))
+        self.max_length = int(max_length or 16_384)
+
+    def _load_network(self):
+        if self.framework == "torch":
+            from dspy_wsp.decision.families.d1_lm.torch import D1LMTorch
+
+            return D1LMTorch.from_dir(self._dir, device=self.device or "cpu", pad_token_id=self.tok.pad_token_id)
+        from dspy_wsp.decision.families.d1_lm.mlx import D1LMMLX
+
+        return D1LMMLX.from_dir(self._dir, pad_token_id=self.tok.pad_token_id)
+
+    def _check_question(self, raw):
+        from dspy_wsp.decision.families.d1_lm import encoding
+
+        encoding.check_supported(raw)
+
+    def _encode_request(self, state, questions):
+        from dspy_wsp.decision.families.d1_lm import encoding
+
+        names = list(questions)
+        rows = encoding.encode_request(self.tok, state, list(questions.values()), max_length=self.max_length,
+                                       set_size=self.set_size, scheme=self.scheme)
+        return [(row, names[i * self.set_size : (i + 1) * self.set_size]) for i, row in enumerate(rows)]
+
+    def _row_outputs(self, output, n):
+        return output
+
+    def _row_tokens(self, row) -> int:
+        return len(row.ids)
+
+    def _probabilities(self, logits, q):
+        from dspy_wsp.decision.families.d1_lm import encoding
+
+        return encoding.probabilities(logits, self.temperature)
+
+    def _model_tensor(self, name):
+        return name.startswith("model.language_model.")
+
+    def default_protected(self):
+        return (r"^model\.language_model\.embed_tokens\.weight$", r"^model\.language_model\.embedding_norm\.weight$")
+
+    def num_tokens(self, text: str) -> int:
+        return len(self.tok.encode(text))
+
+    def dims(self) -> dict:
+        t = self.config["text_config"]
+        return {"layers": t["num_hidden_layers"], "hidden": t["hidden_size"], "intermediate": t["intermediate_size"],
+                "heads": t["num_attention_heads"], "kv_heads": t["num_key_value_heads"], "vocab": t["vocab_size"]}
+
+    def describe(self) -> str:
+        t = self.config["text_config"]
+        kinds = t["layer_types"]
+        n = sum(int(np.prod(self.reader.shape(k))) for k in self._param_for)
+        last = len(kinds) - 1
+        return (
+            f"{self.model_id} (d1 decision model on LFM3, text path): a language model with {len(kinds)} blocks, width "
+            f"{t['hidden_size']}. Blocks {[i for i, k in enumerate(kinds) if k == 'full_attention']} use full attention, blocks "
+            f"{[i for i, k in enumerate(kinds) if k == 'sliding_attention']} sliding-window attention over {t['sliding_window']} "
+            "tokens, and the others a gated causal short convolution; each block has pre- and post-norms and a SwiGLU MLP "
+            "(`feed_forward.w1`, `w3`, `w2`). A request is one ChatML user turn: the state, then up to "
+            f"{self.set_size} questions, each ending at the assistant header and an empty <think></think> block (its answer "
+            "position). State tokens read every token; each question reads the state and itself. Options are coded A, B, C "
+            "(choice), 0, 1, 2 (score) or yes/no (noul). The answer is a softmax, at temperature "
+            f"{self.temperature:g}, of the scores at the answer position for the option tokens: the final normed hidden state "
+            "(after `embedding_norm`) times each option token's row of `embed_tokens` (the output layer is tied to the "
+            "embedding); an option scores its best form. There is no separate head: the embedding and the final norm are "
+            f"protected, so edits land in the blocks. `layers.{last}.feed_forward.w2.weight` writes straight into the hidden "
+            f"state the readout scores. {n:,} parameters in float32."
+        )
+
+    def read_conventions(self) -> dict:
+        return {**super().read_conventions(),
+                "option_logits": "each option's score at the answer position before the temperature: head_inputs . option_rows",
+                "head_inputs": "the final normed hidden state at the question's answer position, one copy per option",
+                "option_rows": "each option's best-form row of embed_tokens, which the readout multiplies by head_inputs",
+                "hidden_mean": "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens"}

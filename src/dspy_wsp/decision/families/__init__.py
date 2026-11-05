@@ -32,6 +32,12 @@ def _nanojev(read: Read) -> bool:
     return "set_head" in (read("config.json") or {}) and (read("backbone_config/config.json") or {}).get("model_type") == "qwen3"
 
 
+def _d1_lm(read: Read) -> bool:
+    config = read("config.json") or {}
+    return (config.get("model_type") == "lfm3_vl" and (config.get("text_config") or {}).get("model_type") == "lfm3"
+            and config.get("d1_attention") == "set")
+
+
 FAMILIES: list[Family] = [
     Family("d1_omni", "dspy_wsp.backends.decision.D1Backend", _d1_omni,
            "config.json with model_type 'd1_omni'",
@@ -39,6 +45,9 @@ FAMILIES: list[Family] = [
     Family("nanojev", "dspy_wsp.backends.decision.NanoJevBackend", _nanojev,
            "config.json with set_head, and backbone_config/config.json with model_type 'qwen3'",
            {"nanojev": ("C-Tianyu/NanoJev", "047b927b30882a1138fc504821b82ac145a4b81a")}),
+    Family("d1_lm", "dspy_wsp.backends.decision.D1LMBackend", _d1_lm,
+           "config.json with model_type 'lfm3_vl' and d1_attention 'set'",
+           {"d1-2b": ("LiquidAI/d1-2B", "652f920e544ea37f81e4b0ce89b81d4ed0da90b1")}),
 ]
 
 
