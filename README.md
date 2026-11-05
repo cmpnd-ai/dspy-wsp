@@ -128,8 +128,6 @@ Scored on the answers each program returns, on the same 400 test cases:
 | WeightSpace | 64.2% (+11.9 ± 2.3) | 68.4% (+20.6 ± 2.3) |
 | WeightSpace + ReAnchor | 69.9% (+17.7 ± 2.4) | 71.3% (+23.4 ± 2.3) |
 
-Fit an edit on the same requests the model will serve. The writer fit each edit through the DSPy program's requests. NanoJev's edit also raised accuracy under the dataset's own request format, from 48.9% to 66.5%. d1's edit moved accuracy under that format only from 55.0% to 55.8%.
-
 ## How a run works
 
 The writer works in turns. Each turn it explains its next step and sends exactly one block:

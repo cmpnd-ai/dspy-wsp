@@ -107,7 +107,7 @@ Gains are over plain. ReAnchor added to WeightSpace gained +5.8 ± 1.0 points fo
 
 - On balanced, rule-based tasks, a closed-form edit to one head readout raised both models' test accuracy by 20 to 23 points, and prior-only versions of the edits gave no gain. The edits change how the head reads features the backbone already computes.
 - As in the Typed Decisions runs, the edits are fits of a readout to practice data, close to fitting a linear probe on frozen features. The validation and test results show that they generalize to new records from the same tasks.
-- d1's edit is specific to the request format it was fit on. A deployment should fit the edit on the same requests it will serve.
+- d1's edit is specific to the request format it was fit on.
 - ReAnchor is a cheap complement. On top of an edit, its main effect is to set Score cut points that match the edited probabilities.
 
 ## Files
