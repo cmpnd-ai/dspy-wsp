@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from decision_fixtures import build_d1
-from dspy_wsp.decision import d1
+from dspy_wsp.decision.families.d1_omni import encoding as d1
 from dspy_wsp.decision.schema import parse_question
 
 CHOICE = parse_question({"type": "choice", "instructions": "What should happen?", "criteria": {"stop": "Halt the agent now.", "continue": "Let it proceed.", "review": "Queue for a human."}})
@@ -25,7 +25,7 @@ def tok(d1_dir):
 
 @pytest.fixture(scope="module")
 def torch_model(d1_dir):
-    from dspy_wsp.decision.d1_torch import D1Torch
+    from dspy_wsp.decision.families.d1_omni.torch import D1Torch
 
     return D1Torch.from_dir(d1_dir)
 
@@ -89,7 +89,7 @@ def test_capture_matches_logits(tok, torch_model):
 @pytest.fixture(scope="module")
 def mlx_model(d1_dir):
     pytest.importorskip("mlx.core")
-    from dspy_wsp.decision.d1_mlx import D1MLX
+    from dspy_wsp.decision.families.d1_omni.mlx import D1MLX
 
     return D1MLX.from_dir(d1_dir)
 

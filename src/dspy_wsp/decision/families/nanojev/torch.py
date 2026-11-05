@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from dspy_wsp.decision import nanojev
+from dspy_wsp.decision.families.nanojev import encoding as nanojev
 from dspy_wsp.decision.schema import Question
 
 TOKEN_BUDGET = 32_768

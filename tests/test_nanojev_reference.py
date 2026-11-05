@@ -35,9 +35,9 @@ def test_reference_parity(tmp_path):
     from safetensors.torch import load_file
     from transformers import AutoConfig, AutoModel, AutoTokenizer
 
-    from dspy_wsp.decision import nanojev
-    from dspy_wsp.decision.nanojev_mlx import NanoJevMLX
-    from dspy_wsp.decision.nanojev_torch import NanoJevTorch
+    from dspy_wsp.decision.families.nanojev import encoding as nanojev
+    from dspy_wsp.decision.families.nanojev.mlx import NanoJevMLX
+    from dspy_wsp.decision.families.nanojev.torch import NanoJevTorch
     from dspy_wsp.decision.schema import parse_question
 
     folder = snapshot_download(REPO, revision=REVISION, allow_patterns=["best.safetensors", "config.json", "backbone_config/*", "tokenizer/*"])

@@ -322,7 +322,7 @@ def _default_framework() -> str:
 class D1Backend(DecisionBackend):
     """Liquid AI's d1 decision models (text only). Defaults to d1-omni-600M at a pinned revision."""
 
-    family = "d1"
+    family = "d1_omni"
     # The model's own code (*.py) is downloaded, never run, so a saved checkpoint loads with it.
     download_patterns = ["config.json", "model.safetensors", "tokenizer.json", "tokenizer_config.json", "LICENSE", "*.py"]
 
@@ -330,7 +330,7 @@ class D1Backend(DecisionBackend):
         super().__init__(model, revision=revision, framework=framework, device=device, max_length=max_length)
 
     def _setup(self, max_length):
-        from dspy_wsp.decision import d1
+        from dspy_wsp.decision.families.d1_omni import encoding as d1
 
         self.config = d1.load_config(self._dir)
         self.tok = d1.Tokenizer(self._dir)
@@ -338,15 +338,15 @@ class D1Backend(DecisionBackend):
 
     def _load_network(self):
         if self.framework == "torch":
-            from dspy_wsp.decision.d1_torch import D1Torch
+            from dspy_wsp.decision.families.d1_omni.torch import D1Torch
 
             return D1Torch.from_dir(self._dir, device=self.device or "cpu")
-        from dspy_wsp.decision.d1_mlx import D1MLX
+        from dspy_wsp.decision.families.d1_omni.mlx import D1MLX
 
         return D1MLX.from_dir(self._dir)
 
     def _encode(self, state, q):
-        from dspy_wsp.decision import d1
+        from dspy_wsp.decision.families.d1_omni import encoding as d1
 
         try:
             ids, markers = d1.encode(self.tok, state, q, self.max_length)
@@ -355,7 +355,7 @@ class D1Backend(DecisionBackend):
         return ids, markers, q
 
     def _probabilities(self, logits, q):
-        from dspy_wsp.decision import d1
+        from dspy_wsp.decision.families.d1_omni import encoding as d1
 
         return d1.probabilities(logits, q, self.config["temperatures"])
 
@@ -408,7 +408,7 @@ class NanoJevBackend(DecisionBackend):
         super().__init__(model, revision=revision, framework=framework, device=device, max_length=max_length)
 
     def _setup(self, max_length):
-        from dspy_wsp.decision import nanojev
+        from dspy_wsp.decision.families.nanojev import encoding as nanojev
 
         self.run_config, self.backbone_config = nanojev.load_configs(self._dir)
         self.tok = nanojev.Tokenizer(self._dir / "tokenizer")
@@ -416,15 +416,15 @@ class NanoJevBackend(DecisionBackend):
 
     def _load_network(self):
         if self.framework == "torch":
-            from dspy_wsp.decision.nanojev_torch import NanoJevTorch
+            from dspy_wsp.decision.families.nanojev.torch import NanoJevTorch
 
             return NanoJevTorch.from_dir(self._dir, device=self.device or "cpu", pad_token_id=self.tok.pad_token_id)
-        from dspy_wsp.decision.nanojev_mlx import NanoJevMLX
+        from dspy_wsp.decision.families.nanojev.mlx import NanoJevMLX
 
         return NanoJevMLX.from_dir(self._dir, pad_token_id=self.tok.pad_token_id)
 
     def _encode(self, state, q):
-        from dspy_wsp.decision import nanojev
+        from dspy_wsp.decision.families.nanojev import encoding as nanojev
 
         paths, prefix = nanojev.encode(self.tok, state, q, self.max_length)
         return paths, prefix, q
@@ -433,7 +433,7 @@ class NanoJevBackend(DecisionBackend):
         return sum(len(p) for p in row[0])
 
     def _probabilities(self, logits, q):
-        from dspy_wsp.decision import nanojev
+        from dspy_wsp.decision.families.nanojev import encoding as nanojev
 
         return nanojev.probabilities(logits, q)
 

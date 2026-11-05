@@ -5,10 +5,8 @@
     report = check_decision_model("/path/to/checkpoint")       # load, answer, batch and edit checks
     print(report.summary())
 
-A family is recognized from its config files:
-
-    d1       config.json has model_type "d1_omni"
-    nanojev  config.json has set_head, and backbone_config/config.json has model_type "qwen3"
+The families, how each is recognized and their aliases are listed in
+`dspy_wsp.decision.families`.
 """
 
 from __future__ import annotations
@@ -21,12 +19,10 @@ from typing import Any
 
 import numpy as np
 
-ALIASES = {
-    "d1": ("LiquidAI/d1-omni-600M", "02b55d7076f15129e59ab3f94783f32c4b088674"),
-    "nanojev": ("C-Tianyu/NanoJev", "047b927b30882a1138fc504821b82ac145a4b81a"),
-}
-FAMILY_HINT = ("d1 (config.json with model_type 'd1_omni') and nanojev (config.json with set_head, "
-               "and backbone_config/config.json with model_type 'qwen3')")
+from dspy_wsp.decision.families import FAMILIES, backend_class
+
+ALIASES = {alias: target for f in FAMILIES for alias, target in f.aliases.items()}
+FAMILY_HINT = "; ".join(f"{f.name} ({f.hint})" for f in FAMILIES)
 
 
 class DecisionModelError(ValueError):
@@ -60,26 +56,21 @@ def _read_json(model: str, revision: str | None, name: str) -> dict | None:
 
 
 def detect_family(model: str, revision: str | None = None) -> str:
-    """"d1" or "nanojev", from the checkpoint's config files."""
-    config = _read_json(model, revision, "config.json")
-    if config is None:
+    """The name of the family whose config `model` matches."""
+    if _read_json(model, revision, "config.json") is None:
         raise DecisionModelError(f"{model}: no config.json found (expected a local folder or a Hugging Face repo id)")
-    if config.get("model_type") == "d1_omni":
-        return "d1"
-    if "set_head" in config:
-        backbone = _read_json(model, revision, "backbone_config/config.json") or {}
-        if backbone.get("model_type") == "qwen3":
-            return "nanojev"
+    for family in FAMILIES:
+        if family.matches(lambda name: _read_json(model, revision, name)):
+            return family.name
     raise DecisionModelError(f"{model} is not a supported decision model. Supported families: {FAMILY_HINT}.")
 
 
 def load_decision_backend(model: str, *, revision: str | None = None, framework: str | None = None,
                           device: str | None = None, max_length: int | None = None):
     """A decision backend for `model`: an alias ("d1", "nanojev"), a Hugging Face repo id or a local folder."""
-    from dspy_wsp.backends.decision import D1Backend, NanoJevBackend
-
     repo, revision = resolve_model(model, revision)
-    cls = {"d1": D1Backend, "nanojev": NanoJevBackend}[detect_family(repo, revision)]
+    name = detect_family(repo, revision)
+    cls = backend_class(next(f for f in FAMILIES if f.name == name))
     kwargs = {"framework": framework, "device": device}
     if max_length is not None:
         kwargs["max_length"] = max_length

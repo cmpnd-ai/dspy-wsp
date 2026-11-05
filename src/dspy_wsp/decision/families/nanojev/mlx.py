@@ -1,4 +1,4 @@
-"""The NanoJev network in MLX (see `nanojev_torch` for the architecture). The backbone is
+"""The NanoJev network in MLX (see `torch.py` in this folder for the architecture). The backbone is
 mlx-lm's Qwen3 model; parameter names equal the checkpoint's tensor names.
 
 Call it from one thread: MLX streams belong to the thread that made them.
@@ -13,9 +13,9 @@ import mlx.core as mx
 import mlx.nn as nn
 import numpy as np
 
-from dspy_wsp.decision import nanojev
-from dspy_wsp.decision.d1_mlx import MultiheadAttention
-from dspy_wsp.decision.nanojev_torch import TOKEN_BUDGET, Row
+from dspy_wsp.decision.families.nanojev import encoding as nanojev
+from dspy_wsp.decision.families.d1_omni.mlx import MultiheadAttention
+from dspy_wsp.decision.families.nanojev.torch import TOKEN_BUDGET, Row
 
 
 class NanoJevMLX(nn.Module):

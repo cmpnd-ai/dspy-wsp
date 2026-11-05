@@ -15,7 +15,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from dspy_wsp.decision import d1
+from dspy_wsp.decision.families.d1_omni import encoding as d1
 from dspy_wsp.decision.schema import Question
 
 TOKEN_BUDGET = 32_768  # padded tokens per forward

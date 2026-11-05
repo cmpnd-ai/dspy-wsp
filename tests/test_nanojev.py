@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from decision_fixtures import build_nanojev
-from dspy_wsp.decision import nanojev
+from dspy_wsp.decision.families.nanojev import encoding as nanojev
 from dspy_wsp.decision.schema import RequestError, parse_question
 
 CHOICE = parse_question({"type": "choice", "instructions": "What should happen?", "criteria": {"stop": "Halt now.", "continue": "Proceed.", "review": "Ask a human."}})
@@ -25,7 +25,7 @@ def tok(nj_dir):
 
 @pytest.fixture(scope="module")
 def torch_model(nj_dir, tok):
-    from dspy_wsp.decision.nanojev_torch import NanoJevTorch
+    from dspy_wsp.decision.families.nanojev.torch import NanoJevTorch
 
     return NanoJevTorch.from_dir(nj_dir, pad_token_id=tok.pad_token_id)
 
@@ -69,7 +69,7 @@ def test_logits_shapes_and_padding(tok, torch_model):
 
 def test_mlx_matches_torch(nj_dir, tok, torch_model):
     pytest.importorskip("mlx.core")
-    from dspy_wsp.decision.nanojev_mlx import NanoJevMLX
+    from dspy_wsp.decision.families.nanojev.mlx import NanoJevMLX
 
     mlx_model = NanoJevMLX.from_dir(nj_dir, pad_token_id=tok.pad_token_id)
     rs = rows(tok, CHOICE, NOUL, SCORE) + rows(tok, CHOICE, state="another, longer state " * 10)

@@ -62,11 +62,11 @@ def test_missing_folder_is_refused(tmp_path):
 
 
 @pytest.mark.parametrize("framework", ["torch", "mlx"])
-@pytest.mark.parametrize("which", ["d1", "nanojev"])
+@pytest.mark.parametrize("which", ["d1_omni", "nanojev"])
 def test_check_passes_on_good_checkpoints(which, framework, d1_dir, nj_dir):
     if framework == "mlx":
         pytest.importorskip("mlx.core")
-    report = check_decision_model(str(d1_dir if which == "d1" else nj_dir), framework=framework, max_length=512)
+    report = check_decision_model(str(d1_dir if which == "d1_omni" else nj_dir), framework=framework, max_length=512)
     assert report.ok, report.problems
     assert report.family == which
     assert {"load", "tensors", "answers", "batching", "edits"} <= {c["name"] for c in report.checks}
@@ -85,7 +85,7 @@ def test_check_reports_a_checkpoint_that_does_not_load(tmp_path, d1_dir):
     save_file(weights, str(broken / "model.safetensors"))
     report = check_decision_model(str(broken), framework="torch")
     assert not report.ok
-    assert report.family == "d1"
+    assert report.family == "d1_omni"
     assert any("load" in p for p in report.problems)
     assert "FAIL" in report.summary()
 

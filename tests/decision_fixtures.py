@@ -56,7 +56,7 @@ def build_d1(folder: Path) -> Path:
     """A tiny d1 checkpoint folder: config, tokenizer and random weights, plus unused media tensors."""
     from safetensors.torch import save_file
 
-    from dspy_wsp.decision.d1_torch import D1Torch
+    from dspy_wsp.decision.families.d1_omni.torch import D1Torch
 
     build_tokenizer(folder, D1_SPECIALS, bos="<|startoftext|>", pad="<|pad|>")
     from tokenizers import Tokenizer
@@ -93,7 +93,7 @@ def build_nanojev(folder: Path) -> Path:
     from safetensors.torch import save_file
     from tokenizers import Tokenizer
 
-    from dspy_wsp.decision.nanojev_torch import NanoJevTorch
+    from dspy_wsp.decision.families.nanojev.torch import NanoJevTorch
 
     build_tokenizer(folder / "tokenizer", NANOJEV_SPECIALS, bos="<|im_start|>", pad="<|endoftext|>", eos="<|im_end|>")
     vocab = Tokenizer.from_file(str(folder / "tokenizer" / "tokenizer.json")).get_vocab_size()

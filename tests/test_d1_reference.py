@@ -32,7 +32,7 @@ def snapshot():
 
 
 def ours(model, folder, cases):
-    from dspy_wsp.decision import d1
+    from dspy_wsp.decision.families.d1_omni import encoding as d1
     from dspy_wsp.decision.schema import parse_question
 
     tok, cfg = d1.Tokenizer(folder), d1.load_config(folder)
@@ -49,8 +49,8 @@ def test_reference_parity(snapshot):
     import torch
     from transformers import AutoModel
 
-    from dspy_wsp.decision.d1_mlx import D1MLX
-    from dspy_wsp.decision.d1_torch import D1Torch
+    from dspy_wsp.decision.families.d1_omni.mlx import D1MLX
+    from dspy_wsp.decision.families.d1_omni.torch import D1Torch
 
     cases = typed_decisions_cases(20)
     ref = AutoModel.from_pretrained(snapshot, trust_remote_code=True, dtype=torch.float32).eval()

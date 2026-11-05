@@ -1,5 +1,5 @@
 """The d1 text network in MLX. Parameter names equal the checkpoint's tensor names,
-and the computation matches `d1_torch` (see that module for the architecture).
+and the computation matches `torch.py` in this folder, which describes the architecture.
 
 Call it from one thread: MLX streams belong to the thread that made them.
 """
@@ -12,8 +12,8 @@ import mlx.core as mx
 import mlx.nn as nn
 import numpy as np
 
-from dspy_wsp.decision import d1
-from dspy_wsp.decision.d1_torch import TOKEN_BUDGET, Row
+from dspy_wsp.decision.families.d1_omni import encoding as d1
+from dspy_wsp.decision.families.d1_omni.torch import TOKEN_BUDGET, Row
 
 NEG = -1e9
 
