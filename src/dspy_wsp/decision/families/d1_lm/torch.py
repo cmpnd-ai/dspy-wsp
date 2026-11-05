@@ -33,15 +33,18 @@ class D1LMTorch(nn.Module):
 
     @classmethod
     def from_dir(cls, folder: str | Path, device: str = "cpu", pad_token_id: int = 0) -> D1LMTorch:
+        """Built without weights (the meta device), then given the checkpoint's language-model tensors in float32."""
         import json
 
-        from safetensors.torch import load_file
+        from safetensors import safe_open
 
         folder = Path(folder)
-        net = cls(json.loads((folder / "config.json").read_text()), pad_token_id)
-        weights = {k: v for k, v in load_file(str(folder / "model.safetensors")).items() if k.startswith(PREFIX)}
-        net.load_state_dict(weights, strict=True)
-        return net.to(device=device, dtype=torch.float32).eval()
+        with torch.device("meta"):
+            net = cls(json.loads((folder / "config.json").read_text()), pad_token_id)
+        with safe_open(str(folder / "model.safetensors"), framework="pt") as f:
+            weights = {k: f.get_tensor(k).to(device=device, dtype=torch.float32) for k in f.keys() if k.startswith(PREFIX)}
+        net.load_state_dict(weights, strict=True, assign=True)
+        return net.eval()
 
     @property
     def device(self):

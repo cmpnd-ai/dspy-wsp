@@ -151,3 +151,34 @@ def test_query_chunks_change_nothing(tok, net, mlx_net, monkeypatch):
         for a, b in zip(whole, part):
             for qa, qb in zip(a, b):
                 assert np.allclose(qa, qb, atol=1e-5)
+
+
+def test_from_dir_skips_random_init(folder, tok, monkeypatch):
+    seen = []
+    real = torch.nn.init.kaiming_uniform_
+
+    def spy(tensor, *args, **kwargs):
+        seen.append(tensor.device.type)
+        return real(tensor, *args, **kwargs)
+
+    monkeypatch.setattr(torch.nn.init, "kaiming_uniform_", spy)
+    D1LMTorch.from_dir(folder, pad_token_id=tok.pad_token_id)
+    assert seen and set(seen) == {"meta"}
+
+
+def test_bf16_checkpoint_loads_as_float32(folder, tok, tmp_path, net):
+    import shutil
+
+    from safetensors.torch import load_file, save_file
+
+    half = tmp_path / "bf16"
+    shutil.copytree(folder, half)
+    weights = load_file(str(half / "model.safetensors"))
+    save_file({k: v.to(torch.bfloat16) for k, v in weights.items()}, str(half / "model.safetensors"))
+    loaded = D1LMTorch.from_dir(half, pad_token_id=tok.pad_token_id)
+    params = dict(loaded.named_parameters())
+    assert all(p.dtype == torch.float32 for p in params.values())
+    name = "model.language_model.layers.1.self_attn.q_proj.weight"
+    assert torch.equal(params[name], weights[name].to(torch.bfloat16).float())
+    rows = rows_for(tok, STATE, QS)
+    assert len(loaded.logits(rows)[0]) == 3

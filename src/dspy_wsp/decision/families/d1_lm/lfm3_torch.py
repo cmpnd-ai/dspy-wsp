@@ -145,11 +145,7 @@ class LanguageModel(nn.Module):
         self.embed_tokens = nn.Embedding(cfg["vocab_size"], d)
         self.layers = nn.ModuleList(Layer(cfg, kind) for kind in cfg["layer_types"])
         self.embedding_norm = RMSNorm(d, cfg["norm_eps"])
-        head_dim = cfg.get("head_dim") or d // cfg["num_attention_heads"]
-        for kind, p in cfg.get("rope_parameters", {}).items():
-            if kind in cfg["layer_types"]:
-                inv = inverse_frequencies(head_dim, p["rope_theta"], p.get("partial_rotary_factor", 1.0))
-                self.register_buffer(f"inv_freq_{kind}", inv, persistent=False)
+        self.head_dim = cfg.get("head_dim") or d // cfg["num_attention_heads"]
 
     def forward(self, ids, full, sliding, real, layers=()):
         """The final normed hidden states, and the hidden state after each listed layer (0 = embeddings)."""
@@ -157,8 +153,11 @@ class LanguageModel(nn.Module):
         kept = {0: h} if 0 in layers else {}
         pos = torch.arange(ids.shape[1], device=ids.device, dtype=torch.float32)
         rope = {}
-        for kind in {"full_attention", "sliding_attention"} & set(self.cfg["layer_types"]):
-            freqs = pos[:, None] * getattr(self, f"inv_freq_{kind}")[None]
+        for kind, p in self.cfg.get("rope_parameters", {}).items():
+            if kind not in self.cfg["layer_types"]:
+                continue
+            inv = inverse_frequencies(self.head_dim, p["rope_theta"], p.get("partial_rotary_factor", 1.0)).to(ids.device)
+            freqs = pos[:, None] * inv[None]
             emb = torch.cat((freqs, freqs), dim=-1)
             rope[kind] = (emb.cos()[None, None], emb.sin()[None, None])
         def to_bias(mask):  # 0 where a query reads a key, the most negative float elsewhere
