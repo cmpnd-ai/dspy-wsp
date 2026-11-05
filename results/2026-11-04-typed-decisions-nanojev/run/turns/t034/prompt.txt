@@ -1,0 +1,6 @@
+OUTPUT of Python run 20 of at most 300:
+```
+dropped edit scalar.weight
+Installed dose_zero
+```
+[forward passes used: 12 of 25; Python runs used: 20 of 300]

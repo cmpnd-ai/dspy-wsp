@@ -1,0 +1,10 @@
+OUTPUT of Python run 30 of at most 300:
+```
+install signature (j)
+example {'id': 'train_439', 'inputs': {'workflow': 'customer_service', 'state': {'account': {'lifetime_value_usd': 351, 'prior_tickets_90d': 1, 'seats': 1, 'tenure_months': 8, 'tier': 'standard'}, 'thread': [{'role': 'customer', 'text': "I need the CSV export of last month's transaction data right now; the system is still processing and it's holding up my audit."}, {'role': 'agent', 'text': 'I understand the urgency. Could you tell me which account ID you’re exporting from?'}, {'role': 'customer', 'text': "It's account 45219; please expedite the export."}]}}, 'labels': {'case_id': 'tr_customer_service_000155', 'questions': {'action': {'criteria': {'answer_directly': 'The assistant can resolve this itself with information it already has.', 'close_no
+gold {'action': {'confidence': 0.354167, 'label': 'escalate_to_human', 'probabilities': {'answer_directly': 0.183333, 'close_no_action': 0.033333, 'escalate_to_human': 0.483333, 'execute_refund': 0.0, 'request_information': 0.3}, 'type': 'choice'}, 'category': {'confidence': 0.729167, 'label': 'technical', 'probabilities': {'account': 0.056667, 'billing': 0.143333, 'delivery': 0.01, 'refund': 0.006667, 'technical': 0.783333}, 'type': 'choice'}, 'churn_risk': {'confidence': 0.596667, 'label': '1', 'probabilities': {'0': 0.113333, '1': 0.616667, '2': 0.25, '3': 0.02}, 'score': 1.176667, 'type': 'score'}, 'needs_human': {'confidence': 0.113333, 'label': 'true', 'noul': 0.556667, 'probabilities': {'false': 0.443333, 'true': 0.556667}, 'type': 'noul'}, 'urgency': {'confidence': 0.666667, 'label': '3', 'probabilities': {'0': 0.003333, '1': 0.053333, '2': 0.216667, '3': 0.726667}, 'score': 2.666667, 'type': 'score'}}
+Traceback (most recent call last):
+  File "<cell>", line 10, in <module>
+KeyError: 'needs_review'
+```
+[forward passes used: 17 of 25; Python runs used: 30 of 300]

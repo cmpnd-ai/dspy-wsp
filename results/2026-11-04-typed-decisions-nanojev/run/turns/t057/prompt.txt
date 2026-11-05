@@ -1,0 +1,6 @@
+OUTPUT of Python run 35 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 62.6095
+Installed cov_ge_point1
+```
+[forward passes used: 20 of 25; Python runs used: 35 of 300]

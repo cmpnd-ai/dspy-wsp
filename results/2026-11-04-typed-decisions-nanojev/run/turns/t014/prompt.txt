@@ -1,0 +1,11 @@
+OUTPUT of Python run 8 of at most 300:
+```
+Design (7101, 1024) Gram eig quantiles [     0.          0.0139      0.0432      0.1787 149335.5056]
+lambda 0.1 norm 35.844 fit (np.float64(0.585), np.float64(0.04452261656473983)) internal holdout (np.float64(0.518), np.float64(0.05926041673346346))
+lambda 1 norm 11.674 fit (np.float64(0.528), np.float64(0.0549695407348785)) internal holdout (np.float64(0.503), np.float64(0.06180064330485271))
+lambda 10 norm 4.045 fit (np.float64(0.461), np.float64(0.06209108375999598)) internal holdout (np.float64(0.476), np.float64(0.06568768647141972))
+lambda 100 norm 1.017 fit (np.float64(0.393), np.float64(0.06755573837066361)) internal holdout (np.float64(0.42), np.float64(0.07103683147405107))
+lambda 1000 norm 0.19 fit (np.float64(0.353), np.float64(0.07171734860497676)) internal holdout (np.float64(0.373), np.float64(0.07540775646071102))
+Set correction within-choice spread [0.0364 0.1421 0.2282 0.292 ]
+```
+[forward passes used: 4 of 25; Python runs used: 8 of 300]

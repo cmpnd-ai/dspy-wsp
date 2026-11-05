@@ -1,0 +1,16 @@
+OUTPUT of Python run 37 of at most 300:
+```
+13 0.37
+14 0.425
+15 0.505
+16 0.605
+17 0.585
+18 0.57
+19 0.575
+20 0.515
+21 0.56
+22 0.58
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 50.7113
+Installed reverse_direction
+```
+[forward passes used: 22 of 25; Python runs used: 37 of 300]

@@ -1,0 +1,132 @@
+OUTPUT of Python run 27 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 101.4225
+Files: ['gen_7_original.jsonl', 'read_fit1.json', 'panel_request.json', 'gen_6_edited.jsonl', 'read_fit0.json', 'gen_7_edited.jsonl', 'gen_6_original.jsonl', 'baseline_request.json', 'gen_1.jsonl', 'gen_5_original.jsonl', 'dose_request.json', 'read_test0.json', 'synthetic_original.json', 'read_test1.json', 'test_request.json', 'synthetic_edited.json', 'notes.md', 'gen_5_edited.jsonl', 'dw600_linear.npy', 'read_fit2.json']
+Variables: dict_keys(['__name__', 'np', 'torch', 'os', 'json', 'NAMES', 'SHAPES', 'MODEL', 'WORK', 'PRACTICE', 'load', 'load_original', 'save_edit', 'drop_edit', 'edited', 'tok', '__builtins__', 'pathlib', 'collections', 'work', 'examples', 'byid', 'rng', 'ids', 'fit_ids', 'test_ids', 'baseline_request', '__warningregistry__', 'f', 'records', 'stats', 'confusions', 'r', 'gold', 'completion', 'q', 'g', 'out', 'p', 'pred', 'target', 'key', 'k', 'v', 'fit_chunks', 'meta', 'arr', 'n', 'a', 'w0', 'b0', 'calc', 'mask', 'read_batch', 'batches', 'design', 'b', 'chunk', 'ordered', 'designs', 'X', 'y', 'G', 'rhs', 'evals', 'U', 'eval_dw', 'lam', 'dw', 'candidate_dw', 'strength', 'j', 'h', 'z', 'chosen_lambda', 'dw400', 'internal_ids', 'r6', 's6', 'comp', 'o', 'groups400', 'target_residual', 'comparison', 'mode', 'rr', 'dd', 'sc', 'br', 'row', 'Xall', 'yall', 'Gall', 'ea', 'Ua', 'dw600', 'shutil', 'testb', 'testdesign', 'mean_corrections', 'd', 'i', 'scores', 'label', 'delta', 'ii', 'testb1', 'testdesign1', 'wf', 'e', 'copy', 'recbyid', 'synthetic', 'synlabels', 'base', 'violations', 'category', 'text', 'passno', 'mm', 'pp', 'coef', 'groups_test', 'cutoff', 'panel_ids', 'panel_order', 'panel_requests', 'jobs', 'install_job', 'Path', 'bi'])
+Meta footer: core",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 45,
+   "question": "needs_human",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 45,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 46,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "answer_directly",
+    "close_no_action",
+    "escalate_to_human",
+    "execute_refund",
+    "request_information"
+   ]
+  },
+  {
+   "request": 46,
+   "question": "category",
+   "type": "choice",
+   "options": [
+    "account",
+    "billing",
+    "delivery",
+    "refund",
+    "technical"
+   ]
+  },
+  {
+   "request": 46,
+   "question": "churn_risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 46,
+   "question": "needs_human",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 46,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  }
+ ],
+ "layers": [],
+ "conventions": {
+  "rows": "one row per question, in request order; meta.rows names each row's request, question and options",
+  "option_mask": "True on a question's real options; padded options are NaN",
+  "option_logits": "the head's raw score per option, before calibration",
+  "probabilities": "the answer's distribution over the options",
+  "hidden_mean": "hidden state after each listed layer (0 = embeddings, l = after block l-1, the last index after the final norm), averaged over the state and question tokens",
+  "head_inputs": "each option path's final hidden state after `norm` (the input to `scalar`)",
+  "path_ends": "each option path's final hidden state before `norm`",
+  "set_delta": "the set-attention correction added to each option's logit (choice questions; 0 otherwise)"
+ },
+ "model": "edited",
+ "files": {
+  "option_mask.npy": [
+   235,
+   5
+  ],
+  "option_logits.npy": [
+   235,
+   5
+  ],
+  "head_inputs.npy": [
+   235,
+   5,
+   1024
+  ],
+  "path_ends.npy": [
+   235,
+   5,
+   1024
+  ],
+  "set_delta.npy": [
+   235,
+   5
+  ],
+  "probabilities.npy": [
+   235,
+   5
+  ]
+ }
+}
+```
+[forward passes used: 16 of 25; Python runs used: 27 of 300]

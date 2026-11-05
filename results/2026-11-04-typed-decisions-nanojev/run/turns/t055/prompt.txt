@@ -1,0 +1,7 @@
+OUTPUT of Python run 34 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 20.9671
+Installed cov_ge_1
+direction norms: [('dose_zero', 0.0), ('dose_quarter', 13.958743898211436), ('dose_half', 27.917487796422872), ('dose_threequarters', 41.876231694634306), ('dose_125', 69.79371949105717), ('dose_150', 83.75246338926861), ('cov_ge_1', 11.542750112982482), ('cov_ge_point1', 34.46768328728079), ('cov_ge_point01', 54.99914255606792), ('reverse_direction', 27.917487796422872)]
+```
+[forward passes used: 19 of 25; Python runs used: 34 of 300]

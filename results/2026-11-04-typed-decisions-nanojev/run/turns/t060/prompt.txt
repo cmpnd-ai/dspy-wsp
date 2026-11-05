@@ -1,0 +1,40 @@
+RESULT of forward pass 22:
+```
+{
+ "type": "read",
+ "model": "edited",
+ "requests": 47,
+ "questions": 235,
+ "dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev/work/fwd_22",
+ "files": {
+  "option_mask.npy": [
+   235,
+   5
+  ],
+  "option_logits.npy": [
+   235,
+   5
+  ],
+  "head_inputs.npy": [
+   235,
+   5,
+   1024
+  ],
+  "path_ends.npy": [
+   235,
+   5,
+   1024
+  ],
+  "set_delta.npy": [
+   235,
+   5
+  ],
+  "probabilities.npy": [
+   235,
+   5
+  ]
+ },
+ "seconds": 36.1
+}
+```
+[forward passes used: 22 of 25; Python runs used: 36 of 300]

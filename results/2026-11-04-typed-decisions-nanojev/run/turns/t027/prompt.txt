@@ -1,0 +1,28 @@
+OUTPUT of Python run 16 of at most 300:
+```
+baseline 0.358
+fixed_offsets 0.499
+full_repair 0.563
+Fixed vs full by question:
+('agent_trace_observability', 'action') 0.404 0.462
+('agent_trace_observability', 'needs_review') 0.635 0.827
+('agent_trace_observability', 'outcome') 0.462 0.481
+('agent_trace_observability', 'risk') 0.308 0.577
+('agent_trace_observability', 'urgency') 0.462 0.404
+('customer_service', 'action') 0.44 0.4
+('customer_service', 'category') 0.2 0.7
+('customer_service', 'churn_risk') 0.4 0.44
+('customer_service', 'needs_human') 0.58 0.64
+('customer_service', 'urgency') 0.46 0.46
+('invoice_processing', 'discrepancy_severity') 0.411 0.429
+('invoice_processing', 'disposition') 0.375 0.411
+('invoice_processing', 'duplicate') 0.929 0.929
+('invoice_processing', 'matches_order') 0.536 0.554
+('invoice_processing', 'urgency') 0.429 0.464
+('security_incidents', 'credential_compromise') 0.429 0.571
+('security_incidents', 'disposition') 0.857 0.833
+('security_incidents', 'severity') 0.476 0.595
+('security_incidents', 'true_positive') 0.786 0.69
+('security_incidents', 'urgency') 0.476 0.452
+```
+[forward passes used: 9 of 25; Python runs used: 16 of 300]

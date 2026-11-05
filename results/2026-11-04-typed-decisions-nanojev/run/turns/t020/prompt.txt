@@ -1,0 +1,37 @@
+OUTPUT of Python run 12 of at most 300:
+```
+Internal repaired performance:
+('customer_service', 'action') 0.534
+('customer_service', 'category') 0.724
+('customer_service', 'churn_risk') 0.448
+('customer_service', 'needs_human') 0.724
+('customer_service', 'urgency') 0.414
+('security_incidents', 'credential_compromise') 0.479
+('security_incidents', 'disposition') 0.625
+('security_incidents', 'severity') 0.583
+('security_incidents', 'true_positive') 0.5
+('security_incidents', 'urgency') 0.375
+('agent_trace_observability', 'action') 0.553
+('agent_trace_observability', 'needs_review') 0.574
+('agent_trace_observability', 'outcome') 0.532
+('agent_trace_observability', 'risk') 0.426
+('agent_trace_observability', 'urgency') 0.447
+('invoice_processing', 'discrepancy_severity') 0.362
+('invoice_processing', 'disposition') 0.383
+('invoice_processing', 'duplicate') 0.872
+('invoice_processing', 'matches_order') 0.66
+('invoice_processing', 'urgency') 0.362
+(np.float64(0.553), np.float64(0.058377146909669275), 'linear', 0.03, 1)
+(np.float64(0.551), np.float64(0.060203790064793594), 'linear', 0.01, 1)
+(np.float64(0.543), np.float64(0.05809121859535891), 'linear', 0.1, 1)
+(np.float64(0.542), np.float64(0.059149106786253916), 'linear', 0.01, 0.75)
+(np.float64(0.542), np.float64(0.058634451691466014), 'linear', 0.03, 0.75)
+(np.float64(0.54), np.float64(0.05984167314513371), 'log', 0.01, 0.75)
+(np.float64(0.538), np.float64(0.06299855934894483), 'winner', 0.03, 0.75)
+(np.float64(0.538), np.float64(0.06292628865303927), 'blend', 0.01, 0.75)
+(np.float64(0.537), np.float64(0.06814634014468081), 'blend', 0.01, 1)
+(np.float64(0.536), np.float64(0.060688250973749115), 'winner', 0.03, 1)
+(np.float64(0.535), np.float64(0.06246078711560136), 'winner', 0.01, 1)
+(np.float64(0.535), np.float64(0.0602227623272014), 'winner', 0.1, 1)
+```
+[forward passes used: 6 of 25; Python runs used: 12 of 300]

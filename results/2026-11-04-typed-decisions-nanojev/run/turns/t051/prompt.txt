@@ -1,0 +1,25 @@
+OUTPUT of Python run 32 of at most 300:
+```
+13 panel accuracy 0.37
+14 panel accuracy 0.425
+15 panel accuracy 0.505
+16 panel accuracy 0.605
+17 panel accuracy 0.585
+agent violations=0 action {'continue': np.float32(0.266), 'human_review': np.float32(0.303), 'observe': np.float32(0.323), 'stop': np.float32(0.108)}
+agent violations=0 risk {'0': np.float32(0.173), '1': np.float32(0.374), '2': np.float32(0.264), '3': np.float32(0.188)}
+agent violations=1 action {'continue': np.float32(0.184), 'human_review': np.float32(0.364), 'observe': np.float32(0.35), 'stop': np.float32(0.102)}
+agent violations=1 risk {'0': np.float32(0.133), '1': np.float32(0.279), '2': np.float32(0.371), '3': np.float32(0.217)}
+agent violations=3 action {'continue': np.float32(0.139), 'human_review': np.float32(0.384), 'observe': np.float32(0.34), 'stop': np.float32(0.137)}
+agent violations=3 risk {'0': np.float32(0.152), '1': np.float32(0.343), '2': np.float32(0.255), '3': np.float32(0.25)}
+customer billing action {'answer_directly': np.float32(0.326), 'close_no_action': np.float32(0.114), 'escalate_to_human': np.float32(0.318), 'execute_refund': np.float32(0.075), 'request_information': np.float32(0.167)}
+customer billing category {'account': np.float32(0.188), 'billing': np.float32(0.38), 'delivery': np.float32(0.169), 'refund': np.float32(0.077), 'technical': np.float32(0.185)}
+customer technical action {'answer_directly': np.float32(0.392), 'close_no_action': np.float32(0.141), 'escalate_to_human': np.float32(0.193), 'execute_refund': np.float32(0.136), 'request_information': np.float32(0.138)}
+customer technical category {'account': np.float32(0.475), 'billing': np.float32(0.089), 'delivery': np.float32(0.112), 'refund': np.float32(0.056), 'technical': np.float32(0.268)}
+customer delivery action {'answer_directly': np.float32(0.404), 'close_no_action': np.float32(0.063), 'escalate_to_human': np.float32(0.298), 'execute_refund': np.float32(0.064), 'request_information': np.float32(0.171)}
+customer delivery category {'account': np.float32(0.114), 'billing': np.float32(0.153), 'delivery': np.float32(0.288), 'refund': np.float32(0.067), 'technical': np.float32(0.378)}
+customer account action {'answer_directly': np.float32(0.37), 'close_no_action': np.float32(0.065), 'escalate_to_human': np.float32(0.312), 'execute_refund': np.float32(0.064), 'request_information': np.float32(0.189)}
+customer account category {'account': np.float32(0.29), 'billing': np.float32(0.167), 'delivery': np.float32(0.199), 'refund': np.float32(0.045), 'technical': np.float32(0.3)}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 126.7781
+Installed dose_125
+```
+[forward passes used: 17 of 25; Python runs used: 32 of 300]

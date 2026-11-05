@@ -1,0 +1,129 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev",
+ "final_answer": "Submitted the validated edit to **`scalar.weight` only**. All backbone weights and other decision-head tensors remain unchanged.\n\nThe main failure was the shared scalar readout: it showed near-fixed option preferences across varied records. I replaced its readout direction with a closed-form, regularized correction derived from 600 practice examples\u2014without gradients or backbone changes.\n\nCausal checks supported this localization:\n- Increasing correction strength improved a fixed diagnostic panel from **37.0% to 60.5%** before gains saturated.\n- Reversing the direction reduced accuracy to **31.5%**.\n- State-dependent corrections outperformed fixed per-option offsets by **6.27 percentage points** on independent practice cases.\n\n**Independent results** (gain \u00b1 paired standard error):\n\n| Evaluation | Original | Edited | Gain |\n|---|---:|---:|---:|\n| Untouched practice, 300 cases | 36.20% | 57.47% | **+21.27 \u00b1 1.54 pp** |\n| Held-out validation, 300 cases | 34.80% | 57.20% | **+22.40 \u00b1 1.56 pp** |\n\nThe final validation run reproduced the earlier result exactly: **198 cases improved and 33 worsened**. The saved edit is that validated candidate, not a diagnostic ablation.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 39
+ },
+ "turns": 66,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 8,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.572,
+    "score_se_over_items": 0.014324165484728623,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 275
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.572,
+    "gain": 0.224,
+    "se": 0.015570603752787172,
+    "improved": 198,
+    "worsened": 33
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.572,
+    "score_se_over_items": 0.014324165484728623,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 275
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.572,
+    "gain": 0.224,
+    "se": 0.015570603752787172,
+    "improved": 198,
+    "worsened": 33
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.38550000000000006,
+   "score_se_over_items": 0.010606867544084086,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 399
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.5565,
+   "score_se_over_items": 0.011591171776740034,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 377
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.38550000000000006,
+   "edited": 0.5565,
+   "gain": 0.171,
+   "se": 0.013503828474127127,
+   "improved": 243,
+   "worsened": 63
+  }
+ },
+ "patch": "1 tensors, 1,024 entries changed\n  scalar.weight float32[1, 1024]: 1,024 entries (dense), relative change 101.4225"
+}

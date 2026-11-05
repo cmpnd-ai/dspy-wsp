@@ -1,0 +1,7 @@
+OUTPUT of Python run 38 of at most 300:
+```
+Reversed direction accuracy: 0.315
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 101.4225
+cosine with original head: -0.0007140524685382843
+```
+[forward passes used: 23 of 25; Python runs used: 38 of 300]

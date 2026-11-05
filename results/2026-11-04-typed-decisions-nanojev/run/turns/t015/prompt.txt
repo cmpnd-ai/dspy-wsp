@@ -1,0 +1,24 @@
+OUTPUT of Python run 9 of at most 300:
+```
+lambda 0.0001 norm 172.93 internal holdout (np.float64(0.511), np.float64(0.06929100618093685))
+lambda 0.001 norm 148.42 internal holdout (np.float64(0.515), np.float64(0.06752256902910471))
+lambda 0.01 norm 92.26 internal holdout (np.float64(0.521), np.float64(0.06212289375050195))
+lambda 0.03 norm 61.72 internal holdout (np.float64(0.524), np.float64(0.05995961215745306))
+lambda 0.1 norm 35.84 internal holdout (np.float64(0.518), np.float64(0.05926041673346346))
+lambda 0.3 norm 20.82 internal holdout (np.float64(0.517), np.float64(0.06003031565729381))
+lambda 1 norm 11.67 internal holdout (np.float64(0.503), np.float64(0.06180064330485271))
+Model files: ['config.json', 'tokenizer', 'backbone_config', 'best.safetensors']
+strength 0 (np.float64(0.363), np.float64(0.11233432176350823))
+strength 0.25 (np.float64(0.429), np.float64(0.08492849499879403))
+strength 0.5 (np.float64(0.509), np.float64(0.0663887883436629))
+strength 0.75 (np.float64(0.531), np.float64(0.058973299859671105))
+strength 1 (np.float64(0.524), np.float64(0.05995961215745306))
+strength 1.25 (np.float64(0.511), np.float64(0.06639840950994423))
+strength 1.5 (np.float64(0.497), np.float64(0.07576668978267767))
+train_3 action gold human_review before stop after human_review
+train_3 needs_review gold true before true after true
+train_3 outcome gold harmful before success after partial
+train_3 risk gold 3 before 0 after 2
+train_3 urgency gold 3 before 2 after 2
+```
+[forward passes used: 4 of 25; Python runs used: 9 of 300]

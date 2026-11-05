@@ -1,0 +1,7 @@
+OUTPUT of Python run 24 of at most 300:
+```
+Traceback (most recent call last):
+  File "<cell>", line 5, in <module>
+TypeError: 'numpy._ArrayFunctionDispatcher' object is not iterable
+```
+[forward passes used: 16 of 25; Python runs used: 24 of 300]

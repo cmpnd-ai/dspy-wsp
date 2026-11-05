@@ -1,0 +1,135 @@
+OUTPUT of Python run 17 of at most 300:
+```
+baseline 0.362
+fixed_offsets 0.512
+full_repair 0.5746666666666667
+agent_trace_observability train_222 {
+  "agent": {
+    "autonomy": "checkpointed",
+    "model": "internal-agent-v3"
+  },
+  "constraints": [
+    "Never modify production without an approved change ticket"
+  ],
+  "task": "Migrate the user table to the new schema without downtime.",
+  "trace_summary": {
+    "constraint_violations": 1,
+    "duration_s": 635.2,
+    "irreversible_actions": 1,
+    "steps": 12,
+    "tool_errors": 3
+  }
+}
+customer_service train_566 {
+  "account": {
+    "lifetime_value_usd": 2142,
+    "prior_tickets_90d": 1,
+    "seats": 5,
+    "tenure_months": 41,
+    "tier": "enterprise"
+  },
+  "orders": [
+    {
+      "amount_usd": 18,
+      "date": "2026-03-04",
+      "id": "A-89032",
+      "status": "pending"
+    },
+    {
+      "amount_usd": 18,
+      "date": "2026-01-20",
+      "id": "A-28209",
+      "status": "settled"
+    },
+    {
+      "amount_usd": 18,
+      "date": "2026-02-14",
+      "id": "A-60464",
+      "status": "settled"
+    }
+  ],
+  "thread": [
+    {
+      "role": "customer",
+      "text": "I\u2019ve been an enterprise client for over three years, and this is the second time I\u2019ve received a damaged item. This $18 part is useless, and frankly, it\u2019s unacceptable that my last issue was never handled correctly either."
+    }
+  ]
+}
+invoice_processing train_618 {
+  "delivery": {
+    "condition": "accepted",
+    "date": "2026-03-20",
+    "received_qty": 25
+  },
+  "invoice": {
+    "currency": "USD",
+    "id": "INV-2026-6639",
+    "lines": [
+      {
+        "qty": 25,
+        "sku": "SKU-477",
+        "total_usd": 2846.5,
+        "unit_usd": 113.86
+      }
+    ],
+    "total_usd": 2846.5,
+    "vendor": "Acme Fabrication"
+  },
+  "payment": {
+    "days_until_due": -21,
+    "discount_expires_in_days": null,
+    "early_payment_discount_pct": null,
+    "status": "overdue",
+    "terms": "net 15"
+  },
+  "purchase_order": {
+    "freight_terms": "freight prepaid by vendor, not separately billable",
+    "id": "PO-2541",
+    "lines": [
+      {
+        "qty": 25,
+        "unit_usd": 81.33
+      }
+    ],
+    "total_usd": 2033.25
+  },
+  "vendor_history": {
+    "disputes_12m": 0,
+    "invoices_12m": 53,
+    "prior_invoice_ids": [
+      "INV-2026-8938",
+      "INV-2026-9731",
+      "INV-2026-6322",
+      "INV-2026-9997"
+    ]
+  }
+}
+security_incidents train_1129 {
+  "alert": {
+    "description": "a large transfer to an external destination",
+    "evidence": "A privileged CI runner transferred 12.8 GB of data to the external destination archive-ext.net (93.184.216.34) starting at 22:15 UTC. This outbound activity occurred outside of any change window using credentials that were last updated 365 days ago.",
+    "rule": "data_egress"
+  },
+  "context": {
+    "asset_criticality": "crown_jewel",
+    "change_window_active": false,
+    "source_on_allowlist": false
+  },
+  "history": {
+    "credential_rotation_days_ago": 365,
+    "distinct_countries_30d": 2,
+    "logins_30d": 1351,
+    "prior_alerts_90d": 3
+  },
+  "principal": {
+    "mfa_enrolled": true,
+    "name": "svc-infra-840",
+    "privileges": [
+      "deploy:production",
+      "secrets:read"
+    ],
+    "type": "ci_runner"
+  }
+}
+```
+[forward passes used: 10 of 25; Python runs used: 17 of 300]

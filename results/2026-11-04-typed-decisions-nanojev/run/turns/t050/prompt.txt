@@ -1,0 +1,103 @@
+OUTPUT of Python run 31 of at most 300:
+```
+panel_order ['train_50', 'train_107', 'train_122', 'train_258', 'train_278', 'train_281', 'train_299', 'train_302', 'train_369', 'train_387', 'train_439', 'train_464', 'train_465', 'train_490', 'train_502', 'train_591', 'train_645', 'train_654', 'train_678', 'train_702', 'train_712', 'train_751', 'train_788', 'train_820', 'train_822', 'train_855', 'train_882', 'train_927', 'train_930', 'train_961', 'train_980', 'train_1036', 'train_1043', 'train_1049', 'train_1077', 'train_1079', 'train_1094', 'train_1105', 'train_1124', 'train_1164']
+panel request count 47
+job installation bytecode
+ 19           0 RESUME                   0
+
+ 20           2 LOAD_GLOBAL              0 (jobs)
+             12 LOAD_FAST                0 (j)
+             14 BINARY_SUBSCR
+             18 UNPACK_SEQUENCE          2
+             22 STORE_FAST               1 (label)
+             24 STORE_FAST               2 (dd)
+
+ 21          26 LOAD_GLOBAL              2 (np)
+             36 LOAD_ATTR                4 (linalg)
+             56 LOAD_ATTR                7 (NULL|self + norm)
+             76 LOAD_FAST                2 (dd)
+             78 CALL                     1
+             86 LOAD_CONST               1 (0)
+             88 COMPARE_OP              40 (==)
+             92 POP_JUMP_IF_FALSE       12 (to 118)
+             94 LOAD_GLOBAL              9 (NULL + drop_edit)
+            104 LOAD_CONST               2 ('scalar.weight')
+            106 CALL                     1
+            114 POP_TOP
+            116 JUMP_FORWARD            74 (to 266)
+
+ 22     >>  118 LOAD_GLOBAL             11 (NULL + save_edit)
+            128 LOAD_CONST               2 ('scalar.weight')
+            130 LOAD_GLOBAL             12 (torch)
+            140 LOAD_ATTR               15 (NULL|self + from_numpy)
+            160 LOAD_GLOBAL             16 (w0)
+            170 LOAD_FAST                2 (dd)
+            172 BINARY_OP                0 (+)
+            176 LOAD_ATTR               19 (NULL|self + astype)
+            196 LOAD_GLOBAL              2 (np)
+            206 LOAD_ATTR               20 (float32)
+            226 CALL                     1
+            234 CALL                     1
+            242 LOAD_CONST               0 (None)
+            244 LOAD_CONST               0 (None)
+            246 LOAD_CONST               0 (None)
+            248 BUILD_SLICE              2
+            250 BUILD_TUPLE              2
+            252 BINARY_SUBSCR
+            256 CALL                     2
+            264 POP_TOP
+
+ 23     >>  266 LOAD_GLOBAL             23 (NULL + open)
+            276 LOAD_GLOBAL             24 (work)
+            286 LOAD_CONST               3 ('notes.md')
+            288 BINARY_OP               11 (/)
+            292 LOAD_CONST               4 ('a')
+            294 CALL                     2
+            302 BEFORE_WITH
+            304 STORE_FAST               3 (f)
+
+ 24         306 LOAD_FAST                3 (f)
+            308 LOAD_ATTR               27 (NULL|self + write)
+            328 LOAD_CONST               5 ('\nPass ')
+            330 LOAD_CONST               6 (13)
+            332 LOAD_FAST                0 (j)
+            334 BINARY_OP                0 (+)
+            338 FORMAT_VALUE             0
+            340 LOAD_CONST               7 (': diagnostic ')
+            342 LOAD_FAST                1 (label)
+            344 FORMAT_VALUE             0
+            346 LOAD_CONST               8 ('; scalar original + specified dw600 ablation; 40 internal fitting cases plus 7 synthetic variants. Best snapshot best_1 untouched.\n')
+            348 BUILD_STRING             5
+            350 CALL                     1
+            358 POP_TOP
+
+ 23         360 LOAD_CONST               0 (None)
+            362 LOAD_CONST               0 (None)
+            364 LOAD_CONST               0 (None)
+            366 CALL                     2
+            374 POP_TOP
+
+ 25     >>  376 LOAD_GLOBAL             29 (NULL + print)
+            386 LOAD_CONST               9 ('Installed')
+            388 LOAD_FAST                1 (label)
+            390 CALL                     2
+            398 POP_TOP
+            400 RETURN_CONST             0 (None)
+
+ 23     >>  402 PUSH_EXC_INFO
+            404 WITH_EXCEPT_START
+            406 POP_JUMP_IF_TRUE         1 (to 410)
+            408 RERAISE                  2
+        >>  410 POP_TOP
+            412 POP_EXCEPT
+            414 POP_TOP
+            416 POP_TOP
+            418 JUMP_BACKWARD           22 (to 376)
+        >>  420 COPY                     3
+            422 POP_EXCEPT
+            424 RERAISE                  1
+ExceptionTable:
+  304 to 358 -> 402 [1] lasti
+  402 to 410 -> 420 [3] lasti
+```
+[forward passes used: 17 of 25; Python runs used: 31 of 300]

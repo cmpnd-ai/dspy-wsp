@@ -1,0 +1,9 @@
+OUTPUT of Python run 28 of at most 300:
+```
+Jobs: [('dose_zero', (1024,)), ('dose_quarter', (1024,)), ('dose_half', (1024,)), ('dose_threequarters', (1024,)), ('dose_125', (1024,)), ('dose_150', (1024,)), ('cov_ge_1', (1024,)), ('cov_ge_point1', (1024,)), ('cov_ge_point01', (1024,)), ('reverse_direction', (1024,))]
+dose request: {"type": "decide", "model": "both", "problems": ["train_439", "train_1124", "train_490", "train_387", "train_464", "train_278", "train_107", "train_788", "train_961", "train_122", "train_820", "train_1036", "train_751", "train_1105", "train_591", "train_281", "train_930", "train_702", "train_855", "train_822", "train_712", "train_1079", "train_302", "train_1094", "train_678", "train_369", "train_9
+panel ids: ['train_439', 'train_1124', 'train_490', 'train_387', 'train_464'] count 40
+syn labels: ['agent violations=0', 'agent violations=1', 'agent violations=3', 'customer billing', 'customer technical', 'customer delivery', 'customer account']
+direction eigenvalues: [0.     0.0001 0.0001 0.0002 0.0014] [   139.3768    145.6339    442.5802   7740.1729 222629.9151]
+```
+[forward passes used: 16 of 25; Python runs used: 28 of 300]

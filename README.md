@@ -90,7 +90,14 @@ optimizer = WeightSpace(metric=metric, writer_lm=dspy.LM("openai/gpt-6.1-sol"), 
 compiled = optimizer.compile(program, trainset=train, valset=test)
 ```
 
-For a decision model, the writer gets `decide` passes, which run the program and score it, and `read` passes, which return each option's logit and the decision head's inputs. It may recompute the head from those reads and derive edits in closed form. `holdout` moves training examples to a validation set that the writer can score edits on but never see. `examples/typed_decisions.py` runs the Typed Decisions benchmark. `results/2026-11-04-typed-decisions-d1/` documents a run in which one closed-form edit to d1-omni-600M's scorer raised test accuracy from 53.4% to 60.6%.
+For a decision model, the writer gets `decide` passes, which run the program and score it, and `read` passes, which return each option's logit and the decision head's inputs. It may recompute the head from those reads and derive edits in closed form. `holdout` moves training examples to a validation set that the writer can score edits on but never see. `examples/typed_decisions.py` runs the Typed Decisions benchmark. Two runs on a MacBook Pro with MLX, with `openai/gpt-6.1-sol` as the writer and 25 passes each, gave these results on the 400 held-out test cases:
+
+| Model | Tensor edited | Original | Edited | Paired gain | Improved / worse | Run |
+|---|---|---|---|---|---|---|
+| d1-omni-600M | `head.scorer.3.weight` (1,024 weights) | 53.4% | 60.6% | +7.25 ± 1.05 points | 150 / 63 | [results](results/2026-11-04-typed-decisions-d1/) |
+| NanoJev (Qwen3-0.6B) | `scalar.weight` (1,024 weights) | 38.6% | 55.7% | +17.10 ± 1.35 points | 243 / 63 | [results](results/2026-11-04-typed-decisions-nanojev/) |
+
+In both runs the writer derived the edit in closed form from the decision head's inputs, confirmed it on 300 held-out validation cases, and never saw the test cases. Each run took between 75 and 110 minutes.
 
 ## How a run works
 

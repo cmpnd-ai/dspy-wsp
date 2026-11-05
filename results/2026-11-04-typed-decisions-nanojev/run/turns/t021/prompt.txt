@@ -1,0 +1,6 @@
+OUTPUT of Python run 13 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 101.4225
+Correction norm 55.834975592845744 largest changed coordinates [208, 648, 290, 877, 668, 955, 356, 606, 976, 211]
+```
+[forward passes used: 6 of 25; Python runs used: 13 of 300]

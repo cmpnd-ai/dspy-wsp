@@ -1,0 +1,33 @@
+OUTPUT of Python run 19 of at most 300:
+```
+ORIGINAL
+agent violations=0 needs_review {'false': np.float32(0.166), 'true': np.float32(0.834)}
+agent violations=0 risk {'0': np.float32(0.334), '1': np.float32(0.152), '2': np.float32(0.289), '3': np.float32(0.224)}
+agent violations=1 needs_review {'false': np.float32(0.163), 'true': np.float32(0.837)}
+agent violations=1 risk {'0': np.float32(0.326), '1': np.float32(0.155), '2': np.float32(0.305), '3': np.float32(0.214)}
+agent violations=3 needs_review {'false': np.float32(0.159), 'true': np.float32(0.841)}
+agent violations=3 risk {'0': np.float32(0.372), '1': np.float32(0.146), '2': np.float32(0.264), '3': np.float32(0.218)}
+customer billing category {'account': np.float32(0.221), 'billing': np.float32(0.318), 'delivery': np.float32(0.18), 'refund': np.float32(0.16), 'technical': np.float32(0.121)}
+customer technical category {'account': np.float32(0.279), 'billing': np.float32(0.266), 'delivery': np.float32(0.182), 'refund': np.float32(0.137), 'technical': np.float32(0.135)}
+customer delivery category {'account': np.float32(0.234), 'billing': np.float32(0.293), 'delivery': np.float32(0.194), 'refund': np.float32(0.141), 'technical': np.float32(0.138)}
+customer account category {'account': np.float32(0.286), 'billing': np.float32(0.285), 'delivery': np.float32(0.185), 'refund': np.float32(0.13), 'technical': np.float32(0.115)}
+REPAIRED
+agent violations=0 needs_review {'false': np.float32(0.542), 'true': np.float32(0.458)}
+agent violations=0 risk {'0': np.float32(0.173), '1': np.float32(0.374), '2': np.float32(0.264), '3': np.float32(0.188)}
+agent violations=1 needs_review {'false': np.float32(0.264), 'true': np.float32(0.736)}
+agent violations=1 risk {'0': np.float32(0.133), '1': np.float32(0.279), '2': np.float32(0.371), '3': np.float32(0.217)}
+agent violations=3 needs_review {'false': np.float32(0.406), 'true': np.float32(0.594)}
+agent violations=3 risk {'0': np.float32(0.152), '1': np.float32(0.343), '2': np.float32(0.255), '3': np.float32(0.25)}
+customer billing category {'account': np.float32(0.188), 'billing': np.float32(0.38), 'delivery': np.float32(0.169), 'refund': np.float32(0.077), 'technical': np.float32(0.185)}
+customer technical category {'account': np.float32(0.475), 'billing': np.float32(0.089), 'delivery': np.float32(0.112), 'refund': np.float32(0.056), 'technical': np.float32(0.268)}
+customer delivery category {'account': np.float32(0.114), 'billing': np.float32(0.153), 'delivery': np.float32(0.288), 'refund': np.float32(0.067), 'technical': np.float32(0.378)}
+customer account category {'account': np.float32(0.29), 'billing': np.float32(0.167), 'delivery': np.float32(0.199), 'refund': np.float32(0.045), 'technical': np.float32(0.3)}
+keep covariance eigenvalues >= 0.01 directions 955 correction norm 55.0 test (np.float64(0.572), np.float64(0.0536051571599748))
+keep covariance eigenvalues >= 0.03 directions 715 correction norm 48.44 test (np.float64(0.554), np.float64(0.054328748889279306))
+keep covariance eigenvalues >= 0.1 directions 436 correction norm 34.47 test (np.float64(0.5426666666666666), np.float64(0.054933834398742706))
+keep covariance eigenvalues >= 0.3 directions 244 correction norm 21.18 test (np.float64(0.54), np.float64(0.056402477929911876))
+keep covariance eigenvalues >= 1 directions 125 correction norm 11.54 test (np.float64(0.522), np.float64(0.05882673242597673))
+keep covariance eigenvalues >= 3 directions 73 correction norm 7.44 test (np.float64(0.49866666666666665), np.float64(0.06063686971979946))
+keep covariance eigenvalues >= 10 directions 40 correction norm 4.06 test (np.float64(0.4886666666666667), np.float64(0.06656478564167934))
+```
+[forward passes used: 12 of 25; Python runs used: 19 of 300]

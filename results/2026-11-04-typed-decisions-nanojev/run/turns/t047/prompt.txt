@@ -1,0 +1,17 @@
+OUTPUT of Python run 29 of at most 300:
+```
+{"type": "read", "model": "edited", "requests": [{"state": {"instructions": "Answer each question about this agent trace observability record.", "input_fields": "1. `state` (dict):
+install function:
+Traceback (most recent call last):
+  File "<cell>", line 5, in <module>
+  File "/Users/dbreunig/.asdf/installs/python/3.12.4/lib/python3.12/inspect.py", line 1279, in getsource
+    lines, lnum = getsourcelines(object)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dbreunig/.asdf/installs/python/3.12.4/lib/python3.12/inspect.py", line 1261, in getsourcelines
+    lines, lnum = findsource(object)
+                  ^^^^^^^^^^^^^^^^^^
+  File "/Users/dbreunig/.asdf/installs/python/3.12.4/lib/python3.12/inspect.py", line 1090, in findsource
+    raise OSError('could not get source code')
+OSError: could not get source code
+```
+[forward passes used: 16 of 25; Python runs used: 29 of 300]

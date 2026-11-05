@@ -1,0 +1,14 @@
+OUTPUT of Python run 6 of at most 300:
+```
+Metadata fields: {'layers': [], 'conventions': {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "the head's raw score per option, before calibration", 'probabilities': "the answer's distribution over the options", 'hidden_mean': 'hidden state after each listed layer (0 = embeddings, l = after block l-1, the last index after the final norm), averaged over the state and question tokens', 'head_inputs': "each option path's final hidden state after `norm` (the input to `scalar`)", 'path_ends': "each option path's final hidden state before `norm`", 'set_delta': "the set-attention correction added to each option's logit (choice questions; 0 otherwise)"}, 'model': 'original', 'files': {'option_mask.npy': [1000, 5], 'option_logits.npy': [1000, 5], 'head_inputs.npy': [1000, 5, 1024], 'path_ends.npy': [1000, 5, 1024], 'set_delta.npy': [1000, 5], 'probabilities.npy': [1000, 5]}}
+option_mask (1000, 5) min/max 0.0 1.0
+option_logits (1000, 5) min/max nan nan
+head_inputs (1000, 5, 1024) min/max nan nan
+path_ends (1000, 5, 1024) min/max nan nan
+set_delta (1000, 5) min/max nan nan
+probabilities (1000, 5) min/max nan nan
+Scalar reconstruction errors on mask: [0.     0.     1.9378 2.4251]
+Set correction magnitude: [0.     0.5088 0.6294]
+First boolean inputs/logits: [(1, [0.0, 1.6770347356796265], [31.552146911621094, 31.552146911621094])]
+```
+[forward passes used: 3 of 25; Python runs used: 6 of 300]

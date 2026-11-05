@@ -1,0 +1,11 @@
+{
+ "model": "C-Tianyu/NanoJev",
+ "framework": "mlx",
+ "baseline": "program",
+ "decisions": 2000,
+ "accuracy": 0.3855,
+ "kl_from_gold": 0.5664310558638328,
+ "brier": 0.3149134063506576,
+ "ece": 0.1503772286869443,
+ "seconds": 322.1
+}

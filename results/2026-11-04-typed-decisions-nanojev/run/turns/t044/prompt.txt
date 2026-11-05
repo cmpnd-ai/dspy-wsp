@@ -1,0 +1,278 @@
+OUTPUT of Python run 26 of at most 300:
+```
+['fwd_14', 'fwd_13', 'fwd_12', 'fwd_9', 'fwd_15', 'candidate_linear600', 'edited', 'best_1', 'fwd_10', 'fwd_2', 'fwd_4', 'fwd_3', 'fwd_16', 'fwd_11', 'practice']
+{
+ "rows": [
+  {
+   "request": 0,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 5,
+   "question": "action",
+   "type": "choice",
+   "option
+best files ['/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev/work/best_1/scalar.weight.npy']
+```
+[forward passes used: 16 of 25; Python runs used: 26 of 300]

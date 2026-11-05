@@ -1,0 +1,6 @@
+OUTPUT of Python run 33 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 152.1338
+Installed dose_150
+```
+[forward passes used: 18 of 25; Python runs used: 33 of 300]
