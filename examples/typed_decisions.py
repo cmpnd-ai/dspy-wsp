@@ -210,25 +210,42 @@ def main() -> None:
             passes, holdout, valset = 3, 50, [ex for exs in by_wf.values() for ex in exs[:10]]
             limits = Limits(max_generations=64, max_generations_both=64, max_reads=256)
         run_dir = args.run_dir or RUNS / f"{args.model}{'-smoke' if args.smoke else ''}"
-        optimizer = WeightSpace(
-            metric=metric,
-            writer_lm=dspy.LM(WRITER),
-            backend=backend,
-            max_passes=passes,
-            limits=limits,
-            task_description=TASK,
-            holdout=holdout,
-            holdout_key=lambda ex: ex.workflow,
-            sandbox="none" if sys.platform == "darwin" else "auto",  # bubblewrap is Linux-only
-            run_dir=run_dir,
-            resume=True,
-        )
-        compiled = optimizer.compile(TypedDecisions(train), trainset=train, valset=valset)
-        print(compiled.wsp_patch.summary())
-        print(json.dumps(compiled.wsp_report["validation"]["paired"], indent=1))
-        compiled.save(str(Path(run_dir) / "program.json"))
+        optimize(backend, train, valset, run_dir=run_dir, passes=passes, limits=limits, holdout=holdout, task=TASK)
     finally:
         backend.close()
+
+
+def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK):
+    """Run WeightSpace with the writer on a decision benchmark whose examples carry `workflow`, `state`, `questions` and `gold`."""
+    optimizer = WeightSpace(
+        metric=metric,
+        writer_lm=dspy.LM(WRITER),
+        backend=backend,
+        max_passes=passes,
+        limits=limits or Limits(max_generations=900, max_generations_both=450, max_reads=1024),
+        task_description=task,
+        holdout=holdout,
+        holdout_key=lambda ex: ex.workflow,
+        sandbox="none" if sys.platform == "darwin" else "auto",  # bubblewrap is Linux-only
+        run_dir=run_dir,
+        resume=True,
+    )
+    compiled = optimizer.compile(TypedDecisions(train), trainset=train, valset=valset)
+    print(compiled.wsp_patch.summary())
+    print(json.dumps(compiled.wsp_report["validation"]["paired"], indent=1))
+    compiled.save(str(Path(run_dir) / "program.json"))
+    return compiled
+
+
+def baseline(backend, kind: str, train, test, out: Path) -> dict:
+    """Score the unedited model on `test` with the scorer's protocol or through the program, and save the result."""
+    t = time.time()
+    scores = protocol_baseline(backend, test) if kind == "protocol" else program_baseline(backend, test, train)
+    result = {"model": backend.model_id, "framework": backend.framework, "baseline": kind, **scores, "seconds": round(time.time() - t, 1)}
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(result, indent=1))
+    print(json.dumps(result, indent=1))
+    return result
 
 
 if __name__ == "__main__":

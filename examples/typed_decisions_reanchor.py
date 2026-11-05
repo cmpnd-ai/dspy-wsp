@@ -86,23 +86,15 @@ def summary(result: dict) -> dict:
             "probability_accuracy": stats.mean(p), "probability_se": stats.standard_error(p), "by_type": result["by_type"]}
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="nanojev", choices=["d1", "nanojev"])
-    parser.add_argument("--framework", choices=["mlx", "torch"])
-    parser.add_argument("--wsp-run", type=Path, required=True, help="a finished WeightSpace run folder (its patch and practice split)")
-    parser.add_argument("--out", type=Path)
-    args = parser.parse_args()
+def compare(model: str, framework: str | None, wsp_run: Path, out: Path, train: list, test: list) -> dict:
+    """Score plain, ReAnchor, WeightSpace and both on `test`; ReAnchor fits on the WeightSpace run's practice cases."""
     # ReAnchor reruns the program many times on cached answers. DSPy's call history keeps a copy of every
     # request and answer on the client and on each predictor, which grows to tens of GB here.
     dspy.configure(disable_history=True)
-    out = args.out or args.wsp_run.parent / f"reanchor_{args.model}"
     out.mkdir(parents=True, exist_ok=True)
-
-    train, test = load_split("train"), load_split("test")
-    practice, validation = split_from_run(args.wsp_run, train)
-    backend = make_backend(args.model, args.framework)
-    edits = {n: t.float().numpy() for n, t in Patch.load(args.wsp_run / "patch").edited_tensors(backend.reader).items()}
+    practice, validation = split_from_run(wsp_run, train)
+    backend = make_backend(model, framework)
+    edits = {n: t.float().numpy() for n, t in Patch.load(wsp_run / "patch").edited_tensors(backend.reader).items()}
     results, fitted, timings = {}, {}, {}
     try:
         for name, use_edit, reanchor in (("plain", False, False), ("reanchor", False, True), ("wsp", True, False), ("wsp_reanchor", True, True)):
@@ -122,7 +114,7 @@ def main() -> None:
 
     report = {
         "model": backend.model_id,
-        "wsp_run": str(args.wsp_run),
+        "wsp_run": str(wsp_run),
         "practice_cases": len(practice), "validation_cases": len(validation), "test_cases": len(test),
         "conditions": {k: summary(v) for k, v in results.items()},
         "paired_decided": {
@@ -136,6 +128,17 @@ def main() -> None:
     }
     (out / "comparison.json").write_text(json.dumps(report, indent=1, default=str))
     print(json.dumps({k: report[k] for k in ("paired_decided", "reanchor_reports")}, indent=1, default=str))
+    return report
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", default="nanojev", choices=["d1", "nanojev"])
+    parser.add_argument("--framework", choices=["mlx", "torch"])
+    parser.add_argument("--wsp-run", type=Path, required=True, help="a finished WeightSpace run folder (its patch and practice split)")
+    parser.add_argument("--out", type=Path)
+    args = parser.parse_args()
+    compare(args.model, args.framework, args.wsp_run, args.out or args.wsp_run.parent / f"reanchor_{args.model}", load_split("train"), load_split("test"))
 
 
 if __name__ == "__main__":

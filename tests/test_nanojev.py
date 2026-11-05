@@ -97,3 +97,9 @@ def test_backend_edit_scalar_changes_answers(nj_dir, framework):
         assert "norm.weight" in b.editable_names() and not any(p.endswith(r"(^|\.)norm\.weight$") for p in b.default_protected())
     finally:
         b.close()
+
+
+def test_choice_without_descriptions_uses_keys(tok):
+    q = parse_question({"type": "choice", "instructions": "Who owns it?", "criteria": {"alice": None, "bob": ""}})
+    text = tok._tok.decode(nanojev.encode(tok, "s", q, 512)[0][0], skip_special_tokens=False)
+    assert "Candidate:\nalice\nDecision:" in text

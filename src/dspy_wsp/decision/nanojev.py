@@ -48,7 +48,8 @@ class Tokenizer:
 
 def candidate_texts(q: Question) -> list[str]:
     if q.type == "choice":
-        return [f"{k}: {v}" for k, v in q.criteria.items()]
+        # NanoJev's reference requires a description for every option; an option without one is read as its key.
+        return [k if v is None or v == "" else f"{k}: {v}" for k, v in q.criteria.items()]
     if q.type == "score":
         return [f"{c}" for c in q.criteria]
     return [BOOLEAN_TEXT]
