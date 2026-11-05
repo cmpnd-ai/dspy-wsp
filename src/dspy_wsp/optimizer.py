@@ -46,7 +46,13 @@ class WeightSpace(Teleprompter):
         run_dir: where turns, the writer's work folder, the patch and the report go.
             Reusing a run_dir with resume=True continues an interrupted run.
         limits: per-pass limits (defaults follow the paper).
-        protected: regexes of tensor names the writer may read but not edit.
+        protected: regexes of tensor names the writer may read but not edit. None uses the
+            backend's own list if it has one (decision models), else the input embedding,
+            the output layer and the final norm.
+        holdout: trainset examples held out for validation (an int, or a share below 1).
+            The writer can score edits on them but sees only aggregate results; supported
+            for decision backends.
+        holdout_key: groups for a stratified holdout, e.g. lambda ex: ex.workflow.
         sandbox: "auto" isolates the writer's code with bubblewrap (required);
             "none" runs it with your permissions and network.
         kernel_timeout, kernel_memory_bytes, kernel_threads: limits for each Python run.
@@ -71,7 +77,7 @@ class WeightSpace(Teleprompter):
         task_description: str | None = None,
         run_dir: str | Path | None = None,
         limits: Limits | None = None,
-        protected: tuple[str, ...] = DEFAULT_PROTECTED,
+        protected: tuple[str, ...] | None = None,
         sandbox: str = "auto",
         kernel_timeout: float = 900,
         kernel_memory_bytes: int | None = None,
@@ -84,6 +90,8 @@ class WeightSpace(Teleprompter):
         val_samples: int = 1,
         fallback_if_worse: bool = False,
         resume: bool = False,
+        holdout: int | float = 0,
+        holdout_key: Callable | None = None,
     ):
         super().__init__()
         self.metric = metric
@@ -94,7 +102,15 @@ class WeightSpace(Teleprompter):
         self.task_description = task_description
         self.run_dir = Path(run_dir) if run_dir else None
         self.limits = limits or Limits()
+        if protected is None:
+            default = getattr(backend, "default_protected", None)
+            protected = default() if callable(default) else DEFAULT_PROTECTED
         self.protected = tuple(protected)
+        self.holdout = holdout
+        self.holdout_key = holdout_key
+        self.decision = getattr(backend, "kind", "llm") == "decision"
+        if holdout and not self.decision:
+            raise ValueError("holdout is supported for decision backends only")
         self.sandbox = sandbox
         self.kernel_timeout = kernel_timeout
         self.kernel_memory_bytes = kernel_memory_bytes
@@ -136,6 +152,7 @@ class WeightSpace(Teleprompter):
             if pid in practice:
                 pid = f"train_{i}"
             practice[pid] = ex
+        validation = self._split_holdout(practice) if self.holdout else {}
         practice_file = practice_dir / "trainset.jsonl"
         with open(practice_file, "w") as f:
             for pid, ex in practice.items():
@@ -148,17 +165,23 @@ class WeightSpace(Teleprompter):
         budget = Budget(max_passes=self.max_passes, max_code_runs=self.max_code_runs)
         forward = ForwardTool(
             backend=self.backend, program=program, metric=self.metric, practice=practice,
-            edit_store=edit_store, work_dir=work, limits=self.limits, seed=self.seed,
+            edit_store=edit_store, work_dir=work, limits=self.limits, seed=self.seed, validation=validation,
         )
         first = next(iter(practice.values()))
         shapes = reader.shapes()
-        task_prompt = prompts.build_task_prompt(
+        if self.decision:  # list only the loaded network's tensors (d1 checkpoints also hold unused media encoders)
+            shapes = {n: shape for n, shape in shapes.items() if n in editable}
+        build = prompts.build_decision_task_prompt if self.decision else prompts.build_task_prompt
+        extra = {"n_validation": len(validation)} if self.decision else {}
+        task_prompt = build(
+            **extra,
             model_description=self.backend.describe(),
             task_description=self.task_description,
             program_description=prompts.describe_program(program),
             metric_description=prompts.describe_metric(self.metric),
             sampling=self._sampling(),
-            protected_description="the tensors marked (out of scope) below (the input embedding, the output layer and the final norm)",
+            protected_description=getattr(self.backend, "protected_description", None)
+            or "the tensors marked (out of scope) below (the input embedding, the output layer and the final norm)",
             kernel_environment="no internet, no GPU" if self.sandbox != "none" else "no GPU",
             model_dir=str(Path(self.backend.weights_dir).resolve()),
             practice_dir=str(practice_dir),
@@ -181,6 +204,7 @@ class WeightSpace(Teleprompter):
         kernel = Kernel(
             work_dir=work, model_dir=self.backend.weights_dir, tensor_index=reader.index, protected=protected,
             practice_dir=practice_dir, timeout=self.kernel_timeout, max_output=self.max_output,
+            tokenizer_dir=getattr(self.backend, "tokenizer_dir", None) if self.decision else None,
             memory_bytes=self.kernel_memory_bytes, sandbox=self.sandbox, threads=self.kernel_threads,
         )
         session = Session(
@@ -202,6 +226,9 @@ class WeightSpace(Teleprompter):
             "turns": session.turn,
             "conversations": session.conversation,
         }
+        if self.decision:
+            report["validation_runs"] = forward.validation_log
+            report["validation_size"] = len(validation)
         if valset:
             check = forward.paired_eval(valset, edits, n=self.val_samples, out_dir=run_dir / "final_check")
             report["validation"] = check
@@ -232,6 +259,31 @@ class WeightSpace(Teleprompter):
         program.wsp_patch = patch
         program.wsp_report = report
         return program
+
+    def _split_holdout(self, practice: dict) -> dict:
+        """Move `holdout` examples (stratified by `holdout_key`) from practice to validation, in place."""
+        import random
+
+        n_total = len(practice)
+        n = int(round(self.holdout * n_total)) if isinstance(self.holdout, float) and self.holdout < 1 else int(self.holdout)
+        if not 0 < n < n_total:
+            raise ValueError(f"holdout must leave both practice and validation examples; got {n} of {n_total}")
+        groups: dict = {}
+        for pid, ex in practice.items():
+            groups.setdefault(self.holdout_key(ex) if self.holdout_key else "", []).append(pid)
+        keys = sorted(groups, key=str)
+        quota = {k: n * len(groups[k]) / n_total for k in keys}
+        take = {k: int(quota[k]) for k in keys}
+        for k in sorted(keys, key=lambda k: quota[k] - take[k], reverse=True)[: n - sum(take.values())]:
+            take[k] += 1  # the largest remainders get the leftover examples, so the total is exactly n
+        rng = random.Random(self.seed)
+        chosen = []
+        for key in keys:
+            ids = sorted(groups[key])
+            rng.shuffle(ids)
+            chosen += ids[: take[key]]
+        validation = {pid: practice.pop(pid) for pid in sorted(chosen)}
+        return validation
 
     def _sampling(self) -> str:
         b = self.backend

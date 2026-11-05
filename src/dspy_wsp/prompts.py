@@ -60,6 +60,79 @@ FORWARD = Template(
 
 NO_FORWARD = "No forward passes: you cannot run the model. Work from the weights alone."
 
+TASK_DECISION = Template(
+    """TASK. You are given the weights of a decision model: $model_description It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes.$task_description
+
+THE PROGRAM.
+$program_description
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+$metric_description
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: $protected_description, and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel ($kernel_environment): variables survive between your code blocks, like a notebook. The model's files are in $model_dir (read only), practice examples are in $practice_dir, and $work_dir is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to $timeout seconds; output is cut at $max_output characters. You may run code up to $max_code_runs times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+$tensor_listing
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": $practice_file ($n_practice examples). Input fields: $input_keys. Label fields: $label_keys. Choose whichever serve your experiments. A separate validation set of $n_validation examples is held out from you; you can only score edits on it, as described below.
+
+3. $forward_section
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to $max_reads questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep $work_dir/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy $work_dir/edited to $work_dir/best_1/).$explain
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. $ending"""
+)
+
+FORWARD_DECISION = Template(
+    """A forward-pass tool with a budget of $max_passes forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to $max_gen practice items (with "both", up to $max_both per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in $work_dir/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set ($n_validation examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..$n_layers] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most $max_reads questions per pass. The results are .npy files in $work_dir/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in $work_dir from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget."""
+)
+
+
+def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None, n_validation: int, work_dir: str, require_explanations: bool, **fields) -> str:
+    """The task prompt for a decision model: `build_task_prompt`'s fields, with decide, read and validation passes."""
+    forward = FORWARD_DECISION.substitute(
+        max_passes=max_passes, max_gen=limits.max_generations, max_both=limits.max_generations_both,
+        n_validation=n_validation, n_layers=n_layers if n_layers is not None else "L", max_reads=f"{limits.max_reads:,}", work_dir=work_dir,
+    )
+    ending = (
+        f"It continues until all {max_passes} forward passes are used (replying without a code block does not end it earlier); "
+        f"after that, make your final choice: the tensors in {work_dir}/edited when you finish are submitted, so leave there the edit "
+        "with the best paired gain confirmed on the validation set, or no edit if none was confirmed. "
+        "Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help."
+    )
+    return TASK_DECISION.substitute(
+        **{k: v for k, v in fields.items() if k not in ("sampling", "task_description", "n_practice", "input_keys", "label_keys", "max_output")},
+        task_description=f" {fields['task_description'].strip()}" if fields.get("task_description") else "",
+        n_practice=f"{fields['n_practice']:,}",
+        input_keys=", ".join(fields["input_keys"]),
+        label_keys=", ".join(fields["label_keys"]) or "(none)",
+        max_output=f"{fields['max_output']:,}",
+        work_dir=work_dir,
+        n_validation=f"{n_validation:,}",
+        max_reads=f"{limits.max_reads:,}",
+        forward_section=forward,
+        explain=EXPLAIN if require_explanations else "",
+        ending=ending,
+    )
+
 EXPLAIN = "\n6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun."
 
 

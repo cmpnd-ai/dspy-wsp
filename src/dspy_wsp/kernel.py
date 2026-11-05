@@ -63,6 +63,7 @@ class Kernel:
         threads: int | None = None,
         python: str | None = None,
         startup_timeout: float = 600,
+        tokenizer_dir: str | Path | None = None,
     ):
         if sandbox not in ("auto", "none"):
             raise ValueError("sandbox must be 'auto' or 'none'")
@@ -77,6 +78,7 @@ class Kernel:
         self.startup_timeout = startup_timeout
         self._proc: subprocess.Popen | None = None
         self._lines: queue.Queue | None = None
+        self._tokenizer_dir = tokenizer_dir
         self._config_path = self.work_dir.parent / "kernel_config.json"
         self._config_path.write_text(
             json.dumps(
@@ -87,6 +89,7 @@ class Kernel:
                     "tensor_index": tensor_index,
                     "protected": list(protected),
                     "package_parent": str(Path(__file__).resolve().parent.parent),
+                    **({"tokenizer_dir": str(Path(tokenizer_dir).resolve())} if tokenizer_dir else {}),
                 }
             )
         )
@@ -94,7 +97,8 @@ class Kernel:
     # --- lifecycle -------------------------------------------------------------------
     def start(self) -> None:
         script = Path(__file__).with_name("_kernel_main.py")
-        cmd = sandbox_prefix(self.sandbox, [self.work_dir], [self.model_dir, self._config_path, script.parent]) + [self.python, "-I", "-u", str(script), str(self._config_path)]
+        readonly = [self.model_dir, self._config_path, script.parent] + ([Path(tokenizer_dir).resolve()] if (tokenizer_dir := self._tokenizer_dir) else [])
+        cmd = sandbox_prefix(self.sandbox, [self.work_dir], readonly) + [self.python, "-I", "-u", str(script), str(self._config_path)]
         env = {
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "HOME": "/tmp" if self.sandbox != "none" else os.environ.get("HOME", "/tmp"),

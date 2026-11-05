@@ -333,6 +333,8 @@ class D1Backend(DecisionBackend):
     def default_protected(self):
         return (r"^encoder\.embed_tokens\.weight$", r"^encoder\.embedding_norm\.weight$")
 
+    protected_description = "the tensors marked (out of scope) below (the token embedding and the encoder's final norm)"
+
     def num_tokens(self, text: str) -> int:
         return len(self.tok.encode(text))
 

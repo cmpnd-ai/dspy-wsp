@@ -99,6 +99,10 @@ def _prelude(cfg: dict, ns: dict) -> None:
         _tok = None
 
         def _get(self):
+            if self._tok is None and cfg.get("tokenizer_dir"):
+                from tokenizers import Tokenizer
+
+                self._tok = Tokenizer.from_file(os.path.join(cfg["tokenizer_dir"], "tokenizer.json"))
             if self._tok is None:
                 try:
                     from transformers import AutoTokenizer
