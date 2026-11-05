@@ -1,0 +1,36 @@
+RESULT of forward pass 2:
+```
+{
+ "type": "read",
+ "model": "original",
+ "requests": 420,
+ "questions": 980,
+ "dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/d1/work/fwd_2",
+ "files": {
+  "option_mask.npy": [
+   980,
+   4
+  ],
+  "option_logits.npy": [
+   980,
+   4
+  ],
+  "head_inputs.npy": [
+   980,
+   4,
+   1024
+  ],
+  "trunk_markers.npy": [
+   980,
+   4,
+   1024
+  ],
+  "probabilities.npy": [
+   980,
+   4
+  ]
+ },
+ "seconds": 52.2
+}
+```
+[forward passes used: 2 of 25; Python runs used: 4 of 300]

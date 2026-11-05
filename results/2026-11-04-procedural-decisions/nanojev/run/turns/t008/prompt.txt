@@ -1,0 +1,17 @@
+OUTPUT of Python run 5 of at most 300:
+```
+Metadata keys: dict_keys(['rows', 'layers', 'conventions', 'model', 'files'])
+layers []
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "the head's raw score per option, before calibration", 'probabilities': "the answer's distribution over the options", 'hidden_mean': 'hidden state after each listed layer (0 = embeddings, l = after block l-1, the last index after the final norm), averaged over the state and question tokens', 'head_inputs': "each option path's final hidden state after `norm` (the input to `scalar`)", 'path_ends': "each option path's final hidden state before `norm`", 'set_delta': "the set-attention correction added to each option's logit (choice questions; 0 otherwise)"}
+model original
+files {'option_mask.npy': [980, 4], 'option_logits.npy': [980, 4], 'head_inputs.npy': [980, 4, 1024], 'path_ends.npy': [980, 4, 1024], 'set_delta.npy': [980, 4], 'probabilities.npy': [980, 4]}
+current_owner head norms [31.566 31.549 31.554 31.549] raw [2.2046 0.7973 1.1036 0.5621] logits [ 1.8154  0.2315  0.5533 -0.0307] delta [-0.3892 -0.5658 -0.5504 -0.5928]
+current_severity head norms [31.55  31.547 31.569    nan] raw [0.7001 0.3575 2.8773    nan] logits [0.7001 0.3575 2.8773    nan] delta [ 0.  0.  0. nan]
+is_open head norms [31.553 31.553    nan    nan] raw [0.9857 0.9857    nan    nan] logits [0.     0.9857    nan    nan] delta [ 0.  0. nan nan]
+intent head norms [31.564 31.551 31.549 31.542] raw [ 2.4758  1.3514  1.1322 -0.9449] logits [ 1.9436  0.8111  0.5904 -1.5599] delta [-0.5322 -0.5404 -0.5418 -0.615 ]
+is_urgent head norms [31.553 31.553    nan    nan] raw [1.5131 1.5131    nan    nan] logits [0.     1.5131    nan    nan] delta [ 0.  0. nan nan]
+workflow_impact head norms [31.544 31.547 31.547    nan] raw [-0.0832  0.5363  0.7976     nan] logits [-0.0832  0.5363  0.7976     nan] delta [ 0.  0.  0. nan]
+incident_real head norms [31.557 31.557    nan    nan] raw [1.6577 1.6577    nan    nan] logits [0.     1.6577    nan    nan] delta [ 0.  0. nan nan]
+fit_ids first ['train_175', 'train_389', 'train_379', 'train_169']
+```
+[forward passes used: 2 of 25; Python runs used: 5 of 300]

@@ -1,0 +1,43 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-05T09:41:21+00:00",
+  "base_model": "C-Tianyu/NanoJev",
+  "revision": "047b927b30882a1138fc504821b82ac145a4b81a",
+  "writer": "openai/gpt-6.1-sol",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 32
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev",
+  "validation": {
+   "items": 400,
+   "original": 0.4925,
+   "edited": 0.7233333333333333,
+   "gain": 0.23083333333333333,
+   "se": 0.023170717207184024,
+   "improved": 193,
+   "worsened": 54
+  }
+ },
+ "changed_tensors": 1,
+ "changed_entries_total": 1024,
+ "tensors": [
+  {
+   "name": "scalar.weight",
+   "shape": [
+    1,
+    1024
+   ],
+   "dtype": "float32",
+   "form": "dense",
+   "changed_entries": 1024,
+   "relative_change": 114.64921569824219,
+   "base_sha256": "592948d82fdb9f5519c3a2e3b222519bb1fa887e4fdd8f5944737cef3ce45254",
+   "edited_sha256": "0e82193c757e0225c886fe2746e67e98f060483c7851c43e1c216f9896ba3f43"
+  }
+ ]
+}

@@ -1,0 +1,11 @@
+OUTPUT of Python run 27 of at most 300:
+```
+measure signature (logits, rr, mm, yy)
+Lists [('NAMES', 1084), ('data', 900), ('base', 900), ('v', 300), ('fitids', 420), ('testids', 420), ('ids', 300), ('rows', 980), ('fit_order', 420), ('rt', 980), ('test_order', 420), ('reserveids', 60), ('rr', 140), ('reserve_order', 60), ('rows0', 420), ('rowsC', 420), ('pairs', 140)]
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 49.5474
+request {'type': 'read', 'model': 'original', 'from': {'pass': 1, 'ids': ['train_347', 'train_390', 'train_86', 'train_338', 'train_222', 'train_32', 'train_171', 'train_380', 'train_24', 'train_339', 'train_251', 'train_387', 'train_281', 'train_62', 'train_396', 'train_253', 'train_107', 'train_68', 'train_135', 'train_243', 'train_313', 'train_397', 'train_312', 'train_365', 'train_363', 'train_377', 'train_0', 'train_89', 'train_263', 'train_127', 'train_195', 'train_169', 'train_66', 'train_342', '
+Traceback (most recent call last):
+  File "<cell>", line 7, in <module>
+TypeError: linalg_vector_norm(): argument 'input' (position 1) must be Tensor, not numpy.ndarray
+```
+[forward passes used: 16 of 25; Python runs used: 27 of 300]

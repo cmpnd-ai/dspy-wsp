@@ -1,0 +1,10 @@
+OUTPUT of Python run 6 of at most 300:
+```
+Design (2380, 1024) eigenvalues [     0.          0.0017      0.0091      0.0575 333847.0715]
+ridge 1 delta norm 10.521 inner heldout (np.float64(0.4523809523809524), {'current_owner': np.float64(0.429), 'current_severity': np.float64(0.321), 'is_open': np.float64(0.714), 'intent': np.float64(0.25), 'is_urgent': np.float64(0.321), 'workflow_impact': np.float64(0.321), 'incident_real': np.float64(0.571)})
+ridge 10 delta norm 1.907 inner heldout (np.float64(0.4206349206349206), {'current_owner': np.float64(0.357), 'current_severity': np.float64(0.179), 'is_open': np.float64(0.607), 'intent': np.float64(0.179), 'is_urgent': np.float64(0.286), 'workflow_impact': np.float64(0.25), 'incident_real': np.float64(0.643)})
+ridge 100 delta norm 0.443 inner heldout (np.float64(0.38095238095238093), {'current_owner': np.float64(0.179), 'current_severity': np.float64(0.25), 'is_open': np.float64(0.571), 'intent': np.float64(0.214), 'is_urgent': np.float64(0.286), 'workflow_impact': np.float64(0.214), 'incident_real': np.float64(0.571)})
+ridge 1000 delta norm 0.248 inner heldout (np.float64(0.40476190476190477), {'current_owner': np.float64(0.143), 'current_severity': np.float64(0.25), 'is_open': np.float64(0.393), 'intent': np.float64(0.214), 'is_urgent': np.float64(0.5), 'workflow_impact': np.float64(0.321), 'incident_real': np.float64(0.607)})
+ridge 10000 delta norm 0.078 inner heldout (np.float64(0.4126984126984127), {'current_owner': np.float64(0.179), 'current_severity': np.float64(0.25), 'is_open': np.float64(0.321), 'intent': np.float64(0.214), 'is_urgent': np.float64(0.75), 'workflow_impact': np.float64(0.286), 'incident_real': np.float64(0.571)})
+```
+[forward passes used: 2 of 25; Python runs used: 6 of 300]

@@ -110,6 +110,15 @@ WeightSpace also combines with `dspy.experimental.ReAnchor`, which fits how a pr
 
 See [the comparison](results/2026-11-04-typed-decisions-nanojev/reanchor/) for how the two methods divide the gain.
 
+On three balanced, rule-based tasks from Procedural Typed Decisions, overnight on the same laptop, the same kind of edit gave larger gains (400 test cases):
+
+| Model | Original | WeightSpace | ReAnchor (decided) | WeightSpace + ReAnchor (decided) | Run |
+|---|---|---|---|---|---|
+| d1-omni-600M | 52.3% | 72.3% (+20.0 ± 2.3) | 58.7% | 69.9% | [results](results/2026-11-04-procedural-decisions/) |
+| NanoJev | 49.3% | 72.3% (+23.1 ± 2.3) | 52.8% | 71.3% | [results](results/2026-11-04-procedural-decisions/) |
+
+There, edits that only shifted option preferences gained nothing, so the gains come from how the head reads each record.
+
 ## How a run works
 
 The writer works in turns. Each turn it explains its next step and sends exactly one block:

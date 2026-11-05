@@ -1,0 +1,161 @@
+{
+ "model": "LiquidAI/d1-omni-600M",
+ "wsp_run": "runs/procedural-decisions/d1",
+ "practice_cases": 900,
+ "validation_cases": 300,
+ "test_cases": 400,
+ "conditions": {
+  "plain": {
+   "decided_accuracy": 0.5225,
+   "decided_se": 0.01866054731717568,
+   "probability_accuracy": 0.5233333333333333,
+   "probability_se": 0.018695257970012133,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.50187265917603,
+     "probability_accuracy": 0.50187265917603,
+     "decisions": 267
+    },
+    "noul": {
+     "decided_accuracy": 0.555,
+     "probability_accuracy": 0.555,
+     "decisions": 400
+    },
+    "score": {
+     "decided_accuracy": 0.49063670411985016,
+     "probability_accuracy": 0.4943820224719101,
+     "decisions": 267
+    }
+   }
+  },
+  "reanchor": {
+   "decided_accuracy": 0.5866666666666667,
+   "decided_se": 0.018487805218547218,
+   "probability_accuracy": 0.5233333333333333,
+   "probability_se": 0.018695257970012133,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.5205992509363296,
+     "probability_accuracy": 0.50187265917603,
+     "decisions": 267
+    },
+    "noul": {
+     "decided_accuracy": 0.6275,
+     "probability_accuracy": 0.555,
+     "decisions": 400
+    },
+    "score": {
+     "decided_accuracy": 0.5318352059925093,
+     "probability_accuracy": 0.4943820224719101,
+     "decisions": 267
+    }
+   }
+  },
+  "wsp": {
+   "decided_accuracy": 0.6416666666666667,
+   "decided_se": 0.017497065831911934,
+   "probability_accuracy": 0.7233333333333333,
+   "probability_se": 0.01648691708526278,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.6254681647940075,
+     "probability_accuracy": 0.6254681647940075,
+     "decisions": 267
+    },
+    "noul": {
+     "decided_accuracy": 0.7125,
+     "probability_accuracy": 0.7125,
+     "decisions": 400
+    },
+    "score": {
+     "decided_accuracy": 0.38202247191011235,
+     "probability_accuracy": 0.7490636704119851,
+     "decisions": 267
+    }
+   }
+  },
+  "wsp_reanchor": {
+   "decided_accuracy": 0.6991666666666667,
+   "decided_se": 0.017123999014380376,
+   "probability_accuracy": 0.7233333333333333,
+   "probability_se": 0.01648691708526278,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.6329588014981273,
+     "probability_accuracy": 0.6254681647940075,
+     "decisions": 267
+    },
+    "noul": {
+     "decided_accuracy": 0.7125,
+     "probability_accuracy": 0.7125,
+     "decisions": 400
+    },
+    "score": {
+     "decided_accuracy": 0.6329588014981273,
+     "probability_accuracy": 0.7490636704119851,
+     "decisions": 267
+    }
+   }
+  }
+ },
+ "paired_decided": {
+  "reanchor_vs_plain": {
+   "items": 400,
+   "original": 0.5225,
+   "edited": 0.5866666666666667,
+   "gain": 0.06416666666666666,
+   "se": 0.021503263726169404,
+   "improved": 109,
+   "worsened": 70
+  },
+  "wsp_vs_plain": {
+   "items": 400,
+   "original": 0.5225,
+   "edited": 0.6416666666666667,
+   "gain": 0.11916666666666666,
+   "se": 0.022787467120228607,
+   "improved": 145,
+   "worsened": 85
+  },
+  "wsp_reanchor_vs_plain": {
+   "items": 400,
+   "original": 0.5225,
+   "edited": 0.6991666666666667,
+   "gain": 0.17666666666666667,
+   "se": 0.023623921533394588,
+   "improved": 176,
+   "worsened": 70
+  },
+  "wsp_reanchor_vs_wsp": {
+   "items": 400,
+   "original": 0.6416666666666667,
+   "edited": 0.6991666666666667,
+   "gain": 0.0575,
+   "se": 0.009480281166408096,
+   "improved": 104,
+   "worsened": 34
+  }
+ },
+ "reanchor_reports": {
+  "reanchor": {
+   "train_score_before": 0.5152,
+   "train_score": 0.5993,
+   "val_score_before": 0.5433,
+   "val_score": 0.5944,
+   "fitted_outputs": 7
+  },
+  "wsp_reanchor": {
+   "train_score_before": 0.6848,
+   "train_score": 0.7804,
+   "val_score_before": 0.6333,
+   "val_score": 0.7044,
+   "fitted_outputs": 7
+  }
+ },
+ "seconds": {
+  "plain": 60.1,
+  "reanchor": 301.6,
+  "wsp": 60.1,
+  "wsp_reanchor": 301.5
+ }
+}

@@ -1,0 +1,9 @@
+OUTPUT of Python run 30 of at most 300:
+```
+64 0.47619047619047616
+256 0.5880952380952381
+512 0.6777777777777777
+1024 0.8063492063492064
+saved edit head.scorer.3.weight: 64 of 1,024 entries changed, relative change 17.9751
+```
+[forward passes used: 17 of 25; Python runs used: 30 of 300]

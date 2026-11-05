@@ -1,0 +1,49 @@
+RESULT of forward pass 22:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 420,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/d1/work/gen_22_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/d1/work/gen_22_edited.jsonl"
+ ],
+ "original": {
+  "graded": 420,
+  "score": 0.5198412698412698,
+  "score_se_over_items": 0.018111100503177994,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 310
+  }
+ },
+ "edited": {
+  "graded": 420,
+  "score": 0.5095238095238095,
+  "score_se_over_items": 0.01826981462658674,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 311
+  }
+ },
+ "paired": {
+  "items": 420,
+  "original": 0.5198412698412698,
+  "edited": 0.5095238095238095,
+  "gain": -0.010317460317460317,
+  "se": 0.004249247493272411,
+  "improved": 8,
+  "worsened": 21
+ },
+ "seconds": 123.8
+}
+```
+[forward passes used: 22 of 25; Python runs used: 35 of 300]

@@ -1,0 +1,7 @@
+OUTPUT of Python run 22 of at most 300:
+```
+bias-only 0.4166666666666667 {'current_owner': 0.236, 'current_severity': 0.279, 'is_open': 0.521, 'intent': 0.207, 'is_urgent': 0.75, 'workflow_impact': 0.343, 'incident_real': 0.471}
+evidence-only 0.546031746031746 {'current_owner': 0.657, 'current_severity': 0.607, 'is_open': 0.579, 'intent': 0.457, 'is_urgent': 0.736, 'workflow_impact': 0.357, 'incident_real': 0.507}
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 1.1430
+```
+[forward passes used: 14 of 25; Python runs used: 22 of 300]

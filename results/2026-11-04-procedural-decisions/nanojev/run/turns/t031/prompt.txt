@@ -1,0 +1,13 @@
+OUTPUT of Python run 18 of at most 300:
+```
+Columns: mean correct-direction margin shift, fraction both correct, pair accuracy
+current_owner original [0.75, 0.167, 0.4] edited [2.979, 0.3, 0.533]
+current_severity original [0.045, 0.0, 0.3] edited [1.71, 0.233, 0.5]
+is_open original [0.022, 0.0, 0.5] edited [0.336, 0.133, 0.567]
+intent original [0.024, 0.0, 0.417] edited [0.042, 0.0, 0.133]
+is_urgent original [0.109, 0.0, 0.5] edited [0.536, 0.133, 0.567]
+workflow_impact original [0.547, 0.0, 0.5] edited [2.968, 1.0, 1.0]
+incident_real original [0.057, 0.0, 0.5] edited [0.371, 0.0, 0.5]
+Max scalar intervention prediction error 1.3696271233598623e-05
+```
+[forward passes used: 12 of 25; Python runs used: 18 of 300]

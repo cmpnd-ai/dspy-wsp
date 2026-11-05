@@ -1,0 +1,17 @@
+OUTPUT of Python run 8 of at most 300:
+```
+test baseline 0.5198412698412698 {'current_owner': 0.643, 'current_severity': 0.6, 'is_open': 0.514, 'intent': 0.407, 'is_urgent': 0.7, 'workflow_impact': 0.357, 'incident_real': 0.486}
+1.0 0.5 0.5278 gain 0.0079 SE 0.0042 {'current_owner': 0.664, 'current_severity': 0.607, 'is_open': 0.536, 'intent': 0.429, 'is_urgent': 0.7, 'workflow_impact': 0.357, 'incident_real': 0.486}
+1.0 1.0 0.6937 gain 0.1738 SE 0.0221 {'current_owner': 0.75, 'current_severity': 0.679, 'is_open': 0.586, 'intent': 0.493, 'is_urgent': 0.75, 'workflow_impact': 0.779, 'incident_real': 0.736}
+1.0 1.5 0.3802 gain -0.1397 SE 0.0338 {'current_owner': 0.157, 'current_severity': 0.064, 'is_open': 0.514, 'intent': 0.229, 'is_urgent': 0.643, 'workflow_impact': 0.271, 'incident_real': 0.514}
+10.0 0.5 0.5262 gain 0.0063 SE 0.0032 {'current_owner': 0.664, 'current_severity': 0.607, 'is_open': 0.529, 'intent': 0.429, 'is_urgent': 0.693, 'workflow_impact': 0.357, 'incident_real': 0.486}
+10.0 1.0 0.6325 gain 0.1127 SE 0.0148 {'current_owner': 0.75, 'current_severity': 0.736, 'is_open': 0.571, 'intent': 0.529, 'is_urgent': 0.7, 'workflow_impact': 0.736, 'incident_real': 0.557}
+10.0 1.5 0.3563 gain -0.1635 SE 0.0338 {'current_owner': 0.121, 'current_severity': 0.057, 'is_open': 0.529, 'intent': 0.179, 'is_urgent': 0.507, 'workflow_impact': 0.271, 'incident_real': 0.514}
+100.0 0.5 0.5238 gain 0.004 SE 0.0021 {'current_owner': 0.643, 'current_severity': 0.6, 'is_open': 0.536, 'intent': 0.421, 'is_urgent': 0.7, 'workflow_impact': 0.357, 'incident_real': 0.486}
+100.0 1.0 0.5476 gain 0.0278 SE 0.0093 {'current_owner': 0.664, 'current_severity': 0.621, 'is_open': 0.557, 'intent': 0.493, 'is_urgent': 0.671, 'workflow_impact': 0.464, 'incident_real': 0.486}
+100.0 1.5 0.323 gain -0.1968 SE 0.0343 {'current_owner': 0.086, 'current_severity': 0.05, 'is_open': 0.457, 'intent': 0.193, 'is_urgent': 0.307, 'workflow_impact': 0.271, 'incident_real': 0.514}
+1000.0 0.5 0.5198 gain 0.0 SE 0.0 {'current_owner': 0.643, 'current_severity': 0.6, 'is_open': 0.514, 'intent': 0.407, 'is_urgent': 0.7, 'workflow_impact': 0.357, 'incident_real': 0.486}
+1000.0 1.0 0.5214 gain 0.0016 SE 0.0037 {'current_owner': 0.643, 'current_severity': 0.607, 'is_open': 0.529, 'intent': 0.407, 'is_urgent': 0.7, 'workflow_impact': 0.35, 'incident_real': 0.486}
+1000.0 1.5 0.3238 gain -0.196 SE 0.0344 {'current_owner': 0.079, 'current_severity': 0.05, 'is_open': 0.464, 'intent': 0.193, 'is_urgent': 0.314, 'workflow_impact': 0.271, 'incident_real': 0.514}
+```
+[forward passes used: 3 of 25; Python runs used: 8 of 300]

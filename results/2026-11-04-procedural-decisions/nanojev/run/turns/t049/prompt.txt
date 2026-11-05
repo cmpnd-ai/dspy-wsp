@@ -1,0 +1,6 @@
+OUTPUT of Python run 28 of at most 300:
+```
+Half strength {'current_owner': [0.932, 0.3, 0.483], 'current_severity': [0.439, 0.0, 0.35], 'is_open': [0.09, 0.067, 0.533], 'intent': [0.017, 0.033, 0.35], 'is_urgent': [0.161, 0.067, 0.533], 'workflow_impact': [0.879, 0.9, 0.95], 'incident_real': [0.107, 0.0, 0.5]}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 171.9738
+```
+[forward passes used: 20 of 25; Python runs used: 28 of 300]

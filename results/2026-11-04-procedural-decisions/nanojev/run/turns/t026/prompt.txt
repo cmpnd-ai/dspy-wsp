@@ -1,0 +1,8 @@
+OUTPUT of Python run 16 of at most 300:
+```
+full norm 63.117 all-practice 0.803 {'current_owner': np.float64(0.84), 'current_severity': np.float64(0.79), 'is_open': np.float64(0.8233), 'intent': np.float64(0.4267), 'is_urgent': np.float64(0.8033), 'workflow_impact': np.float64(0.7833), 'incident_real': np.float64(0.92)}
+prior-only norm 0.648 all-practice 0.473 {'current_owner': np.float64(0.5133), 'current_severity': np.float64(0.38), 'is_open': np.float64(0.5767), 'intent': np.float64(0.26), 'is_urgent': np.float64(0.53), 'workflow_impact': np.float64(0.4767), 'incident_real': np.float64(0.5067)}
+evidence-only norm 63.266 all-practice 0.4944 {'current_owner': np.float64(0.46), 'current_severity': np.float64(0.7233), 'is_open': np.float64(0.4233), 'intent': np.float64(0.31), 'is_urgent': np.float64(0.4933), 'workflow_impact': np.float64(0.52), 'incident_real': np.float64(0.5067)}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 1.1779
+```
+[forward passes used: 9 of 25; Python runs used: 16 of 300]

@@ -1,0 +1,8 @@
+OUTPUT of Python run 15 of at most 300:
+```
+mean-option subspace rank 13 delta norms 15.130231 0.47397232155614294 15.12280485605868
+bias only 0.4182539682539682 {'current_owner': 0.207, 'current_severity': 0.264, 'is_open': 0.536, 'intent': 0.386, 'is_urgent': 0.571, 'workflow_impact': 0.364, 'incident_real': 0.479}
+evidence only 0.5341269841269841 {'current_owner': 0.664, 'current_severity': 0.614, 'is_open': 0.543, 'intent': 0.421, 'is_urgent': 0.707, 'workflow_impact': 0.357, 'incident_real': 0.5}
+both 0.7206349206349205 {'current_owner': 0.743, 'current_severity': 0.664, 'is_open': 0.586, 'intent': 0.5, 'is_urgent': 0.736, 'workflow_impact': 0.729, 'incident_real': 0.843}
+```
+[forward passes used: 7 of 25; Python runs used: 15 of 300]

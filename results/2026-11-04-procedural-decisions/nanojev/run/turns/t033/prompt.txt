@@ -1,0 +1,24 @@
+RESULT of forward pass 13:
+```
+{
+ "type": "decide",
+ "model": "edited",
+ "generations": 900,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/gen_13.jsonl"
+ ],
+ "graded": 900,
+ "score": 0.8029629629629629,
+ "score_se_over_items": 0.008967095773709523,
+ "mean_output_tokens": 0.0,
+ "cut_share": 0.0,
+ "failures": {
+  "cut_at_max_tokens": 0,
+  "program_error": 0,
+  "metric_error": 0,
+  "scored_below_1": 380
+ },
+ "seconds": 370.1
+}
+```
+[forward passes used: 13 of 25; Python runs used: 19 of 300]

@@ -1,0 +1,221 @@
+HANDOFF. The conversation was restarted to keep it short; the kernel and its variables are unchanged. Your task follows, unchanged.
+
+TASK. You are given the weights of a decision model: C-Tianyu/NanoJev (NanoJev decision model): a Qwen3 backbone (`backbone.*`, 28 causal transformer blocks, width 1024, MLP width 3072, 16 attention heads, 8 key/value heads) and a decision head. Every option is read on its own text path: 'State:
+<state>
+Question type: <choice, score or boolean>
+Question:
+<instructions>
+Candidate:
+<option text>
+Decision:' then EOS. The backbone's final hidden state at the EOS goes through a LayerNorm (`norm`) and a scalar head (`scalar`, one weight per hidden unit and a bias) to give the option's logit. For choice questions, a set-attention correction over the question's options (`set_project`, `set_attention`, `set_output`) adds to each logit. A noul (boolean) has one path, "The proposition is true.", and logits [0, z] for [false, true]; a score's options are its level descriptions. A softmax per question gives the probabilities. 596,250,498 parameters in float32. It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program answers typed questions about procedurally generated records: event logs, support tickets with explicit rules, and sensor reports. Every answer follows exactly from rules and facts stated in the record.
+
+THE PROGRAM.
+TypedDecisions, with 3 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'event_state_reconstruction': state -> current_owner, current_severity, is_open
+  instructions: Answer each question about this event state reconstruction record.
+  state: The record to judge.
+  current_owner: Who owns the incident after replaying the event log?
+  current_severity: What is the incident's current severity after replaying the event log?
+  is_open: Is the incident open after replaying the event log?
+- step 'multi_view_adjudication': state -> intent, is_urgent, workflow_impact
+  instructions: Answer each question about this multi view adjudication record.
+  state: The record to judge.
+  intent: Following the intent rule, what is the primary operational issue?
+  is_urgent: Following the urgency rule, is this request urgent?
+  workflow_impact: Following the workflow impact rule, how much does the issue block the user's work?
+- step 'partial_observation_calibration': state -> incident_real
+  instructions: Answer each question about this partial observation calibration record.
+  state: The record to judge.
+  incident_real: After conditioning on every sensor observation, is the incident more likely real than not?
+Program source:
+class TypedDecisions(dspy.Module):
+    """One Predict per workflow; each case goes to its workflow's questions."""
+
+    def __init__(self, examples: list[dspy.Example]):
+        super().__init__()
+        schemas = {}
+        for ex in examples:
+            schemas.setdefault(ex.workflow, ex.questions)
+        self.workflows = sorted(schemas)
+        for wf in self.workflows:
+            setattr(self, wf, dspy.Predict(make_signature(wf, schemas[wf])))
+
+    def forward(self, workflow: str, state: dict):
+        return getattr(self, workflow)(state=state)
+
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    results, notes = [], []
+    for qid, gold in example.gold.items():
+        probs = predicted_probabilities(pred[qid])
+        ok, _, brier, _ = score_one(probs, gold)
+        results.append((ok, brier))
+        best = max(probs, key=probs.get)
+        target = max(gold["probabilities"], key=gold["probabilities"].get)
+        notes.append(f"{qid}: {'right' if ok else 'WRONG'} (predicted {best} {probs[best]:.2f}, gold {target} {gold['probabilities'][target]:.2f})")
+    accuracy = sum(ok for ok, _ in results) / len(results)
+    brier = sum(b for _, b in results) / len(results)
+    return dspy.Prediction(score=accuracy, feedback="; ".join(notes) + f". Mean Brier {brier:.3f}.")
+
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the token embedding and the backbone's final norm), and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no GPU): variables survive between your code blocks, like a notebook. The model's files are in /Users/dbreunig/.cache/huggingface/hub/models--C-Tianyu--NanoJev/snapshots/047b927b30882a1138fc504821b82ac145a4b81a (read only), practice examples are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/practice, and /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  backbone.embed_tokens.weight [151936, 1024] (out of scope)
+  backbone.layers.0.input_layernorm.weight [1024]
+  backbone.layers.0.mlp.down_proj.weight [1024, 3072]
+  backbone.layers.0.mlp.gate_proj.weight [3072, 1024]
+  backbone.layers.0.mlp.up_proj.weight [3072, 1024]
+  backbone.layers.0.post_attention_layernorm.weight [1024]
+  backbone.layers.0.self_attn.k_norm.weight [128]
+  backbone.layers.0.self_attn.k_proj.weight [1024, 1024]
+  backbone.layers.0.self_attn.o_proj.weight [1024, 2048]
+  backbone.layers.0.self_attn.q_norm.weight [128]
+  backbone.layers.0.self_attn.q_proj.weight [2048, 1024]
+  backbone.layers.0.self_attn.v_proj.weight [1024, 1024]
+  backbone.norm.weight [1024] (out of scope)
+  norm.bias [1024]
+  norm.weight [1024]
+  scalar.bias [1]
+  scalar.weight [1, 1024]
+  set_attention.in_proj_bias [384]
+  set_attention.in_proj_weight [384, 128]
+  set_attention.out_proj.bias [128]
+  set_attention.out_proj.weight [128, 128]
+  set_output.bias [1]
+  set_output.weight [1, 128]
+  set_project.bias [128]
+  set_project.weight [128, 1025]
+  ... the same names for blocks 0..27; 322 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/practice/trainset.jsonl (900 examples). Input fields: state, workflow. Label fields: case_id, gold, level, questions. Choose whichever serve your experiments. A separate validation set of 300 examples is held out from you; you can only score edits on it, as described below.
+
+3. A forward-pass tool with a budget of 25 forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to 900 practice items (with "both", up to 450 per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set (300 examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..28] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most 1,024 questions per pass. The results are .npy files in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to 1,024 questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/edited to /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 25 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/edited when you finish are submitted, so leave there the edit with the best paired gain confirmed on the validation set, or no edit if none was confirmed. Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help.
+
+YOUR NOTEBOOK (notes.md):
+# NanoJev weight repair
+
+Initial state: no edits. Inspecting practice records before original-model baseline.
+
+Baseline all 900: accuracy .4800, SE .01263. Per-question: {'current_owner': 0.5333333333333333, 'current_severity': 0.49, 'is_open': 0.5766666666666667, 'intent': 0.22, 'is_urgent': 0.5066666666666667, 'workflow_impact': 0.5133333333333333, 'incident_real': 0.49333333333333335}
+No edits. Read pass 2: fixed fitting subset, 140 examples per workflow (420 total, 980 questions), seed 731. Test subset remaining 480 excluded from fitting.
+
+Read order checked: baseline order, not requested ID order. Initial misaligned exploratory calculations discarded, no weights applied.
+Closed-form residual fit: within-question centered multiclass contrasts; boolean true vs fixed zero; ridge=1 selected on internal 84-item holdout (.6190 vs .4960 baseline). Refit on 420 fitting examples.
+Pass 3: scalar.weight = original + 0.5 * delta (delta norm 13.8385); all other tensors original. Paired test on 450 disjoint practice items.
+
+Pass 3 half-strength, disjoint 450: .47185 -> .52370, gain .05185 ± .00935 paired SE (76 improved,25 worsened).
+Pass 4: scalar.weight original + 1.0*delta, same 450 for dose-response; no other edits.
+
+Pass 4 full strength disjoint 450: .47185 -> .66889, gain .19704 ± .02296 paired SE; 207 improved,76 worsened. Saved best_full_ridge1.
+Pass 5 hidden validation: same full-strength scalar edit; no other tensors changed.
+
+Pass 5 VALIDATION confirmed full ridge1: .45111 -> .64222, gain .19111 ± .02981 paired SE; 130 improved,55 worsened. Current confirmed best = best_full_ridge1.
+Pass 6: scalar.weight original + 1.5*delta, same 450 practice test items; predicted overshoot relative to full strength.
+
+Pass 6 1.5x overshoot: .61704 vs .47185, gain .14519 ± .02819, worse than 1x (.66889). Restored validated 1x.
+Passes 7-8: original-model read on remaining 480 practice records in two 240-record batches; all existing features retained. No new edit.
+
+Original reads now cover all 900. Three-fold practice CV (seed926): ridge .1=.69074, .3=.68519,1=.67259,3=.65926; no backbone training. Fitted new additive scalar direction on 900 with ridge .1.
+Pass 9 validation: original+delta900_ridge.1, norm 63.1165; all other tensors original. Earlier validated edit backed up.
+
+Pass 9 VALIDATION delta900 ridge.1: .45111 -> .68667, gain .23556 ± .03020;148 improved,51 worsened. Saved best_900_ridge01.
+Pass 10 control: scalar original+prior-only direction, fit using means within question/option identity, no state-varying evidence; same 450 practice diagnostic cohort (now part of larger fit).
+
+Pass 10 prior-only control: .47185 -> .47407, gain .00222 ± .02939. Restored validated delta900.
+Passes 11-12: 210 matched cue pairs (30 per question), original then edited read. One decisive fact changed per pair; event owner probe uses final assign event. No probe used to fit.
+
+Counterfactual probe summaries (margin shift,both correct,pair accuracy): {11: {'current_owner': [0.75, 0.167, 0.4], 'current_severity': [0.045, 0.0, 0.3], 'is_open': [0.022, 0.0, 0.5], 'intent': [0.024, 0.0, 0.417], 'is_urgent': [0.109, 0.0, 0.5], 'workflow_impact': [0.547, 0.0, 0.5], 'incident_real': [0.057, 0.0, 0.5]}, 12: {'current_owner': [2.979, 0.3, 0.533], 'current_severity': [1.71, 0.233, 0.5], 'is_open': [0.336, 0.133, 0.567], 'intent': [0.042, 0.0, 0.133], 'is_urgent': [0.536, 0.133, 0.567], 'workflow_impact': [2.968, 1.0, 1.0], 'incident_real': [0.371, 0.0, 0.5]}}
+Exact head intervention prediction max error 0.000014.
+
+Pass 13: confirmed best scalar=original+delta900 ridge.1; decide edited on all 900 practice for complete baseline comparison. Counterfactual failures remain in intent and one-sensor OOD probes; no claim of complete reasoning repair.
+
+Pass 13 all-practice (in-sample): .48000 -> .80296, gain 0.32296 ± 0.01486.
+Pass 14 causal ablation: original scalar + high-variance portion of delta900 only (eigenvalue >=1 in practice contrast covariance). Same 450 diagnostic practice cohort; remove low-variance evidence component. Not a candidate to keep.
+
+Pass 14 high-only ablation on 450: .47185 -> .68370, gain .21185 ± .02259; confirms loss from removing low-variance directions.
+Pass 15 validation: same high-only scalar correction (eigenvalue>=1); full validated edit remains backed up.
+
+Pass 15 high-only validation .62778, gain .17667 ± .03058; inferior to full .68667. Rejected; restored best_900_ridge01.
+Passes 16-18: full confirmed scalar correction, paired per-workflow diagnostics on all 300 practice items per workflow (in-sample): event, multi-view, sensors. No other edits.
+
+
+YOUR CURRENT EDIT:
+scalar.weight: 1,024 of 1,024 entries changed, relative change 114.6492
+
+[forward passes used: 18 of 25; Python runs used: 22 of 300]
+
+RESULT of forward pass 18:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 300,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/gen_18_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev/work/gen_18_edited.jsonl"
+ ],
+ "original": {
+  "graded": 300,
+  "score": 0.49333333333333335,
+  "score_se_over_items": 0.02891317619548029,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 152
+  }
+ },
+ "edited": {
+  "graded": 300,
+  "score": 0.92,
+  "score_se_over_items": 0.01568929081105472,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 24
+  }
+ },
+ "paired": {
+  "items": 300,
+  "original": 0.49333333333333335,
+  "edited": 0.92,
+  "gain": 0.4266666666666667,
+  "se": 0.03328647765904522,
+  "improved": 141,
+  "worsened": 13
+ },
+ "seconds": 29.7
+}
+```
+[forward passes used: 18 of 25; Python runs used: 22 of 300]

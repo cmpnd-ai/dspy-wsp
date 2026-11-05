@@ -1,0 +1,6 @@
+OUTPUT of Python run 27 of at most 300:
+```
+Reversal {'current_owner': [-0.74, 0.0, 0.233], 'current_severity': [-0.81, 0.0, 0.233], 'is_open': [-0.146, 0.0, 0.5], 'intent': [0.003, 0.0, 0.433], 'is_urgent': [-0.159, 0.0, 0.5], 'workflow_impact': [-0.937, 0.0, 0.117], 'incident_real': [-0.129, 0.0, 0.5]}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 57.3246
+```
+[forward passes used: 19 of 25; Python runs used: 27 of 300]

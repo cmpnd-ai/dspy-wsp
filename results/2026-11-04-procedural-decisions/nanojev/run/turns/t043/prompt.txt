@@ -1,0 +1,22 @@
+OUTPUT of Python run 24 of at most 300:
+```
+<function summarize_file at 0x1014b25c0>
+<function eval_all at 0x1014b2a20>
+<function scores_direction at 0x1014b2f20>
+delta900 <class 'numpy.ndarray'> (1024,) length 1024
+delta_prior <class 'numpy.ndarray'> (1024,) length 1024
+delta_evidence <class 'numpy.ndarray'> (1024,) length 1024
+delta_high <class 'numpy.ndarray'> (1024,) length 1024
+X <class 'numpy.ndarray'> (2380, 1024) length 2380
+XX <class 'numpy.ndarray'> (5100, 1024) length 5100
+YY <class 'numpy.ndarray'> (5100,) length 5100
+allrows <class 'list'> None length 2100
+groups <class 'collections.defaultdict'> None length 17
+design_groups <class 'list'> None length 5100
+16 0.5333333333333333 0.8177777777777777 gain 0.2844444444444445 SE 0.019454554891231456
+17 0.41333333333333333 0.6711111111111111 gain 0.2577777777777778 SE 0.021192804832565425
+18 0.49333333333333335 0.92 gain 0.4266666666666667 SE 0.03328647765904522
+norms [('delta900', 63.11651589390319), ('delta_prior', 0.6484513336537034), ('delta_evidence', 63.26576263968305), ('delta_high', 16.733197857089998)]
+Sample group []
+```
+[forward passes used: 18 of 25; Python runs used: 24 of 300]

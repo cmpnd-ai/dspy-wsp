@@ -1,0 +1,6 @@
+OUTPUT of Python run 37 of at most 300:
+```
+Second partition head input difference 0.0
+Second partition replay error 5.531311e-05
+```
+[forward passes used: 23 of 25; Python runs used: 37 of 300]

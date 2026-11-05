@@ -1,0 +1,9 @@
+OUTPUT of Python run 12 of at most 300:
+```
+0.001 norm 118.051 fit 0.881 test 0.6651 gain 0.1452 se 0.0246 {'current_owner': 0.629, 'current_severity': 0.443, 'is_open': 0.507, 'intent': 0.55, 'is_urgent': 0.707, 'workflow_impact': 0.6, 'incident_real': 0.85}
+0.01 norm 43.529 fit 0.8444 test 0.6984 gain 0.1786 se 0.0238 {'current_owner': 0.686, 'current_severity': 0.493, 'is_open': 0.55, 'intent': 0.536, 'is_urgent': 0.729, 'workflow_impact': 0.7, 'incident_real': 0.864}
+0.1 norm 15.12 fit 0.8071 test 0.7206 gain 0.2008 se 0.0238 {'current_owner': 0.743, 'current_severity': 0.664, 'is_open': 0.586, 'intent': 0.5, 'is_urgent': 0.736, 'workflow_impact': 0.729, 'incident_real': 0.843}
+1.0 norm 5.586 fit 0.7579 test 0.6929 gain 0.173 se 0.0221 {'current_owner': 0.75, 'current_severity': 0.679, 'is_open': 0.586, 'intent': 0.493, 'is_urgent': 0.743, 'workflow_impact': 0.779, 'incident_real': 0.736}
+10.0 norm 1.763 fit 0.6437 test 0.631 gain 0.1111 se 0.0148 {'current_owner': 0.75, 'current_severity': 0.75, 'is_open': 0.571, 'intent': 0.521, 'is_urgent': 0.693, 'workflow_impact': 0.721, 'incident_real': 0.557}
+```
+[forward passes used: 5 of 25; Python runs used: 12 of 300]

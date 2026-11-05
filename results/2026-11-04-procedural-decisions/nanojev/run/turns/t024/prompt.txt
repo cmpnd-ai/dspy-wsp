@@ -1,0 +1,7 @@
+OUTPUT of Python run 15 of at most 300:
+```
+new delta norm 63.11651589390319 old 13.838451647894527
+In-sample 0.8029629629629629 {'current_owner': np.float64(0.84), 'current_severity': np.float64(0.79), 'is_open': np.float64(0.8233), 'intent': np.float64(0.4267), 'is_urgent': np.float64(0.8033), 'workflow_impact': np.float64(0.7833), 'incident_real': np.float64(0.92)}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 114.6492
+```
+[forward passes used: 8 of 25; Python runs used: 15 of 300]

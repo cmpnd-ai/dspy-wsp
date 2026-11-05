@@ -1,0 +1,8 @@
+OUTPUT of Python run 7 of at most 300:
+```
+Requested first: ['train_175', 'train_389', 'train_379', 'train_169', 'train_254'] baseline-order first: ['train_0', 'train_1', 'train_4', 'train_5', 'train_9']
+train_175 {'alice': 0.11612753732574997, 'bob': 0.538578096089878, 'carol': 0.3037002021112018, 'unassigned': 0.04159416447317019}
+train_0 {'alice': 0.607502701070064, 'bob': 0.1246453867236604, 'carol': 0.17195356227625816, 'unassigned': 0.09589834993001747}
+read first: [0.6075 0.1246 0.172  0.0959]
+```
+[forward passes used: 2 of 25; Python runs used: 7 of 300]

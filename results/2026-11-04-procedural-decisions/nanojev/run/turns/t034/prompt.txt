@@ -1,0 +1,12 @@
+OUTPUT of Python run 20 of at most 300:
+```
+Eigenvalue quantiles [     0.          0.0106      0.037       0.1729      1.0087     55.5359 894202.0536]
+cutoff 0.001 low dims 5 low norm 0.426 high-only score 0.8033
+cutoff 0.01 low dims 243 low norm 13.343 high-only score 0.8007
+cutoff 0.1 low dims 690 low norm 43.506 high-only score 0.7578
+cutoff 1 low dims 921 low norm 60.858 high-only score 0.6844
+cutoff 10 low dims 996 low norm 62.915 high-only score 0.6259
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 30.3953
+In-sample paired gain 0.322962962962963 SE 0.01485603789705641
+```
+[forward passes used: 13 of 25; Python runs used: 20 of 300]

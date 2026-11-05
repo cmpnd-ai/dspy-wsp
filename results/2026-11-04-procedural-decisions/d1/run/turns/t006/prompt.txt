@@ -1,0 +1,68 @@
+OUTPUT of Python run 3 of at most 300:
+```
+{
+  "id": "train_0",
+  "sample": 0,
+  "model": "original",
+  "inputs": {
+    "workflow": "event_state_reconstruction",
+    "state": {
+      "initial_state": {
+        "owner": "alice",
+        "open": true,
+        "severity": "critical"
+      },
+      "events": [
+        {
+          "ts": 104,
+          "kind": "reopen"
+        },
+        {
+          "ts": 108,
+          "kind": "resolve"
+        },
+        {
+          "ts": 114,
+          "kind": "severity",
+          "severity": "degraded"
+        },
+        {
+          "ts": 119,
+          "kind": "resolve"
+        },
+        {
+          "ts": 125,
+          "kind": "note",
+          "text": "triage"
+        }
+      ],
+      "rule": "Start from initial_state and apply events in ascending timestamp order. stale_snapshot is an older redundant view and must not override later events.",
+      "stale_snapshot": {
+        "as_of": 114,
+        "owner": "alice",
+        "open": false,
+        "severity": "degraded"
+      }
+    }
+  },
+  "outputs": {
+    "current_owner": "confidence=0.8275579308740348 value='alice' probabilities={'alice': 0.8706684481555261, 'bob': 0.024000124507911298, 'carol': 0.02602917012930635, 'unassigned': 0.07930225720725617}",
+    "current_severity": "confidence=0.6023253691167498 value=1.7348835794111666 probabilities={0: 8.380163834624876e-05, 1: 0.26494881731214087, 2: 0.7349673810495129} level=2",
+    "is_open": "confidence=0.935083106105318 value=False probability=0.03245844694734099"
+  },
+  "score": 0.6666666666666666,
+  "feedback": "current_owner: right (predicted alice 0.87, gold alice 1.00); current_severity: WRONG (predicted 2 0.73, gold 1 1.00); is_open: right (predicted false 0.97, gold false 1.00). Mean Brier 0.369.",
+  "calls": [
+    {
+      "prompt": "{\"state\": {\"instructions\": \"Answer each question about this event state reconstruction record.\", \"input_fields\": \"1. `state` (dict): The record to judge.\", \"inputs\": {\"state\": {\"initial_state\": {\"owner\": \"alice\", \"open\": true, \"severity\": \"critical\"}, \"events\": [{\"ts\": 104, \"kind\": \"reopen\"}, {\"ts\": 108, \"kind\": \"resolve\"}, {\"ts\": 114, \"kind\": \"severity\", \"severity\": \"degraded\"}, {\"ts\": 119, \"kind\": \"resolve\"}, {\"ts\": 125, \"kind\": \"note\", \"text\": \"triage\"}], \"rule\": \"Start from initial_state and apply events in ascending timestamp order. stale_snapshot is an older redundant view and must not override later events.\", \"stale_snapshot\": {\"as_of\": 114, \"owner\": \"alice\", \"open\": false, \"severity\": \"degraded\"}}}}, \"questions\": {\"current_owner\": {\"instructions\": \"Who owns the incident after replaying the event log?\", \"type\": \"choice\", \"criteria\": {\"alice\": null, \"bob\": null, \"carol\": null, \"unassigned\": null}}, \"current_severity\": {\"instructions\": \"What is the incident's current severity after replaying the event log?\", \"type\": \"score\", \"criteria\": [\"routine: Routine.\", \"degraded: Degraded service requiring attention.\", \"critical: Critical user-blocking incident.\"]}, \"is_open\": {\"instructions\": \"Is the incident open after replaying the event log?\", \"type\": \"noul\"}}}",
+      "completion": "{\"current_owner\": {\"choice\": \"alice\", \"confidence\": 0.8275579308740348, \"probabilities\": {\"alice\": 0.8706684481555261, \"bob\": 0.024000124507911298, \"carol\": 0.02602917012930635, \"unassigned\": 0.07930225720725617}}, \"current_severity\": {\"score\": 1.7348835794111666, \"confidence\": 0.6023253691167498, \"probabilities\": {\"0\": 8.380163834624876e-05, \"1\": 0.26494881731214087, \"2\": 0.7349673810495129}}, \"is_open\": {\"noul\": 0.03245844694734099}}",
+      "finish_reason": "stop",
+      "input_tokens": 814,
+      "output_tokens": 0
+    }
+  ],
+  "cut": false,
+  "output_tokens": 0
+}
+```
+[forward passes used: 1 of 25; Python runs used: 3 of 300]

@@ -1,0 +1,12 @@
+{
+ "model": "C-Tianyu/NanoJev",
+ "framework": "mlx",
+ "baseline": "protocol",
+ "weights": "edited (runs/procedural-decisions/nanojev/patch)",
+ "decisions": 934,
+ "accuracy": 0.6648822269807281,
+ "kl_from_gold": 0.6840440767202989,
+ "brier": 0.40946581415752403,
+ "ece": 0.041969488425857064,
+ "seconds": 154.6
+}

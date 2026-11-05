@@ -1,0 +1,6 @@
+OUTPUT of Python run 36 of at most 300:
+```
+Unchanged output bias 0.031294167041778564 bias-corrected replay error 5.054474e-05
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 49.5474
+```
+[forward passes used: 22 of 25; Python runs used: 36 of 300]

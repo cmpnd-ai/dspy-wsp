@@ -1,0 +1,24 @@
+RESULT of forward pass 1:
+```
+{
+ "type": "decide",
+ "model": "original",
+ "generations": 900,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/d1/work/gen_1.jsonl"
+ ],
+ "graded": 900,
+ "score": 0.5159259259259259,
+ "score_se_over_items": 0.012329366858460152,
+ "mean_output_tokens": 0.0,
+ "cut_share": 0.0,
+ "failures": {
+  "cut_at_max_tokens": 0,
+  "program_error": 0,
+  "metric_error": 0,
+  "scored_below_1": 670
+ },
+ "seconds": 136.4
+}
+```
+[forward passes used: 1 of 25; Python runs used: 2 of 300]

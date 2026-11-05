@@ -1,0 +1,7 @@
+OUTPUT of Python run 16 of at most 300:
+```
+B reserve 0.5277777777777778 0.611111111111111 paired gain 0.08333333333333333 SE 0.06169045705903928 {'current_owner': 0.55, 'current_severity': 0.75, 'is_open': 0.4, 'intent': 0.45, 'is_urgent': 0.6, 'workflow_impact': 0.8, 'incident_real': 0.65}
+C reserve 0.6333333333333333 gain 0.10555555555555557 SE 0.06162258141526038 {'current_owner': 0.65, 'current_severity': 0.85, 'is_open': 0.5, 'intent': 0.55, 'is_urgent': 0.6, 'workflow_impact': 0.75, 'incident_real': 0.6}
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 49.5474
+```
+[forward passes used: 8 of 25; Python runs used: 16 of 300]

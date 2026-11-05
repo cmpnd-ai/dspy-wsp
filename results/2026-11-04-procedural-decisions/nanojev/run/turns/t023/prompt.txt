@@ -1,0 +1,9 @@
+OUTPUT of Python run 14 of at most 300:
+```
+ridge 0.1 crossfold 0.6907 {'current_owner': np.float64(0.777), 'current_severity': np.float64(0.717), 'is_open': np.float64(0.613), 'intent': np.float64(0.287), 'is_urgent': np.float64(0.61), 'workflow_impact': np.float64(0.723), 'incident_real': np.float64(0.83)}
+ridge 0.3 crossfold 0.6852 {'current_owner': np.float64(0.773), 'current_severity': np.float64(0.71), 'is_open': np.float64(0.613), 'intent': np.float64(0.287), 'is_urgent': np.float64(0.583), 'workflow_impact': np.float64(0.7), 'incident_real': np.float64(0.833)}
+ridge 1 crossfold 0.6726 {'current_owner': np.float64(0.787), 'current_severity': np.float64(0.703), 'is_open': np.float64(0.583), 'intent': np.float64(0.28), 'is_urgent': np.float64(0.583), 'workflow_impact': np.float64(0.707), 'incident_real': np.float64(0.803)}
+ridge 3 crossfold 0.6593 {'current_owner': np.float64(0.767), 'current_severity': np.float64(0.707), 'is_open': np.float64(0.57), 'intent': np.float64(0.25), 'is_urgent': np.float64(0.577), 'workflow_impact': np.float64(0.683), 'incident_real': np.float64(0.793)}
+existing correction all 0.705925925925926
+```
+[forward passes used: 8 of 25; Python runs used: 14 of 300]

@@ -1,0 +1,11 @@
+OUTPUT of Python run 6 of at most 300:
+```
+logit reconstruction max error 2.861023e-06
+meta other keys [('layers', '[]'), ('conventions', '{\'rows\': "one row per question, in request order; meta.rows names each row\'s request, question and options", \'option_mask\': "True on a question\'s real options; padded options are NaN", \'option_logits\': "the head\'s raw score per option, before calibration", \'probabilities\': "the answer\'s distribution over the options", \'hidden_mean\': "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the row\'s tokens", \'head_inputs\': "the scorer\'s input at each option\'s <ma'), ('model', 'original'), ('files', "{'option_mask.npy': [980, 4], 'option_logits.npy': [980, 4], 'head_inputs.npy': [980, 4, 1024], 'trunk_markers.npy': [980, 4, 1024], 'probabilities.npy': [980, 4]}")]
+original {'current_owner': 0.307, 'current_severity': 0.371, 'is_open': 0.529, 'intent': 0.257, 'is_urgent': 0.457, 'workflow_impact': 0.371, 'incident_real': 0.521}
+1.0 norm nan fit {'current_owner': 0.321, 'current_severity': 0.236, 'is_open': 0.429, 'intent': 0.193, 'is_urgent': 0.479, 'workflow_impact': 0.25, 'incident_real': 0.521}
+10.0 norm nan fit {'current_owner': 0.321, 'current_severity': 0.236, 'is_open': 0.429, 'intent': 0.193, 'is_urgent': 0.479, 'workflow_impact': 0.25, 'incident_real': 0.521}
+100.0 norm nan fit {'current_owner': 0.321, 'current_severity': 0.236, 'is_open': 0.429, 'intent': 0.193, 'is_urgent': 0.479, 'workflow_impact': 0.25, 'incident_real': 0.521}
+1000.0 norm nan fit {'current_owner': 0.321, 'current_severity': 0.236, 'is_open': 0.429, 'intent': 0.193, 'is_urgent': 0.479, 'workflow_impact': 0.25, 'incident_real': 0.521}
+```
+[forward passes used: 2 of 25; Python runs used: 6 of 300]

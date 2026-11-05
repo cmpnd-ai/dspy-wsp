@@ -1,0 +1,11 @@
+OUTPUT of Python run 8 of at most 300:
+```
+Original inner heldout (np.float64(0.496031746031746), {'current_owner': np.float64(0.643), 'current_severity': np.float64(0.321), 'is_open': np.float64(0.536), 'intent': np.float64(0.286), 'is_urgent': np.float64(0.679), 'workflow_impact': np.float64(0.607), 'incident_real': np.float64(0.464)})
+0.01 norm 138.011 (np.float64(0.5634920634920635), {'current_owner': np.float64(0.679), 'current_severity': np.float64(0.643), 'is_open': np.float64(0.5), 'intent': np.float64(0.321), 'is_urgent': np.float64(0.536), 'workflow_impact': np.float64(0.679), 'incident_real': np.float64(0.571)})
+0.1 norm 47.398 (np.float64(0.5992063492063492), {'current_owner': np.float64(0.714), 'current_severity': np.float64(0.714), 'is_open': np.float64(0.536), 'intent': np.float64(0.25), 'is_urgent': np.float64(0.464), 'workflow_impact': np.float64(0.679), 'incident_real': np.float64(0.679)})
+1 norm 12.795 (np.float64(0.6190476190476191), {'current_owner': np.float64(0.679), 'current_severity': np.float64(0.786), 'is_open': np.float64(0.536), 'intent': np.float64(0.321), 'is_urgent': np.float64(0.429), 'workflow_impact': np.float64(0.786), 'incident_real': np.float64(0.679)})
+10 norm 2.931 (np.float64(0.5158730158730158), {'current_owner': np.float64(0.75), 'current_severity': np.float64(0.536), 'is_open': np.float64(0.464), 'intent': np.float64(0.214), 'is_urgent': np.float64(0.393), 'workflow_impact': np.float64(0.679), 'incident_real': np.float64(0.536)})
+100 norm 0.629 (np.float64(0.4246031746031746), {'current_owner': np.float64(0.714), 'current_severity': np.float64(0.321), 'is_open': np.float64(0.536), 'intent': np.float64(0.357), 'is_urgent': np.float64(0.393), 'workflow_impact': np.float64(0.536), 'incident_real': np.float64(0.321)})
+1000 norm 0.214 (np.float64(0.43650793650793646), {'current_owner': np.float64(0.679), 'current_severity': np.float64(0.321), 'is_open': np.float64(0.571), 'intent': np.float64(0.321), 'is_urgent': np.float64(0.607), 'workflow_impact': np.float64(0.571), 'incident_real': np.float64(0.286)})
+```
+[forward passes used: 2 of 25; Python runs used: 8 of 300]

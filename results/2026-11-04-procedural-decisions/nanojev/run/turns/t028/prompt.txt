@@ -1,0 +1,7 @@
+OUTPUT of Python run 17 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 114.6492
+Probe pairs 210 questions 420
+Owner event kinds Counter({'severity': 507, 'assign': 483, 'note': 474, 'resolve': 465, 'reopen': 463, 'void': 278})
+```
+[forward passes used: 10 of 25; Python runs used: 17 of 300]

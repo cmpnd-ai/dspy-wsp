@@ -1,0 +1,8 @@
+OUTPUT of Python run 34 of at most 300:
+```
+  File "<cell>", line 14
+    ". Next pass 22 reverse direction w0-(wC-w0), same 420 testids, diagnostic negative control.\n")
+                                                                                                   ^
+SyntaxError: unmatched ')'
+```
+[forward passes used: 21 of 25; Python runs used: 34 of 300]

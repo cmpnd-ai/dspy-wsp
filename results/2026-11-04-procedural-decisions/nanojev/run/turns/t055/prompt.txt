@@ -1,0 +1,6 @@
+OUTPUT of Python run 31 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 114.6492
+Restored full; difference from saved edit: 2.361107274140295e-07
+```
+[forward passes used: 23 of 25; Python runs used: 31 of 300]

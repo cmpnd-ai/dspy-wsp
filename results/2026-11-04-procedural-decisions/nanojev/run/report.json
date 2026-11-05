@@ -1,0 +1,205 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/procedural-decisions/nanojev",
+ "final_answer": "Submitted the validated edit to **`scalar.weight` only**. All backbone weights, normalization parameters, biases, and set-attention weights remain unchanged.\n\nThe repair changes how the scalar head reads existing hidden-state evidence. I derived an additive direction using closed-form ridge regression on practice option contrasts\u2014no gradient training or global temperature scaling.\n\nEvidence supporting the mechanism:\n- An option-prior-only control produced essentially no gain.\n- Reversing the correction reversed sensitivity to several decisive state cues.\n- A strength sweep favored the submitted correction over both half strength and 1.5\u00d7 strength.\n\n**Measured results**\n- **Held-out validation, 300 examples:** 45.11% \u2192 **68.67%**, a gain of **23.56 percentage points \u00b1 3.02 pp paired SE**; 148 examples improved and 51 worsened.\n- **All 900 practice examples:** 48.00% \u2192 **80.30%**, a gain of **32.30 pp \u00b1 1.49 pp paired SE**. This is in-sample for the final edit.\n\nThe final validation reproduced the earlier result exactly. The evidence supports a useful readout repair, not complete reasoning recovery: intent and some counterfactual probes remain weak.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 32
+ },
+ "turns": 58,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 5,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.45111111111111113,
+    "score_se_over_items": 0.021825140558418665,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 233
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6422222222222221,
+    "score_se_over_items": 0.020412768507245493,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 180
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.45111111111111113,
+    "edited": 0.6422222222222221,
+    "gain": 0.19111111111111112,
+    "se": 0.029809807673854084,
+    "improved": 130,
+    "worsened": 55
+   }
+  },
+  {
+   "pass": 9,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.45111111111111113,
+    "score_se_over_items": 0.021825140558418665,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 233
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6866666666666666,
+    "score_se_over_items": 0.019624872924672666,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 169
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.45111111111111113,
+    "edited": 0.6866666666666666,
+    "gain": 0.23555555555555557,
+    "se": 0.030197882957262764,
+    "improved": 148,
+    "worsened": 51
+   }
+  },
+  {
+   "pass": 15,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.45111111111111113,
+    "score_se_over_items": 0.021825140558418665,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 233
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6277777777777778,
+    "score_se_over_items": 0.020368118069689536,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 188
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.45111111111111113,
+    "edited": 0.6277777777777778,
+    "gain": 0.17666666666666667,
+    "se": 0.03057583530252153,
+    "improved": 130,
+    "worsened": 63
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.45111111111111113,
+    "score_se_over_items": 0.021825140558418665,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 233
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6866666666666666,
+    "score_se_over_items": 0.019624872924672666,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 169
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.45111111111111113,
+    "edited": 0.6866666666666666,
+    "gain": 0.23555555555555557,
+    "se": 0.030197882957262764,
+    "improved": 148,
+    "worsened": 51
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.4925,
+   "score_se_over_items": 0.0188021529396421,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 302
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.7233333333333333,
+   "score_se_over_items": 0.01570846199774904,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 211
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.4925,
+   "edited": 0.7233333333333333,
+   "gain": 0.23083333333333333,
+   "se": 0.023170717207184024,
+   "improved": 193,
+   "worsened": 54
+  }
+ },
+ "patch": "1 tensors, 1,024 entries changed\n  scalar.weight float32[1, 1024]: 1,024 entries (dense), relative change 114.6492"
+}

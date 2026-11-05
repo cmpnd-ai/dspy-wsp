@@ -1,0 +1,9 @@
+OUTPUT of Python run 18 of at most 300:
+```
+dose 0.5 score 0.5452380952380952 {'current_owner': 0.664, 'current_severity': 0.607, 'is_open': 0.564, 'intent': 0.457, 'is_urgent': 0.736, 'workflow_impact': 0.357, 'incident_real': 0.507}
+dose 0.9 score 0.7126984126984128 {'current_owner': 0.764, 'current_severity': 0.729, 'is_open': 0.657, 'intent': 0.593, 'is_urgent': 0.829, 'workflow_impact': 0.529, 'incident_real': 0.771}
+dose 1.0 score 0.8063492063492064 {'current_owner': 0.786, 'current_severity': 0.814, 'is_open': 0.721, 'intent': 0.593, 'is_urgent': 0.807, 'workflow_impact': 0.9, 'incident_real': 0.879}
+dose 1.1 score 0.696031746031746 {'current_owner': 0.664, 'current_severity': 0.379, 'is_open': 0.664, 'intent': 0.557, 'is_urgent': 0.814, 'workflow_impact': 0.636, 'incident_real': 0.85}
+saved edit head.scorer.3.weight: 1,024 of 1,024 entries changed, relative change 24.7737
+```
+[forward passes used: 10 of 25; Python runs used: 18 of 300]

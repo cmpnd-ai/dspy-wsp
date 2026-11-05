@@ -1,0 +1,7 @@
+OUTPUT of Python run 32 of at most 300:
+```
+Full minus 22 0.025925925925925925 paired SE 0.011731686877317436
+Full minus 23 0.16962962962962966 paired SE 0.017207898417839134
+Final edited tensors ['scalar.weight']
+```
+[forward passes used: 24 of 25; Python runs used: 32 of 300]

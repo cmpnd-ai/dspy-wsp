@@ -1,0 +1,5 @@
+OUTPUT of Python run 29 of at most 300:
+```
+1.5 strength probes {'current_owner': [2.047, 0.3, 0.567], 'current_severity': [1.271, 0.3, 0.517], 'is_open': [0.247, 0.2, 0.6], 'intent': [0.026, 0.0, 0.033], 'is_urgent': [0.375, 0.1, 0.55], 'workflow_impact': [2.089, 0.8, 0.9], 'incident_real': [0.264, 0.0, 0.5]}
+```
+[forward passes used: 21 of 25; Python runs used: 29 of 300]

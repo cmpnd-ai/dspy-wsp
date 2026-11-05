@@ -1,0 +1,12 @@
+{
+ "model": "LiquidAI/d1-omni-600M",
+ "framework": "mlx",
+ "baseline": "protocol",
+ "weights": "edited (runs/procedural-decisions/d1/patch)",
+ "decisions": 934,
+ "accuracy": 0.5578158458244111,
+ "kl_from_gold": 0.884078168711121,
+ "brier": 0.5409309926363453,
+ "ece": 0.1061224215359071,
+ "seconds": 56.3
+}

@@ -1,0 +1,105 @@
+OUTPUT of Python run 1 of at most 300:
+```
+900 Counter({'event_state_reconstruction': 300, 'multi_view_adjudication': 300, 'partial_observation_calibration': 300})
+{
+  "id": "train_0",
+  "inputs": {
+    "workflow": "event_state_reconstruction",
+    "state": {
+      "initial_state": {
+        "owner": "alice",
+        "open": true,
+        "severity": "critical"
+      },
+      "events": [
+        {
+          "ts": 104,
+          "kind": "reopen"
+        },
+        {
+          "ts": 108,
+          "kind": "resolve"
+        },
+        {
+          "ts": 114,
+          "kind": "severity",
+          "severity": "degraded"
+        },
+        {
+          "ts": 119,
+          "kind": "resolve"
+        },
+        {
+          "ts": 125,
+          "kind": "note",
+          "text": "triage"
+        }
+      ],
+      "rule": "Start from initial_state and apply events in ascending timestamp order. stale_snapshot is an older redundant view and must not override later events.",
+      "stale_snapshot": {
+        "as_of": 114,
+        "owner": "alice",
+        "open": false,
+        "severity": "degraded"
+      }
+    }
+  },
+  "labels": {
+    "case_id": "event_state_reconstruction:validation:236",
+    "level": 1,
+    "questions": {
+      "current_owner": {
+        "type": "choice",
+        "instructions": "Who owns the incident after replaying the event log?",
+        "criteria": {
+          "alice": null,
+          "bob": null,
+          "carol": null,
+          "unassigned": null
+        }
+      },
+      "current_severity": {
+        "type": "score",
+        "instructions": "What is the incident's current severity after replaying the event log?",
+        "criteria": [
+          "routine: Routine.",
+          "degraded: Degraded service requiring attention.",
+          "critical: Critical user-blocking incident."
+        ]
+      },
+      "is_open": {
+        "type": "noul",
+        "instructions": "Is the incident open after replaying the event log?"
+      }
+    },
+    "gold": {
+      "current_owner": {
+        "type": "choice",
+        "probabilities": {
+          "alice": 1.0,
+          "bob": 0.0,
+          "carol": 0.0,
+          "unassigned": 0.0
+        }
+      },
+      "current_severity": {
+        "type": "score",
+        "probabilities": {
+          "0": 0.0,
+          "1": 1.0,
+          "2": 0.0
+        }
+      },
+      "is_open": {
+        "type": "noul",
+        "probabilities": {
+          "false": 1.0,
+          "true": 0.0
+        }
+      }
+    }
+  }
+}
+tensor head names ['head.head.layers.0.linear1.bias', 'head.head.layers.0.linear1.weight', 'head.head.layers.0.linear2.bias', 'head.head.layers.0.linear2.weight', 'head.head.layers.0.norm1.bias', 'head.head.layers.0.norm1.weight', 'head.head.layers.0.norm2.bias', 'head.head.layers.0.norm2.weight', 'head.head.layers.0.self_attn.in_proj_bias', 'head.head.layers.0.self_attn.in_proj_weight', 'head.head.layers.0.self_attn.out_proj.bias', 'head.head.layers.0.self_attn.out_proj.weight', 'head.head.layers.1.linear1.bias', 'head.head.layers.1.linear1.weight', 'head.head.layers.1.linear2.bias', 'head.head.layers.1.linear2.weight', 'head.head.layers.1.norm1.bias', 'head.head.layers.1.norm1.weight', 'head.head.layers.1.norm2.bias', 'head.head.layers.1.norm2.weight', 'head.head.layers.1.self_attn.in_proj_bias', 'head.head.layers.1.self_attn.in_proj_weight', 'head.head.layers.1.self_attn.out_proj.bias', 'head.head.layers.1.self_attn.out_proj.weight', 'head.scorer.0.bias', 'head.scorer.0.weight', 'head.scorer.1.bias', 'head.scorer.1.weight', 'head.scorer.3.bias', 'head.scorer.3.weight', 'head.type_emb.weight']
+```
+[forward passes used: 0 of 25; Python runs used: 1 of 300]

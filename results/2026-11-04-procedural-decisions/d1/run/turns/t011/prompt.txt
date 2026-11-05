@@ -1,0 +1,9 @@
+OUTPUT of Python run 7 of at most 300:
+```
+baseline {'current_owner': 0.5, 'current_severity': 0.564, 'is_open': 0.514, 'intent': 0.379, 'is_urgent': 0.7, 'workflow_impact': 0.371, 'incident_real': 0.521} w norm 0.352796
+1.0 delta norm 5.591 {'current_owner': 0.829, 'current_severity': 0.893, 'is_open': 0.771, 'intent': 0.514, 'is_urgent': 0.771, 'workflow_impact': 0.85, 'incident_real': 0.729}
+10.0 delta norm 1.779 {'current_owner': 0.729, 'current_severity': 0.814, 'is_open': 0.686, 'intent': 0.429, 'is_urgent': 0.721, 'workflow_impact': 0.743, 'incident_real': 0.557}
+100.0 delta norm 0.478 {'current_owner': 0.593, 'current_severity': 0.643, 'is_open': 0.55, 'intent': 0.386, 'is_urgent': 0.671, 'workflow_impact': 0.421, 'incident_real': 0.521}
+1000.0 delta norm 0.237 {'current_owner': 0.536, 'current_severity': 0.564, 'is_open': 0.529, 'intent': 0.4, 'is_urgent': 0.707, 'workflow_impact': 0.379, 'incident_real': 0.521}
+```
+[forward passes used: 2 of 25; Python runs used: 7 of 300]

@@ -1,0 +1,8 @@
+OUTPUT of Python run 38 of at most 300:
+```
+Reserve head input difference 0.0
+Reserve replay error 4.386902e-05
+Current edits ['head.scorer.3.weight']
+Exact C match True
+```
+[forward passes used: 24 of 25; Python runs used: 38 of 300]

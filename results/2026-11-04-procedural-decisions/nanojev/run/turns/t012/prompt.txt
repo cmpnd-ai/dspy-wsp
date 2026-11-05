@@ -1,0 +1,12 @@
+OUTPUT of Python run 9 of at most 300:
+```
+Delta norm 13.838451647894527 original norm 0.5505185408178979 cosine -0.053052384796165926
+strength 0 fit score (np.float64(0.4880952380952381), {'current_owner': np.float64(0.614), 'current_severity': np.float64(0.479), 'is_open': np.float64(0.557), 'intent': np.float64(0.214), 'is_urgent': np.float64(0.514), 'workflow_impact': np.float64(0.493), 'incident_real': np.float64(0.507)})
+strength 0.25 fit score (np.float64(0.503968253968254), {'current_owner': np.float64(0.686), 'current_severity': np.float64(0.479), 'is_open': np.float64(0.557), 'intent': np.float64(0.257), 'is_urgent': np.float64(0.514), 'workflow_impact': np.float64(0.521), 'incident_real': np.float64(0.507)})
+strength 0.5 fit score (np.float64(0.5468253968253968), {'current_owner': np.float64(0.764), 'current_severity': np.float64(0.6), 'is_open': np.float64(0.557), 'intent': np.float64(0.25), 'is_urgent': np.float64(0.514), 'workflow_impact': np.float64(0.564), 'incident_real': np.float64(0.557)})
+strength 1 fit score (np.float64(0.7452380952380953), {'current_owner': np.float64(0.829), 'current_severity': np.float64(0.786), 'is_open': np.float64(0.743), 'intent': np.float64(0.4), 'is_urgent': np.float64(0.657), 'workflow_impact': np.float64(0.7), 'incident_real': np.float64(0.864)})
+strength 1.5 fit score (np.float64(0.6722222222222223), {'current_owner': np.float64(0.814), 'current_severity': np.float64(0.8), 'is_open': np.float64(0.721), 'intent': np.float64(0.271), 'is_urgent': np.float64(0.6), 'workflow_impact': np.float64(0.679), 'incident_real': np.float64(0.721)})
+strength 2 fit score (np.float64(0.6190476190476191), {'current_owner': np.float64(0.8), 'current_severity': np.float64(0.771), 'is_open': np.float64(0.643), 'intent': np.float64(0.279), 'is_urgent': np.float64(0.529), 'workflow_impact': np.float64(0.621), 'incident_real': np.float64(0.643)})
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 12.5686
+```
+[forward passes used: 2 of 25; Python runs used: 9 of 300]

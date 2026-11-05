@@ -1,0 +1,13 @@
+OUTPUT of Python run 11 of at most 300:
+```
+w0 norm 0.352796 new norm 5.5861416 cosine 0.016540697
+current_owner old choices [56 50 32  2] new [48 21 46 25]
+current_severity old choices [27 65 48  0] new [33 65 42  0]
+is_open old choices [78 62  0  0] new [ 34 106   0   0]
+intent old choices [ 0 34 29 77] new [19 56 39 26]
+is_urgent old choices [67 73  0  0] new [79 61  0  0]
+workflow_impact old choices [  0 140   0   0] new [36 47 57  0]
+incident_real old choices [140   0   0   0] new [91 49  0  0]
+highest contribution neurons [(512, 0.0143, 0.7487, 1.0866), (902, 0.0196, -0.6296, 1.0778), (83, -0.0145, -0.6912, 0.9562), (285, -0.022, 0.5219, 0.9555), (64, -0.0192, 0.5928, 0.8384), (637, -0.021, 0.4724, 0.747), (948, 0.0146, 0.4617, 0.7438), (530, -0.0218, -0.5239, 0.7157), (250, 0.0066, 0.5123, 0.6634), (91, -0.0109, 0.5142, 0.6591), (305, 0.0072, -0.6685, 0.6568), (440, -0.0168, 0.4544, 0.6511)]
+```
+[forward passes used: 5 of 25; Python runs used: 11 of 300]

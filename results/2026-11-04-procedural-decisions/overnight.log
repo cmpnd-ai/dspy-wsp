@@ -1,0 +1,17 @@
+=== Wed Nov  4 22:24:35 PST 2026 start d1 baseline-protocol
+=== Wed Nov  4 22:25:34 PST 2026 end d1 baseline-protocol exit 0
+=== Wed Nov  4 22:25:34 PST 2026 start d1 baseline-program
+=== Wed Nov  4 22:26:38 PST 2026 end d1 baseline-program exit 0
+=== Wed Nov  4 22:26:38 PST 2026 start d1 optimize
+=== Wed Nov  4 23:26:28 PST 2026 end d1 optimize exit 0
+=== Wed Nov  4 23:26:28 PST 2026 start d1 compare
+=== Wed Nov  4 23:38:34 PST 2026 end d1 compare exit 0
+=== Wed Nov  4 23:38:34 PST 2026 start nanojev baseline-protocol
+=== Wed Nov  4 23:41:11 PST 2026 end nanojev baseline-protocol exit 0
+=== Wed Nov  4 23:41:11 PST 2026 start nanojev baseline-program
+=== Wed Nov  4 23:43:59 PST 2026 end nanojev baseline-program exit 0
+=== Wed Nov  4 23:43:59 PST 2026 start nanojev optimize
+=== Thu Nov  5 01:41:22 PST 2026 end nanojev optimize exit 0
+=== Thu Nov  5 01:41:22 PST 2026 start nanojev compare
+=== Thu Nov  5 02:07:29 PST 2026 end nanojev compare exit 0
+=== Thu Nov  5 02:07:29 PST 2026 all done

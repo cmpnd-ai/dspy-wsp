@@ -1,0 +1,12 @@
+OUTPUT of Python run 23 of at most 300:
+```
+Variables: ['EL', 'G', 'H', 'HH', 'MODEL', 'NAMES', 'PH', 'PL', 'PRACTICE', 'Path', 'SHAPES', 'U', 'UU', 'W0', 'WORK', 'X', 'XP', 'XW', 'XX', 'Xparts', 'YP', 'YW', 'YY', 'ZZ', 'a', 'aa', 'acc', 'addpair', 'allrows', 'ans', 'arr', 'b', 'b0', 'base_scores', 'both', 'byid', 'candidates', 'coeff', 'collections', 'confusions', 'copy', 'cutoff', 'cv', 'cvq', 'd', 'data', 'dd', 'delta', 'delta900', 'delta_evidence', 'delta_high', 'delta_prior', 'design_groups', 'design_ids', 'dhigh', 'diff', 'diff13', 'dlow', 'drop_edit', 'dw', 'e', 'edited', 'ee', 'eig', 'eval_all', 'ex', 'f', 'fit_ids', 'fit_ids_requested', 'fit_order', 'fold', 'foldmap', 'g', 'goldvec', 'groups', 'gs', 'held', 'hs', 'i', 'ids', 'idsrows', 'ind', 'inds', 'inner_hold', 'j', 'json', 'k', 'lam', 'll', 'load', 'load_original', 'mask', 'meta', 'mm', 'n', 'name', 'notes', 'np', 'opts', 'order', 'os', 'p', 'pair', 'pn', 'pred', 'probe_pairs', 'probe_requests', 'probe_summary', 'q', 'qs', 'r', 'random', 'raw', 'read_groups', 'records', 'remaining', 'reqparts', 'reqs', 'rhs', 'rid', 'rng', 'rows', 'rr13', 'ry', 's', 'save_edit', 'scores_direction', 'shift', 'shutil', 'spectral', 'ss', 'stats', 'strength', 'summarize_file', 't', 't0', 't1', 'target', 'targets', 'test450', 'test_ids', 'tok', 'torch', 'trainmask', 'ts', 'u', 'v', 'vals', 'weightedcv', 'wf', 'wfs', 'work', 'xx', 'y', 'yparts', 'yy', 'zs', 'zz']
+Current edits: ['scalar.weight']
+16 record keys: ['id', 'sample', 'model', 'inputs', 'outputs', 'score', 'feedback', 'calls', 'cut', 'output_tokens'] n: 300
+First edited feedback: current_owner: right (predicted alice 0.85, gold alice 1.00); current_severity: right (predicted 1 0.89, gold 1 1.00); is_open: WRONG (predicted true 0.51, gold false 1.00). Mean Brier 0.190.
+17 record keys: ['id', 'sample', 'model', 'inputs', 'outputs', 'score', 'feedback', 'calls', 'cut', 'output_tokens'] n: 300
+First edited feedback: intent: WRONG (predicted access 0.44, gold billing 1.00); is_urgent: WRONG (predicted false 0.54, gold true 1.00); workflow_impact: right (predicted 0 0.57, gold 0 1.00). Mean Brier 0.566.
+18 record keys: ['id', 'sample', 'model', 'inputs', 'outputs', 'score', 'feedback', 'calls', 'cut', 'output_tokens'] n: 300
+First edited feedback: incident_real: right (predicted true 0.71, gold true 0.60). Mean Brier 0.024.
+```
+[forward passes used: 18 of 25; Python runs used: 23 of 300]

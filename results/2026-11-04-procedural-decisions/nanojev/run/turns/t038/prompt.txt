@@ -1,0 +1,5 @@
+OUTPUT of Python run 22 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 114.6492
+```
+[forward passes used: 15 of 25; Python runs used: 22 of 300]
