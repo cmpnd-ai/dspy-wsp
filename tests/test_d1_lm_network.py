@@ -104,3 +104,37 @@ def test_sliding_window_limits_reach():
         b, _ = lm(changed, full, sliding, real)
     assert torch.allclose(a[0, 10], b[0, 10], atol=1e-6)
     assert not torch.allclose(a[0, 1], b[0, 1], atol=1e-6)
+
+
+@pytest.fixture(scope="module")
+def mlx_net(folder, tok):
+    pytest.importorskip("mlx.core")
+    from dspy_wsp.decision.families.d1_lm.mlx import D1LMMLX
+
+    return D1LMMLX.from_dir(folder, pad_token_id=tok.pad_token_id)
+
+
+def _requests(tok):
+    many = [parse_question({"type": "noul", "instructions": f"Is fact {i} stated?"}) for i in range(17)]
+    return {
+        "one": rows_for(tok, STATE, QS[:1]),
+        "seventeen": rows_for(tok, STATE, many),
+        "two_lengths": rows_for(tok, "Short.", QS) + rows_for(tok, {"ticket": "word " * 150}, QS),
+    }
+
+
+@pytest.mark.parametrize("case", ["one", "seventeen", "two_lengths"])
+def test_mlx_matches_torch(case, tok, net, mlx_net):
+    rows = _requests(tok)[case]
+    a = net.capture(rows, [0, 3, 6])
+    b = mlx_net.capture(rows, [0, 3, 6])
+    for ra, rb in zip(a, b):
+        for qa, qb in zip(ra, rb):
+            for key in ("logits", "head_inputs", "option_rows", "hidden_mean"):
+                assert np.allclose(qa[key], qb[key], atol=1e-4), key
+
+
+def test_mlx_parameter_names(net, mlx_net):
+    from mlx.utils import tree_flatten
+
+    assert {k for k, _ in tree_flatten(mlx_net.parameters())} == set(dict(net.named_parameters()))
