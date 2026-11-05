@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -190,6 +190,7 @@ class Row:
     question_of: list[int]  # per token: -1 on the state, k on question k (1-based)
     slots: list[int]  # each question's answer position
     questions: list[Question]
+    groups: list[list[list[int]]] = field(default_factory=list)  # per question: the tokens each option scores
 
 
 def encode_request(tok: Tokenizer, state: Any, questions: Sequence[Question], *, max_length: int,
@@ -211,7 +212,8 @@ def encode_request(tok: Tokenizer, state: Any, questions: Sequence[Question], *,
             slots.append(len(ids) - 1)
         if len(ids) > max_length:
             raise RequestError(f"a request row has {len(ids)} tokens; at most {max_length}")
-        rows.append(Row(ids, state_len, question_of, slots, list(questions[start : start + set_size])))
+        own = list(questions[start : start + set_size])
+        rows.append(Row(ids, state_len, question_of, slots, own, [readout_groups(tok, q, scheme) for q in own]))
     return rows
 
 

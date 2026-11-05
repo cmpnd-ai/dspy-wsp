@@ -119,3 +119,44 @@ def build_d1_lm_tokenizer(folder: Path) -> Path:
     """A ChatML byte-level tokenizer in which yes, Yes, no and No are single tokens."""
     build_tokenizer(folder, D1_LM_SPECIALS, bos="<|startoftext|>", pad="<|pad|>", eos="<|im_end|>", corpus=D1_LM_CORPUS)
     return folder
+
+
+def d1_lm_config(vocab: int) -> dict:
+    """A tiny d1-2B config: every LFM3 layer kind, sandwich norms, partial RoPE on full attention."""
+    return {
+        "model_type": "lfm3_vl", "architectures": ["D1Model"], "d1_attention": "set", "d1_set_size": 16, "d1_codes": 2,
+        "tie_word_embeddings": True, "dtype": "float32",
+        "text_config": {
+            "model_type": "lfm3", "vocab_size": vocab, "hidden_size": 64, "intermediate_size": 128,
+            "num_hidden_layers": 6, "num_attention_heads": 4, "num_key_value_heads": 2, "head_dim": 16,
+            "layer_types": ["conv", "full_attention", "conv", "sliding_attention", "conv", "full_attention"],
+            "conv_L_cache": 7, "conv_bias": False, "sliding_window": 8, "use_sandwich_norm": True, "norm_eps": 1e-5,
+            "rope_parameters": {"full_attention": {"rope_theta": 1_000_000.0, "rope_type": "default", "partial_rotary_factor": 0.5},
+                                "sliding_attention": {"rope_theta": 10_000.0, "rope_type": "default"}},
+            "tie_word_embeddings": True,
+        },
+    }
+
+
+def build_d1_lm(folder: Path) -> Path:
+    """A tiny d1-2B checkpoint folder: config, calibration, tokenizer and random weights, plus an unused vision tensor."""
+    from safetensors.torch import save_file
+    from tokenizers import Tokenizer
+
+    from dspy_wsp.decision.families.d1_lm.torch import D1LMTorch
+
+    build_d1_lm_tokenizer(folder)
+    vocab = Tokenizer.from_file(str(folder / "tokenizer.json")).get_vocab_size()
+    cfg = d1_lm_config(vocab)
+    (folder / "config.json").write_text(json.dumps(cfg))
+    (folder / "calibration.json").write_text(json.dumps({"default": 1.337, "temperatures": {}}))
+    torch.manual_seed(0)
+    model = D1LMTorch(cfg)
+    with torch.no_grad():
+        for p in model.parameters():
+            if p.dim() > 1:
+                p.normal_(0, 0.2)
+    state = {k: v.contiguous() for k, v in model.state_dict().items()}
+    state["model.vision_tower.dummy.weight"] = torch.zeros(4, 4)
+    save_file(state, str(folder / "model.safetensors"))
+    return folder
