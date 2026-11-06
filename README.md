@@ -189,7 +189,7 @@ optimizer = WeightSpace(metric=metric, writer_lm=writer, backend=backend, max_pa
 - `max_passes` counts every pass: the writer's passes and each of GEPA's scorings. A round costs at most `3 + passes_per_proposal` passes.
 - `WeightSpace` refuses a `max_passes` that can't pay for `min_rounds` rounds, and a `max_code_runs` below `min_rounds * code_runs_per_proposal` (30 by default).
 - A parent that scores perfectly on its minibatch can't be beaten there, so GEPA skips that round's writer session. The parent's scoring still costs one pass.
-- A writer call that times out or drops its connection is retried twice. If it still fails, or every example fails to run, the search stops. The run then finishes with the best candidate so far, and the report's `search.error` says why.
+- A writer call that times out, drops its connection or runs past the model's output limit is retried twice. If it still fails, or every example fails to run, the search stops. The run then finishes with the best candidate so far, and the report's `search.error` says why.
 - Writers can't run validation passes in a round, because GEPA uses the validation set to select candidates.
 - Each round is written to `rounds.jsonl` and `progress.md` when it ends. Every candidate's edit and notes are kept in `candidates/`.
 - Pass `resume=True` with the same `run_dir` to continue a stopped search. It picks up GEPA's saved state, the round log and the pass count, and it reuses the seed's saved validation scores.

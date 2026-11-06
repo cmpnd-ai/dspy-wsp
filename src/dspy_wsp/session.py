@@ -22,7 +22,7 @@ from dspy_wsp.budget import Budget
 logger = logging.getLogger(__name__)
 
 
-WRITER_RETRIES = 2  # extra tries for a writer call that fails in transport
+WRITER_RETRIES = 2  # extra tries for a writer call that times out or runs past the output limit
 
 
 class Session:
@@ -103,7 +103,7 @@ class Session:
 
     # --- the writer -----------------------------------------------------------------
     def _ask(self, messages: list[dict]) -> str:
-        from dspy.utils.exceptions import LMTransportError
+        from dspy.utils.exceptions import LMInvalidRequestError, LMTransportError
 
         for attempt in range(WRITER_RETRIES + 1):
             try:
@@ -111,8 +111,10 @@ class Session:
                     warnings.simplefilter("ignore")
                     out = self.writer_lm(messages=messages)
                 break
-            except LMTransportError as e:  # a timeout or dropped connection, after the LM's own retries
-                if attempt == WRITER_RETRIES:
+            except (LMTransportError, LMInvalidRequestError) as e:
+                # a timeout or dropped connection, or a reply cut off at the model's output limit
+                retryable = isinstance(e, LMTransportError) or "output limit" in str(e)
+                if not retryable or attempt == WRITER_RETRIES:
                     raise
                 logger.warning("the writer's call failed (%s); retrying", e)
         first = out[0] if out else ""

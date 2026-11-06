@@ -237,3 +237,21 @@ def test_a_stopped_search_resumes_from_its_logs(backend, tmp_path):
     assert report["budget"]["passes_used"] == 6 and report["budget"]["code_runs_used"] == 2
     assert "ROUND 2" in engine.received[0][0][1] and (tmp_path / "run" / "rounds" / "r02").exists()
     assert "| 1 | c000 |" in (tmp_path / "run" / "progress.md").read_text()
+
+
+class CutOffWriter(FailingWriter):
+    """A writer whose first reply runs past the model's output limit and then replies from a script."""
+
+    def __call__(self, messages):
+        self.calls += 1
+        if self.calls == 1:
+            from dspy.utils.exceptions import LMInvalidRequestError
+            raise LMInvalidRequestError("Could not finish the message because max_tokens or model output limit was reached.")
+        return [self.replies.pop(0)] if self.replies else ["done"]
+
+
+def test_a_reply_cut_off_at_the_output_limit_is_retried(backend, tmp_path):
+    writer = CutOffWriter([EDIT, FINAL, FINAL])
+    compiled = make_with(backend, tmp_path, writer).compile(Program(), trainset=trainset())
+    search = compiled.wsp_report["search"]
+    assert "error" not in search and search["rounds"] == 2 and search["best"] == "c001"
