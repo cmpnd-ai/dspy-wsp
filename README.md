@@ -149,6 +149,10 @@ Scored on the answers each program returns, on the same 400 test cases:
 | ReAnchor | 58.7% (+6.4 ± 2.2) | 52.8% (+5.0 ± 1.7) |
 | WeightSpace | 64.2% (+11.9 ± 2.3) | 68.4% (+20.6 ± 2.3) |
 | WeightSpace + ReAnchor | 69.9% (+17.7 ± 2.4) | 71.3% (+23.4 ± 2.3) |
+| WeightSpace (GEPA) | 66.9% (+14.7 ± 2.2) | 65.6% (+17.8 ± 2.4) |
+| WeightSpace (GEPA) + ReAnchor | 71.2% (+18.9 ± 2.3) | 67.9% (+20.1 ± 2.4) |
+
+The WeightSpace rows come from one 25-pass conversation. The GEPA rows come from a [population search](#population-search) with 51 passes and at least 10 rounds. The search beat the conversation on d1-omni-600M and trailed it on NanoJev. Every difference between the two is smaller than two standard errors.
 
 ## How a run works
 
