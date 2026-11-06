@@ -18,7 +18,6 @@ This design adds GEPA's population search to WeightSpace and keeps WeightSpace's
 
 - Changes to the files in `dspy_wsp.edit_gepa`. Its text-edits search stays as its author wrote it.
 - GEPA search for LLM backends. GEPA selects on a validation set, and only decision backends have one (`holdout`).
-- Resuming an interrupted GEPA run.
 - GEPA's merge step.
 
 ## How a GEPA run works
@@ -90,4 +89,6 @@ Tests use the tiny d1-omni fixture and the scripted writer that the existing opt
 - Each child inherits its parent's notes and the shared kernel.
 - GEPA skips the writer session when the parent scores perfectly on its minibatch, because a child can't beat it there.
 - A writer failure, or a scoring where every example fails, stops the search. The run finishes with the best candidate so far.
+- The session retries a writer call twice after a transport error, such as a read timeout.
+- `resume=True` continues a stopped search from GEPA's saved state and `rounds.jsonl`. GEPA scores the seed again when it starts, so the search returns the seed's saved scores for that scoring and counts no pass.
 - `code_runs_per_proposal` defaults to 30, so 10 rounds fit the default 300 Python runs.

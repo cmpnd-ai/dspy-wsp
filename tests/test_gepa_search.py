@@ -200,3 +200,40 @@ def test_round_prompt_asks_for_the_best_edit(backend, tmp_path):
     first = (tmp_path / "run" / "rounds" / "r01" / "turns" / "t001" / "prompt.txt").read_text()
     assert "Leave your best edit" in first and "unless it clearly hurts" in first
     assert "Keep an edit only if" not in first
+
+
+class FlakyWriter(FailingWriter):
+    """A writer whose first call times out, as a slow API would, and then replies from a script."""
+
+    def __call__(self, messages):
+        self.calls += 1
+        if self.calls == 1:
+            from dspy.utils.exceptions import LMTransportError
+            raise LMTransportError("read timed out waiting for headers")
+        return [self.replies.pop(0)] if self.replies else ["done"]
+
+
+def test_a_writer_timeout_is_retried(backend, tmp_path):
+    writer = FlakyWriter([EDIT, FINAL, FINAL])
+    compiled = make_with(backend, tmp_path, writer).compile(Program(), trainset=trainset())
+    search = compiled.wsp_report["search"]
+    assert "error" not in search and search["rounds"] == 2 and search["best"] == "c001"
+
+
+def test_a_stopped_search_resumes_from_its_logs(backend, tmp_path):
+    make_with(backend, tmp_path, FailingWriter([EDIT, DECIDE])).compile(Program(), trainset=trainset())
+    writer, engine = scripted_writer([EDIT, FINAL, FINAL])
+    s = GEPASearch(min_rounds=2, minibatch_size=2, passes_per_proposal=1, code_runs_per_proposal=5)
+    opt = WeightSpace(metric=edited_metric(backend), writer_lm=writer, backend=backend, max_passes=s.min_passes(),
+                      sandbox="none", run_dir=tmp_path / "run", kernel_timeout=60, holdout=0.25,
+                      holdout_key=lambda ex: ex.workflow, search=s, resume=True)
+    compiled = opt.compile(Program(), trainset=trainset())
+    report = compiled.wsp_report
+    rows = [json.loads(line) for line in open(tmp_path / "run" / "rounds.jsonl")]
+    assert [r["round"] for r in rows] == [1, 2] and "error" in rows[0] and "error" not in rows[1]
+    assert rows[1]["parent"] == "c000" and rows[1]["child"] == "c001" and rows[1]["accepted"]
+    assert report["search"]["rounds"] == 2 and report["search"]["best"] == "c001" and "error" not in report["search"]
+    # 3 passes from the stopped run, then parent minibatch, child minibatch and child validation: no second seed scoring
+    assert report["budget"]["passes_used"] == 6 and report["budget"]["code_runs_used"] == 2
+    assert "ROUND 2" in engine.received[0][0][1] and (tmp_path / "run" / "rounds" / "r02").exists()
+    assert "| 1 | c000 |" in (tmp_path / "run" / "progress.md").read_text()

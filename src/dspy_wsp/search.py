@@ -93,8 +93,33 @@ class _Search:
         self.row: dict = {}
         self.rows: list[dict] = []
         self.history_start = len(getattr(writer_lm, "history", None) or [])
+        self.usage_before = {"writer_calls": 0, "writer_tokens_in": 0, "writer_tokens_out": 0, "writer_usd": 0.0}
+        self.seed_scores: dict[str, float] = {}  # on resume, GEPA scores the seed again; the model is deterministic, so reuse it
         self.error: Exception | None = None  # set when the search must stop: GEPA swallows exceptions and retries
         self.t0 = time.time()
+
+    def resume(self, gepa_dir: Path) -> None:
+        """Continue a stopped search: its rounds, candidates, budget, writer usage and scores come from the run's logs."""
+        from gepa.core.state import GEPAState
+
+        log = self.run_dir / "rounds.jsonl"
+        self.rows = [json.loads(line) for line in log.read_text().splitlines() if line.strip()] if log.exists() else []
+        state = GEPAState.load(str(gepa_dir))
+        ids = sorted(self.forward.validation)  # GEPA keys validation scores by position in the valset it was given
+        self.seed_scores = {ids[i]: score for i, score in state.prog_candidate_val_subscores[0].items()}
+        for cand, subscores in zip(state.program_candidates, state.prog_candidate_val_subscores):
+            self.val_scores[cand["edit"]] = sum(subscores.values()) / max(1, len(subscores))
+        self.parent_of = {r["child"]: r["parent"] for r in self.rows if r.get("child")}
+        self.n_candidates = sum(1 for p in self.cands.iterdir() if p.is_dir())
+        if self.rows:
+            last = self.rows[-1]
+            self.round = max(r["round"] for r in self.rows)
+            self.budget.passes_used, self.budget.code_runs_used = last["passes_used"], last["code_runs_used"]
+            self.usage_before = {k: last.get(k, 0) for k in ("writer_calls", "writer_tokens_in", "writer_tokens_out", "writer_usd")}
+            self.t0 -= last.get("seconds", 0)
+        else:  # stopped before its first round ended: only the seed's validation run was counted
+            self.budget.passes_used = 1
+        logger.info("resuming the GEPA search after round %d with %d passes used", self.round, self.budget.passes_used)
 
     # --- candidates -------------------------------------------------------------------
     def new_candidate(self, answer: str = "") -> str:
@@ -113,6 +138,9 @@ class _Search:
         from gepa.core.adapter import EvaluationBatch
 
         cid = candidate["edit"]
+        if cid == "c000" and self.seed_scores and all(i in self.seed_scores for i in batch):
+            scores = [self.seed_scores[i] for i in batch]
+            return EvaluationBatch(outputs=scores, scores=scores, trajectories=None)
         items = [(i, self.examples[i]) for i in batch]
         try:
             with self.forward.backend.using(self.edits_of(cid)):
@@ -230,7 +258,10 @@ class _Search:
         tokens_in = sum((e.get("usage") or {}).get("prompt_tokens", 0) or 0 for e in entries)
         tokens_out = sum((e.get("usage") or {}).get("completion_tokens", 0) or 0 for e in entries)
         cost = sum(e.get("cost") or 0.0 for e in entries)
-        return {"writer_calls": len(entries), "writer_tokens_in": tokens_in, "writer_tokens_out": tokens_out, "writer_usd": round(cost, 4)}
+        now = {"writer_calls": len(entries), "writer_tokens_in": tokens_in, "writer_tokens_out": tokens_out, "writer_usd": cost}
+        total = {k: self.usage_before.get(k, 0) + v for k, v in now.items()}
+        total["writer_usd"] = round(total["writer_usd"], 4)
+        return total
 
     def _write_progress(self) -> None:
         fmt = lambda v: "-" if v is None else f"{v:.4f}"  # noqa: E731
@@ -246,8 +277,11 @@ class _Search:
 
 def run_gepa(settings: GEPASearch, *, writer_lm, kernel, forward, budget: Budget, run_dir: str | Path, work_dir: str | Path,
              round_prompt: str, edit_store: EditStore, seed: int = 0, handoff_every: int = 40,
-             require_explanations: bool = True, max_turns: int = 1000) -> tuple[dict, str, dict]:
-    """Run the search. Returns the best candidate's edits, its writer's final message, and a report."""
+             require_explanations: bool = True, max_turns: int = 1000, resume: bool = False) -> tuple[dict, str, dict]:
+    """Run the search. Returns the best candidate's edits, its writer's final message, and a report.
+
+    With `resume`, a search that stopped in `run_dir` continues from GEPA's saved state and the round log.
+    """
     from gepa.api import optimize
 
     if not forward.validation:
@@ -255,17 +289,22 @@ def run_gepa(settings: GEPASearch, *, writer_lm, kernel, forward, budget: Budget
     search = _Search(settings, writer_lm=writer_lm, kernel=kernel, forward=forward, budget=budget, run_dir=Path(run_dir),
                      work_dir=Path(work_dir), round_prompt=round_prompt, edit_store=edit_store, handoff_every=handoff_every,
                      require_explanations=require_explanations, max_turns=max_turns)
+    gepa_dir = Path(run_dir) / "gepa_state"
     forward.allow_validation = False
-    for name in edit_store.names():  # the search starts from the original model
-        (edit_store.dir / f"{name}.npy").unlink()
-    seed_id = search.new_candidate("the original model, with no edits")
+    if resume and (gepa_dir / "gepa_state.bin").exists():
+        search.resume(gepa_dir)
+        seed_id = "c000"
+    else:
+        for name in edit_store.names():  # the search starts from the original model
+            (edit_store.dir / f"{name}.npy").unlink()
+        seed_id = search.new_candidate("the original model, with no edits")
     try:
         res = optimize(
             seed_candidate={"edit": seed_id}, trainset=sorted(forward.practice), valset=sorted(forward.validation),
             adapter=search, custom_candidate_proposer=search.propose, candidate_selection_strategy="pareto",
             reflection_minibatch_size=settings.minibatch_size, skip_perfect_score=True, use_merge=False,
             stop_callbacks=[search.should_stop], callbacks=[search], seed=seed,
-            run_dir=str(Path(run_dir) / "gepa_state"), raise_on_exception=False, display_progress_bar=False,
+            run_dir=str(gepa_dir), raise_on_exception=False, display_progress_bar=False,
         )
     finally:
         forward.allow_validation = True

@@ -68,7 +68,7 @@ class WeightSpace(Teleprompter):
         search: None runs one conversation. GEPASearch(...) runs GEPA's population search: each round,
             the writer gets a short session that starts from a candidate edit, and GEPA keeps the
             children that beat their parents. It needs a decision backend and a holdout, and
-            max_passes counts every pass, the writer's and GEPA's. It cannot resume yet.
+            max_passes counts every pass, the writer's and GEPA's. With resume=True, a stopped search continues from its logs.
     """
 
     def __init__(
@@ -228,14 +228,13 @@ class WeightSpace(Teleprompter):
         )
         search_report = None
         if self.search is not None:
-            if self.resume and (run_dir / "rounds").exists():
-                raise ValueError(f"{run_dir} holds a GEPA search, which cannot resume yet; use a new run_dir")
             try:
                 kernel.start()
                 edits, final_answer, search_report = run_gepa(
                     self.search, writer_lm=self.writer_lm, kernel=kernel, forward=forward, budget=budget, run_dir=run_dir,
                     work_dir=work, round_prompt=task_prompt, edit_store=edit_store, seed=self.seed,
                     handoff_every=self.handoff_every, require_explanations=self.require_explanations, max_turns=self.max_turns,
+                    resume=self.resume,
                 )
             finally:
                 kernel.close()
