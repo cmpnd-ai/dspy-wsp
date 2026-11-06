@@ -192,3 +192,11 @@ def test_round_prompt_states_the_round_limits(backend, tmp_path):
     opt.compile(Program(), trainset=trainset())
     first = (tmp_path / "run" / "rounds" / "r01" / "turns" / "t001" / "prompt.txt").read_text()
     assert "run code up to 5 times" in first and "budget of 1 forward passes in this round" in first
+
+
+def test_round_prompt_asks_for_the_best_edit(backend, tmp_path):
+    opt, _ = make(backend, tmp_path, [FINAL, FINAL])
+    opt.compile(Program(), trainset=trainset())
+    first = (tmp_path / "run" / "rounds" / "r01" / "turns" / "t001" / "prompt.txt").read_text()
+    assert "Leave your best edit" in first and "unless it clearly hurts" in first
+    assert "Keep an edit only if" not in first

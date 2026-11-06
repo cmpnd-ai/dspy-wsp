@@ -84,7 +84,7 @@ $tensor_listing
 HOW TO WORK.
 1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
 2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
-3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it$confirm_rule. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to $max_reads questions.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. $keep_rule Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to $max_reads questions.
 4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and $confirm_fit: an edit that fits the practice examples closely may not carry over.
 5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep $work_dir/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy $work_dir/edited to $work_dir/best_1/).$explain
 
@@ -107,6 +107,11 @@ Any request can also be written as JSON to a file in $work_dir from Python (json
 
 
 VALIDATION_PASS = """VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set ($n_validation examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it."""
+KEEP_RULE = ("Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, "
+             "and only after a validation run confirms it.")
+ROUND_KEEP_RULE = ("Leave your best edit in the edit folder when the round ends, unless it clearly hurts on examples that were not "
+                   "used to choose it. A gain inside its standard error is still worth leaving, because the search tests every "
+                   "candidate on its own practice examples and on the validation set and keeps only the ones that score better.")
 ROUND_VALIDATION_PASS = "VALIDATION is not available to you in this run: the search scores the edit you leave in $work_dir/edited on the held-out validation set ($n_validation examples) after the round."
 
 
@@ -131,7 +136,8 @@ def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None,
             f"a code block. You may end it before its {max_passes} forward passes are used, and you may still run Python after they are. "
             f"The tensors in {work_dir}/edited when the round ends become a new candidate. The search scores it on the practice examples "
             "shown below and, if it beats the candidate you started from there, on the validation set. Aim for edits that hold beyond "
-            "those examples. When you finish, reply without a code block, saying what you changed and the evidence for it."
+            "those examples. A round that ends with the starting edit unchanged cannot improve on it. When you finish, reply "
+            "without a code block, saying what you changed and the evidence for it."
         )
     else:
         ending = (
@@ -154,7 +160,7 @@ def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None,
         explain=EXPLAIN if require_explanations else "",
         ending=ending,
         validation_access="the search scores edits on it." if search_round else "you can only score edits on it, as described below.",
-        confirm_rule="" if search_round else ", and only after a validation run confirms it",
+        keep_rule=ROUND_KEEP_RULE if search_round else KEEP_RULE,
         confirm_fit="the search confirms them on the validation set" if search_round else "confirm them on the validation set",
     )
 
