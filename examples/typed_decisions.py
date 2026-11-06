@@ -239,7 +239,7 @@ def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout
     """Run WeightSpace with the writer on a decision benchmark whose examples carry `workflow`, `state`, `questions` and `gold`."""
     optimizer = WeightSpace(
         metric=metric,
-        writer_lm=dspy.LM(WRITER, max_tokens=128_000, timeout=1800),  # the model's output limit; some writer turns take close to 10 minutes
+        writer_lm=dspy.LM(WRITER, model_type="responses", max_tokens=128_000, timeout=1800),  # Responses API: on Chat Completions gpt-6.1-sol often reasons to the output limit (CMP-1785)
         backend=backend,
         max_passes=passes,
         limits=limits or Limits(max_generations=900, max_generations_both=450, max_reads=1024),
