@@ -18,6 +18,8 @@ task); the 400 test cases come from its test split. Steps:
     python examples/procedural_decisions.py --model d1 --step baseline-program
     OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize
     python examples/procedural_decisions.py --model d1 --step compare
+    OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize --search gepa --rounds 10
+    python examples/procedural_decisions.py --model d1 --step compare --search gepa
 """
 
 from __future__ import annotations
@@ -88,9 +90,10 @@ def main() -> None:
     train, test = splits()
     name = run_name(args.model)
     search = make_search(args.search, args.rounds) if args.step == "optimize" else None
-    run_dir = RUNS / (f"{name}-gepa" if args.search == "gepa" else name)
+    suffix = "-gepa" if args.search == "gepa" else ""
+    run_dir = RUNS / f"{name}{suffix}"
     if args.step == "compare":
-        compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{name}", train, test, revision=args.revision)
+        compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{name}{suffix}", train, test, revision=args.revision)
         return
     backend = make_backend(args.model, args.framework, args.revision)
     try:
