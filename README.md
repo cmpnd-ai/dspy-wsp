@@ -6,6 +6,21 @@ Weight-space programming as a DSPy optimizer.
 
 The method comes from Takehi, Teoh, Zhang and Khattab, *Sparks of Weight Space Programming* (MIT CSAIL, 2026). In their Experiment 8, a frontier model edited 0.016% of Qwen3.5-0.8B's weights. The edit raised MATH-500 from 7.9% to 48.1% by removing a direction that drove the model's looping. This package rebuilds that harness around DSPy programs and metrics.
 
+## Results
+
+We edited three decision models on the Typed Decisions benchmark with `gpt-6-astra` at maximum reasoning effort as the writer. The writer had one conversation with 25 forward passes for each model. The table scores the answers each program returns on 400 held-out test cases. Each gain is the paired gain over the plain model in points, with its standard error.
+
+| Version | d1-omni-600M | NanoJev (Qwen3-0.6B) | d1-2B |
+|---|---|---|---|
+| Plain | 50.9% | 39.2% | 60.6% |
+| ReAnchor | 60.2% (+9.3 ± 1.1) | 50.7% (+11.6 ± 1.3) | 70.1% (+9.5 ± 1.2) |
+| WeightSpace | 66.9% (+16.1 ± 1.2) | 52.4% (+13.3 ± 1.1) | 74.0% (+13.4 ± 1.2) |
+| WeightSpace + ReAnchor | 69.1% (+18.3 ± 1.3) | 56.4% (+17.3 ± 1.3) | 77.9% (+17.3 ± 1.3) |
+
+ReAnchor fits how the program turns probabilities into answers and changes no weights. Each run took between 78 and 167 minutes and cost between $5.42 and $7.63 in writer calls. With `gpt-6.1-sol` as the writer, the WeightSpace edits alone gained 5.8, 12.1 and −0.6 points on the same three models.
+
+[Decision models](#decision-models) covers each run and the Procedural Typed Decisions benchmark.
+
 ## Install
 
 ```bash
