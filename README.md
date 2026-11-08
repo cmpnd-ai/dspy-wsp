@@ -255,7 +255,7 @@ The writer's code runs on your machine. With `sandbox="auto"` (the default), the
 
 Code: MIT.
 
-- The method and the harness come from [*Sparks of Weight-Space Programming*](https://rikiyat.github.io/blog/weight-space-programming/) by Rikiya Takehi, Jayden Teoh, Alex Zhang and Omar Khattab. Please cite it when you use this package.
+- The method and the harness come from [*Sparks of Weight-Space Programming*](https://rikiyat.github.io/blog/weight-space-programming/) by Rikiya Takehi, Jayden Teoh, Alex Zhang and Omar Khattab.
 - The writer's task prompt is adapted from the Experiment 8 prompt released by Takehi et al. in [lm_understand-logs](https://github.com/RikiyaT/lm_understand-logs) under CC BY 4.0.
 - Haoze "Hector" He's [weight editing design](https://github.com/HectorHHZ/llm-honing/blob/main/system-design/weight-edit.md) for `llm-honing` is earlier work on editing decision models, including NanoJev, and releasing the edits as checked checkpoints. See [his post](https://x.com/HaozeHe_Hector/status/2118048048148623453).
 - Michael Isaac contributed the GEPA population search. It uses Lakshya Agrawal's [GEPA](https://github.com/gepa-ai/gepa) library.
