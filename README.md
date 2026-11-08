@@ -4,7 +4,64 @@ Weight-space programming as a DSPy optimizer.
 
 `WeightSpace` improves a DSPy program by having a frontier LM, the *writer*, edit the student model's weights directly. The writer reads the weights in a sandboxed Python kernel. It runs your program on practice examples through a budgeted forward-pass tool, works out what goes wrong inside the network, and saves targeted edits. It uses no gradients and no training.
 
-The method comes from Takehi, Teoh, Zhang and Khattab, *Sparks of Weight Space Programming* (MIT CSAIL, 2026). In their Experiment 8, a frontier model edited 0.016% of Qwen3.5-0.8B's weights. The edit raised MATH-500 from 7.9% to 48.1% by removing a direction that drove the model's looping. This package rebuilds that harness around DSPy programs and metrics.
+The method comes from [*Sparks of Weight-Space Programming*](https://rikiyat.github.io/blog/weight-space-programming/) by Rikiya Takehi, Jayden Teoh, Alex Zhang and Omar Khattab (MIT CSAIL, 2026). In their Experiment 8, a frontier model edited 0.016% of Qwen3.5-0.8B's weights. The edit raised MATH-500 from 7.9% to 48.1% by removing a direction that drove the model's looping. This package rebuilds that harness around DSPy programs and metrics.
+
+This is an early release. We are releasing it outside the core DSPy library so that more people can try it and tell us what breaks. Please report problems and results in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
+
+## Install
+
+```bash
+pip install dspy-wsp
+apt install bubblewrap       # sandboxes the writer's code (Linux)
+```
+
+The base install runs every supported decision model, with MLX on Apple silicon and PyTorch elsewhere. Two extras add more:
+
+- `pip install "dspy-wsp[vllm]"` adds the vLLM backend for text-generating LLMs on NVIDIA GPUs.
+- `pip install "dspy-wsp[examples]"` adds the datasets for the benchmark scripts in `examples/`.
+
+## Use
+
+`WeightSpace` works like the other DSPy optimizers. It takes your metric and your module, and `compile` returns the improved module. Here the student is d1-omni-600M, a decision model that runs on a laptop:
+
+```python
+from typing import Literal
+
+import dspy
+from dspy_wsp import WeightSpace, load_decision_backend
+
+
+class Triage(dspy.Signature):
+    """Triage a support ticket."""
+
+    ticket: str = dspy.InputField()
+    urgent: bool = dspy.OutputField(desc="Does this ticket need a reply today?")
+    team: Literal["billing", "technical", "account"] = dspy.OutputField(desc="Which team should handle it?")
+
+
+def metric(example, pred, trace=None):
+    return ((pred.urgent == example.urgent) + (pred.team == example.team)) / 2
+
+
+backend = load_decision_backend("d1")   # d1-omni-600M at the tested revision
+optimizer = WeightSpace(
+    metric=metric,
+    writer_lm=dspy.LM("openai/gpt-6-astra", model_type="responses", reasoning_effort="max"),
+    backend=backend,
+    max_passes=25,
+    holdout=300,
+    run_dir="runs/triage",
+)
+compiled = optimizer.compile(dspy.Predict(Triage), trainset=train, valset=test)
+
+compiled(ticket="I was charged twice this month.")   # runs on the edited weights
+print(compiled.wsp_patch.summary())
+print(compiled.wsp_report["validation"]["paired"])
+```
+
+`trainset` becomes the writer's practice set. `holdout` moves 300 of those examples to a validation set that the writer can score edits on but never see. The writer never sees `valset`; the optimizer uses it once at the end, comparing original and edited weights on the same examples with the same seeds. Metrics can return a number, a bool, or `dspy.Prediction(score=..., feedback=...)` as GEPA metrics do. The writer reads any feedback text in the records.
+
+A decision model reads `bool` outputs as yes or no questions and `Literal` outputs as choices. Each output needs a question in its `desc`. The `Choice`, `Noul` and `Score` types in `dspy.experimental` add criteria for each option and ordered score levels, and they return each option's probability.
 
 ## Results
 
@@ -19,73 +76,7 @@ We edited three decision models on the Typed Decisions benchmark with `gpt-6-ast
 
 ReAnchor fits how the program turns probabilities into answers and changes no weights. Each run took between 78 and 167 minutes and cost between $5.42 and $7.63 in writer calls. With `gpt-6.1-sol` as the writer, the WeightSpace edits alone gained 5.8, 12.1 and −0.6 points on the same three models.
 
-[Decision models](#decision-models) covers each run and the Procedural Typed Decisions benchmark.
-
-## Install
-
-```bash
-pip install -e ".[hf]"      # from a clone; adds transformers for the Hugging Face backend
-pip install -e ".[mlx]"     # or: mlx-lm for the batched backend on Apple silicon
-pip install -e ".[vllm]"    # or: vLLM for the batched backend on NVIDIA GPUs
-apt install bubblewrap       # sandboxes the writer's code (Linux)
-```
-
-## Use
-
-```python
-import dspy
-from dspy_wsp import WeightSpace, HFBackend
-
-backend = HFBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=8192,
-                    chat_template_kwargs={"enable_thinking": True})
-
-def metric(example, pred, trace=None):
-    return float(pred.answer.strip() == example.answer)
-
-program = dspy.Predict("question -> answer")
-
-optimizer = WeightSpace(
-    metric=metric,
-    writer_lm=dspy.LM("openai/gpt-6-luna"),
-    backend=backend,
-    max_passes=50,
-    run_dir="runs/qwen-math",
-)
-compiled = optimizer.compile(program, trainset=train, valset=val)
-
-compiled(question="What is 17 * 23?")   # runs on the edited weights
-print(compiled.wsp_patch.summary())
-print(compiled.wsp_report["validation"]["paired"])
-```
-
-`trainset` becomes the writer's practice set. The writer never sees `valset`; the optimizer uses it once at the end, comparing original and edited weights on the same examples with the same seeds. Metrics can return a number, a bool, or `dspy.Prediction(score=..., feedback=...)` as GEPA metrics do. The writer reads any feedback text in the generation records.
-
-## Backends
-
-A backend holds the student model, swaps edits in and out, and runs every forward pass.
-
-- **`HFBackend`** runs transformers in-process on CUDA, MPS or CPU. It generates one answer at a time, so it suits small models and short answers.
-- **`MLXBackend`** runs mlx-lm on Apple silicon. It decodes up to `batch_size` answers together, and the forward-pass tool runs that many programs at once to fill the batch. Each answer samples from its own seed. It also supports the presence penalty in Qwen's recommended sampling settings. On an M2 Max it generates about 650 tokens per second across a batch of 32 answers from Qwen3.5-0.8B, which is several times faster than `HFBackend` on the same machine.
-
-```python
-from dspy_wsp import MLXBackend
-
-backend = MLXBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", batch_size=64, max_tokens=32_768,
-                     presence_penalty=1.5, chat_template_kwargs={"enable_thinking": True})
-```
-
-`MLXBackend` reads attention probabilities only from softmax-attention blocks. In Qwen3.5 those are blocks 3, 7, 11, 15, 19 and 23; the other blocks use linear attention. `examples/math500_qwen_mlx.py` runs the paper's MATH setup on a Mac. Its `--baseline N` flag scores the unedited model without a writer.
-
-- **`VLLMBackend`** runs vLLM on NVIDIA GPUs for runs at the paper's scale. vLLM schedules every concurrent LM call, so the forward-pass tool keeps a whole pass in flight (`concurrency=512`). Teacher-forced reads go to an `HFBackend` on the same GPU, because vLLM cannot return hidden states or MLP activations. Both models hold the same edits. To swap edits, the backend waits for running requests to finish, reloads the checkpoint in place with the edited tensors substituted, and clears vLLM's prefix cache. `gpu_memory_utilization` (default 0.6) sets vLLM's share of GPU memory; the Hugging Face model uses the rest. `batch_invariant=True` makes each answer depend only on its prompt and seed, at some cost in speed.
-
-```python
-from dspy_wsp import VLLMBackend
-
-backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_768, presence_penalty=1.5,
-                      chat_template_kwargs={"enable_thinking": True})
-```
-
-`examples/math500_qwen_vllm.py` runs the paper's MATH setup on one GPU: 50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with 4 samples each. `results/2026-11-04-math500-qwen-vllm-1h/` documents a one-hour proof-of-concept run on eight A100 GPUs, with the checks we ran before it.
+[The results folder](results/2026-11-07-typed-decisions-astra/) has every run, edit and comparison. [Decision models](#decision-models) covers the earlier runs and the Procedural Typed Decisions benchmark.
 
 ## Decision models
 
@@ -94,6 +85,8 @@ backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_76
 - `D1Backend` runs Liquid AI's d1-omni models (text path), e.g. d1-omni-600M: an encoder with a decision head.
 - `NanoJevBackend` runs NanoJev models: a Qwen3 backbone with a decision head.
 - `D1LMBackend` runs Liquid AI's d1 models built on LFM3, e.g. d1-2B. It reads each answer from the language model's output at the question's answer position, so it has no separate head. Its output layer is the token embedding, which stays protected, so the writer's edits land in the backbone. It reads text states and answers Choice, Noul and Score questions. It refuses d1-2B's other question types (text, number, date, box and multiple choice).
+
+We have tested `WeightSpace` on three decision models so far: d1-omni-600M, NanoJev and d1-2B. If you run it on another open decision model, please tell us how it went in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
 
 `load_decision_backend` opens a model by alias, Hugging Face repo id or local folder. It reads the checkpoint's config to pick the family, and it refuses other architectures with a message that names the supported ones. The aliases `"d1"`, `"nanojev"` and `"d1-2b"` open the checkpoints we tested, at pinned revisions.
 
@@ -168,6 +161,42 @@ Scored on the answers each program returns, on the same 400 test cases:
 | WeightSpace (GEPA) + ReAnchor | 71.2% (+18.9 ± 2.3) | 67.9% (+20.1 ± 2.4) |
 
 The WeightSpace rows come from one 25-pass conversation. The GEPA rows come from a [population search](#population-search) with 51 passes and at least 10 rounds. The search beat the conversation on d1-omni-600M and trailed it on NanoJev. Every difference between the two is smaller than two standard errors.
+
+## Generating LLMs
+
+`WeightSpace` also edits text-generating LLMs, as the paper did. A pass on an LLM generates many long answers, so we recommend `VLLMBackend` on a GPU machine. `HFBackend` and `MLXBackend` suit small experiments.
+
+A backend holds the student model, swaps edits in and out, and runs every forward pass.
+
+- **`VLLMBackend`** runs vLLM on NVIDIA GPUs for runs at the paper's scale. vLLM schedules every concurrent LM call, so the forward-pass tool keeps a whole pass in flight (`concurrency=512`). Teacher-forced reads go to an `HFBackend` on the same GPU, because vLLM cannot return hidden states or MLP activations. Both models hold the same edits. To swap edits, the backend waits for running requests to finish, reloads the checkpoint in place with the edited tensors substituted, and clears vLLM's prefix cache. `gpu_memory_utilization` (default 0.6) sets vLLM's share of GPU memory; the Hugging Face model uses the rest. `batch_invariant=True` makes each answer depend only on its prompt and seed, at some cost in speed.
+
+```python
+from dspy_wsp import VLLMBackend
+
+backend = VLLMBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", max_tokens=32_768, presence_penalty=1.5,
+                      chat_template_kwargs={"enable_thinking": True})
+```
+
+- **`HFBackend`** runs transformers in-process on CUDA, MPS or CPU. It generates one answer at a time, so it suits small models and short answers.
+- **`MLXBackend`** runs mlx-lm on Apple silicon. It decodes up to `batch_size` answers together, and the forward-pass tool runs that many programs at once to fill the batch. Each answer samples from its own seed. It also supports the presence penalty in Qwen's recommended sampling settings. On an M2 Max it generates about 650 tokens per second across a batch of 32 answers from Qwen3.5-0.8B, which is several times faster than `HFBackend` on the same machine.
+
+```python
+from dspy_wsp import MLXBackend
+
+backend = MLXBackend("Qwen/Qwen3.5-0.8B", revision="<commit>", batch_size=64, max_tokens=32_768,
+                     presence_penalty=1.5, chat_template_kwargs={"enable_thinking": True})
+```
+
+`MLXBackend` reads attention probabilities only from softmax-attention blocks. In Qwen3.5 those are blocks 3, 7, 11, 15, 19 and 23; the other blocks use linear attention.
+
+## Replicate the paper
+
+The paper's Experiment 8 edited Qwen3.5-0.8B to stop its looping on MATH-500. Two scripts rebuild that setup:
+
+- `examples/math500_qwen_vllm.py` runs it on one GPU: 50 passes of up to 512 answers, and a final check on all 500 MATH-500 problems with 4 samples each.
+- `examples/math500_qwen_mlx.py` runs a smaller version on a Mac. Its `--baseline N` flag scores the unedited model without a writer.
+
+This path is a bigger step than the decision models, and we have tested it less. A full run at the paper's scale takes many GPU hours and a long writer session. `results/2026-11-04-math500-qwen-vllm-1h/` documents a one-hour proof-of-concept run on eight A100 GPUs, with the checks we ran before it. We have not yet repeated the paper's full result. If you run this setup, please share what you find in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
 
 ## How a run works
 
@@ -251,18 +280,34 @@ The writer's code runs on your machine. With `sandbox="auto"` (the default), the
 ## Differences from the paper
 
 - The task is your DSPy program and metric, not fixed math benchmarks. Generation passes run the program; the records show every LM call.
-- The paper's writer was `gpt-6-astra` at maximum reasoning effort, driven through the Codex CLI with every built-in tool switched off. Here the writer is any `dspy.LM`. Nobody knows yet how far other models can reproduce the paper's results.
+- The paper's writer was `gpt-6-astra` at maximum reasoning effort, driven through the Codex CLI with every built-in tool switched off. Here the writer is any `dspy.LM`. The writer matters: on our decision model runs, `gpt-6-astra` wrote better edits than `gpt-6.1-sol` on two of three models.
 - `activations` takes separate `layers` (hidden-state indices) and `mlp_layers` (block indices) lists, because one list served both in the paper.
 - `fallback_if_worse=True` returns the original weights when the final check shows a loss. This is an addition to the paper's protocol, and it is off by default.
 - Patches store changed entries or whole tensors. The paper's release also has a low-rank form, which this version doesn't produce yet.
 
 ## Limits and roadmap
 
-- `HFBackend` generates one sequence at a time in-process. That's fine for small models and short answers, but too slow at the paper's scale. There, one pass produced 512 answers of up to 32k tokens, and a pass took up to 30 minutes on a server. `MLXBackend` batches on a Mac, but a 64-problem paired pass at 32k tokens still takes one to two hours. Next on the list is a vLLM backend that pushes edited tensors to a running server.
+- `HFBackend` generates one sequence at a time in-process. That's fine for small models and short answers, but too slow at the paper's scale. There, one pass produced 512 answers of up to 32k tokens, and a pass took up to 30 minutes on a server. `MLXBackend` batches on a Mac, but a 64-problem paired pass at 32k tokens still takes one to two hours.
 - A run is long and costly. The paper's 50-pass run took 158 turns and 20 hours. Budget for the writer's tokens accordingly.
 - Editing removes obstacles; it doesn't add abilities. The paper's Gemma 3 270M follow-up barely moved. That model didn't loop, so the writer had no failure mechanism to repair.
 - Neither the paper nor this package compares against prompt optimization yet. Run GEPA on the same student and budget before you trust a gain.
 
 ## Credits and license
 
-Code: MIT. The writer's task prompt is adapted from the Experiment 8 prompt released by Takehi et al. in [lm_understand-logs](https://github.com/RikiyaT/lm_understand-logs) under CC BY 4.0.
+Code: MIT.
+
+- The method and the harness come from [*Sparks of Weight-Space Programming*](https://rikiyat.github.io/blog/weight-space-programming/) by Rikiya Takehi, Jayden Teoh, Alex Zhang and Omar Khattab. Please cite it when you use this package.
+- The writer's task prompt is adapted from the Experiment 8 prompt released by Takehi et al. in [lm_understand-logs](https://github.com/RikiyaT/lm_understand-logs) under CC BY 4.0.
+- Haoze "Hector" He's [weight editing design](https://github.com/HectorHHZ/llm-honing/blob/main/system-design/weight-edit.md) for `llm-honing` is earlier work on editing decision models, including NanoJev, and releasing the edits as checked checkpoints. See [his post](https://x.com/HaozeHe_Hector/status/2118048048148623453).
+- Michael Isaac contributed the GEPA population search. It uses Lakshya Agrawal's [GEPA](https://github.com/gepa-ai/gepa) library.
+
+```bibtex
+@misc{takehi2026weightspace,
+  title        = {{Sparks of Weight-Space Programming: LLMs can natively read \& write neural network weights}},
+  author       = {Takehi, Rikiya and Teoh, Jayden and Zhang, Alex and Khattab, Omar},
+  year         = {2026},
+  month        = nov,
+  howpublished = {\url{https://rikiyat.github.io/blog/weight-space-programming/}},
+  note         = {Blog post}
+}
+```
