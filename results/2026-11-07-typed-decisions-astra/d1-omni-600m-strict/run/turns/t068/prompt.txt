@@ -1,0 +1,17 @@
+OUTPUT of Python run 49 of at most 300:
+```
+Specific residual norms: [0.0211 0.0101 0.0137 0.0068]
+crown off-target RMS 0.00169
+ cue False n 45 projection mean/sd 0.0004 0.0049
+ cue True n 5 projection mean/sd 0.0234 0.0021
+prod off-target RMS 0.00169
+ cue False n 25 projection mean/sd -0.0003 0.0033
+ cue True n 25 projection mean/sd 0.0106 0.0035
+high off-target RMS 0.00163
+ cue False n 42 projection mean/sd -0.0001 0.0048
+ cue True n 8 projection mean/sd 0.0101 0.0042
+low off-target RMS 0.00158
+ cue False n 42 projection mean/sd 0.0012 0.004
+ cue True n 8 projection mean/sd 0.0079 0.0032
+```
+[forward passes used: 16 of 25; Python runs used: 49 of 300]

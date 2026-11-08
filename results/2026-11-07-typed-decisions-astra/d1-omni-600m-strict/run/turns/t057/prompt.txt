@@ -1,0 +1,16 @@
+OUTPUT of Python run 40 of at most 300:
+```
+low False preds Counter({2: 16, 3: 3, 0: 1}) mean gaps 1-2,3-2,4-2 [-2.130000114440918, -0.5950000286102295, -3.7009999752044678]
+low True preds Counter({2: 16, 3: 4}) mean gaps 1-2,3-2,4-2 [-2.5220000743865967, -0.7749999761581421, -3.5260000228881836]
+medium False preds Counter({2: 17, 3: 3}) mean gaps 1-2,3-2,4-2 [-2.765000104904175, -0.628000020980835, -3.7179999351501465]
+medium True preds Counter({2: 17, 3: 3}) mean gaps 1-2,3-2,4-2 [-3.0190000534057617, -0.7300000190734863, -3.4860000610351562]
+high False preds Counter({3: 11, 2: 9}) mean gaps 1-2,3-2,4-2 [-2.9119999408721924, -0.15299999713897705, -3.818000078201294]
+high True preds Counter({2: 11, 3: 9}) mean gaps 1-2,3-2,4-2 [-3.265000104904175, -0.3840000033378601, -3.5820000171661377]
+crown_jewel False preds Counter({2: 14, 3: 3, 4: 2, 0: 1}) mean gaps 1-2,3-2,4-2 [-2.6040000915527344, -0.7020000219345093, -1.8420000076293945]
+crown_jewel True preds Counter({2: 17, 3: 2, 4: 1}) mean gaps 1-2,3-2,4-2 [-2.736999988555908, -0.878000020980835, -1.6790000200271606]
+crown mean norm 0.2726 half replication cosine 0.996
+privilege mean norm 0.04075 half replication cosine 0.937
+high_asset mean norm 0.07829 half replication cosine 0.95
+Direction cosine crown/priv: -0.7822414636611938
+```
+[forward passes used: 14 of 25; Python runs used: 40 of 300]

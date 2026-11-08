@@ -1,0 +1,29 @@
+OUTPUT of Python run 10 of at most 300:
+```
+<cell>:3: RuntimeWarning: Mean of empty slice
+trunk deadline double-diff norm 0.21671833097934723 split cosine 0.6705124974250793 near vs later projection 0.10391150414943695 -0.11257079988718033 SD 0.1491435468196869
+head deadline double-diff norm 0.04770519211888313 split cosine 0.6579194068908691 near vs later projection 0.018945230171084404 -0.020524056628346443 SD 0.027713844552636147
+Invoice-specific residual direction; norm before unit normalization 0.23442060994100503
+('agent_trace_observability', 'action') -0.0246
+('agent_trace_observability', 'needs_review') 0.0032
+('agent_trace_observability', 'outcome') 0.032
+('agent_trace_observability', 'risk') 0.0284
+('agent_trace_observability', 'urgency') 0.0117
+('customer_service', 'action') -0.0642
+('customer_service', 'category') -0.0532
+('customer_service', 'churn_risk') 0.1227
+('customer_service', 'needs_human') -0.1308
+('customer_service', 'urgency') 0.1439
+('invoice_processing', 'discrepancy_severity') 0.0664
+('invoice_processing', 'disposition') -0.0206
+('invoice_processing', 'duplicate') -0.0146
+('invoice_processing', 'matches_order') -0.0165
+('invoice_processing', 'urgency') 0.2344
+('security_incidents', 'credential_compromise') -0.0398
+('security_incidents', 'disposition') -0.0392
+('security_incidents', 'severity') -0.0118
+('security_incidents', 'true_positive') -0.0263
+('security_incidents', 'urgency') 0.0334
+Invoice target-vs-routine directional mean near/later [(False, 0.21635532663630694), (True, 0.2160444087953045)]
+```
+[forward passes used: 2 of 25; Python runs used: 10 of 300]

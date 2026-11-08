@@ -1,0 +1,12 @@
+OUTPUT of Python run 72 of at most 300:
+```
+AUDIT FILES ['option_mask.npy', 'requests.json', 'head_inputs.npy', 'trunk_markers.npy', 'probabilities.npy', 'option_logits.npy', 'meta.json']
+TAG VARIABLES [('synthetic_tags', 64), ('agent_tags', 128), ('security_cf_tags', 160), ('tags14', 160)]
+TAG FILES ['agent_counterfactual_tags.json', 'deadline_counterfactual_tags.json', 'security_counterfactual_tags.json']
+ROW EXAMPLES [{'request': 0, 'question': 'discrepancy_severity', 'type': 'score', 'options': ['0', '1', '2', '3']}, {'request': 64, 'question': 'action', 'type': 'choice', 'options': ['continue', 'human_review', 'observe', 'stop']}, {'request': 128, 'question': 'credential_compromise', 'type': 'noul', 'options': ['false', 'true']}]
+REQUEST FILES [('requests.json', 149552), ('meta.json', 44049)]
+synthetic_tags [{'id': 'train_736', 'variant': 'later'}, {'id': 'train_736', 'variant': 'near'}, {'id': 'train_736', 'variant': 'overdue'}, {'id': 'train_736', 'variant': 'discount'}, {'id': 'train_713', 'variant': 'later'}, {'id': 'train_713', 'variant': 'near'}, {'id': 'train_713', 'variant': 'overdue'}, {'id': 'train_713', 'variant': 'discount'}]
+agent_tags [{'id': 'train_203', 'variant': 'clean'}, {'id': 'train_203', 'variant': 'dry'}, {'id': 'train_203', 'variant': 'error1'}, {'id': 'train_203', 'variant': 'error4'}, {'id': 'train_203', 'variant': 'irreversible'}, {'id': 'train_203', 'variant': 'violation1'}, {'id': 'train_203', 'variant': 'violation3'}, {'id': 'train_203', 'variant': 'uncontrolled'}]
+security_cf_tags [{'seed': 'train_1170', 'criticality': 'low', 'privileged': False}, {'seed': 'train_1170', 'criticality': 'low', 'privileged': True}, {'seed': 'train_1170', 'criticality': 'medium', 'privileged': False}, {'seed': 'train_1170', 'criticality': 'medium', 'privileged': True}, {'seed': 'train_1170', 'criticality': 'high', 'privileged': False}, {'seed': 'train_1170', 'criticality': 'high', 'privileged': True}, {'seed': 'train_1170', 'criticality': 'crown_jewel', 'privileged': False}, {'seed': 'train_1170', 'criticality': 'crown_jewel', 'privileged': True}]
+```
+[forward passes used: 23 of 25; Python runs used: 72 of 300]

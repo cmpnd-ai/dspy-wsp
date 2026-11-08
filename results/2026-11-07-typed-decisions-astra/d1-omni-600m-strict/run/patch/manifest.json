@@ -1,0 +1,68 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-08T22:06:37+00:00",
+  "base_model": "LiquidAI/d1-omni-600M",
+  "revision": "02b55d7076f15129e59ab3f94783f32c4b088674",
+  "writer": "openai/gpt-6-astra",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 75
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict",
+  "validation": {
+   "items": 400,
+   "original": 0.5335,
+   "edited": 0.561,
+   "gain": 0.0275,
+   "se": 0.007549958920368251,
+   "improved": 93,
+   "worsened": 56
+  }
+ },
+ "changed_tensors": 3,
+ "changed_entries_total": 12312,
+ "tensors": [
+  {
+   "name": "head.scorer.1.bias",
+   "shape": [
+    1024
+   ],
+   "dtype": "float32",
+   "form": "sparse",
+   "changed_entries": 12,
+   "relative_change": 42.7572135925293,
+   "base_sha256": "591980dfb4e4b207854fe67d2bb77813234bc279f64d86ea4a11490eb58d0550",
+   "edited_sha256": "ace43f55971dff4c7cb63641c38deab390d5a09271ff85350ce0d17d0b0d1844"
+  },
+  {
+   "name": "head.scorer.1.weight",
+   "shape": [
+    1024,
+    1024
+   ],
+   "dtype": "float32",
+   "form": "sparse",
+   "changed_entries": 12288,
+   "relative_change": 1.7988094091415405,
+   "base_sha256": "1c5a4ae60c892e26d06fc6b9384c196ed26b876cb624603f92e494053fb1f28c",
+   "edited_sha256": "180975c53d243831aadd7d6fa17cb85797f976942fc39adc6eeeda22ec7f2ae9"
+  },
+  {
+   "name": "head.scorer.3.weight",
+   "shape": [
+    1,
+    1024
+   ],
+   "dtype": "float32",
+   "form": "sparse",
+   "changed_entries": 12,
+   "relative_change": 23.545207977294922,
+   "base_sha256": "26beaddb0be75ebf2f428c4bcc0a4fd1d845746c8f33ce6ec97100079f59a4a1",
+   "edited_sha256": "5a31b4a219e9dcef3ba346d060185267126b68ea1e2670d0dc0b376c0345ee33"
+  }
+ ]
+}

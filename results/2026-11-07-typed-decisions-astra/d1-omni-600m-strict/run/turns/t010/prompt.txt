@@ -1,0 +1,54 @@
+OUTPUT of Python run 7 of at most 300:
+```
+Metadata descriptions: {
+  "layers": [
+    14,
+    16
+  ],
+  "conventions": {
+    "rows": "one row per question, in request order; meta.rows names each row's request, question and options",
+    "option_mask": "True on a question's real options; padded options are NaN",
+    "option_logits": "the head's raw score per option, before calibration",
+    "probabilities": "the answer's distribution over the options",
+    "hidden_mean": "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the row's tokens",
+    "head_inputs": "the scorer's input at each option's <mask> (after the head's transformer layers)",
+    "trunk_markers": "the trunk's normed output at each option's <mask> (the head's input there)"
+  },
+  "model": "original",
+  "files": {
+    "option_mask.npy": [
+      1000,
+      5
+    ],
+    "option_logits.npy": [
+      1000,
+      5
+    ],
+    "head_inputs.npy": [
+      1000,
+      5,
+      1024
+    ],
+    "trunk_markers.npy": [
+      1000,
+      5,
+      1024
+    ],
+    "hidden_mean.npy": [
+      1000,
+      2,
+      1024
+    ],
+    "probabilities.npy": [
+      1000,
+      5
+    ]
+  }
+}
+Requests container: list length 200
+First request snippet: {"state": {"instructions": "Answer each question about this agent trace observability record.", "input_fields": "1. `state` (dict): The record to judge.", "inputs": {"state": {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not touch customer data outside the named accounts"], "task": "Delete personal data for the accounts in the erasure queue.", "trace_summary": {"constraint_violations": 0, "duration_s": 128.5, "irreversible_actions": 0, "steps": 7, "tool_errors": 1}}}}, "questions": {"action": {"instructions": "What should the observability system do with this trace?", "type": "choice", "criteria": {"continue": "Let the agent proceed without interru
+Head features: norm mean/std 484.3115 126.12716 range -114.37742 86.0948 negative fraction 0.49708874339788733
+Trunk features: norm mean/std 71.08117 6.9778247
+Read-vs-decide argmax agreement: 0.629
+```
+[forward passes used: 2 of 25; Python runs used: 7 of 300]

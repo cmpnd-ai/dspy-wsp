@@ -1,0 +1,41 @@
+RESULT of forward pass 15:
+```
+{
+ "type": "read",
+ "model": "edited",
+ "requests": 200,
+ "questions": 1000,
+ "dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/fwd_15",
+ "files": {
+  "option_mask.npy": [
+   1000,
+   5
+  ],
+  "option_logits.npy": [
+   1000,
+   5
+  ],
+  "head_inputs.npy": [
+   1000,
+   5,
+   1024
+  ],
+  "trunk_markers.npy": [
+   1000,
+   5,
+   1024
+  ],
+  "hidden_mean.npy": [
+   1000,
+   1,
+   1024
+  ],
+  "probabilities.npy": [
+   1000,
+   5
+  ]
+ },
+ "seconds": 36.5
+}
+```
+[forward passes used: 15 of 25; Python runs used: 44 of 300]

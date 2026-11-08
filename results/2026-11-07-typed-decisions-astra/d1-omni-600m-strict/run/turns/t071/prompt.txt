@@ -1,0 +1,59 @@
+OUTPUT of Python run 51 of at most 300:
+```
+Overall accuracy 0.577
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.52 delta -0.12
+('agent_trace_observability', 'outcome') acc 0.64 delta -0.02
+('agent_trace_observability', 'risk') acc 0.58 delta 0.06
+('agent_trace_observability', 'urgency') acc 0.4 delta -0.04
+('customer_service', 'action') acc 0.46 delta -0.06
+('customer_service', 'category') acc 0.94 delta -0.02
+('customer_service', 'churn_risk') acc 0.38 delta -0.04
+('customer_service', 'needs_human') acc 0.66 delta -0.02
+('customer_service', 'urgency') acc 0.56 delta 0.02
+('invoice_processing', 'discrepancy_severity') acc 0.54 delta 0.04
+('invoice_processing', 'disposition') acc 0.4 delta 0.08
+('invoice_processing', 'duplicate') acc 0.84 delta -0.02
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.64 delta 0.0
+('security_incidents', 'credential_compromise') acc 0.68 delta -0.06
+('security_incidents', 'disposition') acc 0.54 delta -0.04
+('security_incidents', 'severity') acc 0.52 delta 0.14
+('security_incidents', 'true_positive') acc 0.62 delta -0.08
+('security_incidents', 'urgency') acc 0.48 delta -0.02
+Paired item delta -0.011000000000000001 SE 0.009318215801785407 improved/worse (30, 37)
+Versus original:
+Overall accuracy 0.577
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.52 delta -0.12
+('agent_trace_observability', 'outcome') acc 0.64 delta 0.12
+('agent_trace_observability', 'risk') acc 0.58 delta 0.18
+('agent_trace_observability', 'urgency') acc 0.4 delta 0.04
+('customer_service', 'action') acc 0.46 delta 0.06
+('customer_service', 'category') acc 0.94 delta 0.0
+('customer_service', 'churn_risk') acc 0.38 delta -0.06
+('customer_service', 'needs_human') acc 0.66 delta 0.0
+('customer_service', 'urgency') acc 0.56 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.54 delta 0.08
+('invoice_processing', 'disposition') acc 0.4 delta 0.02
+('invoice_processing', 'duplicate') acc 0.84 delta 0.0
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.64 delta 0.26
+('security_incidents', 'credential_compromise') acc 0.68 delta -0.1
+('security_incidents', 'disposition') acc 0.54 delta -0.02
+('security_incidents', 'severity') acc 0.52 delta 0.12
+('security_incidents', 'true_positive') acc 0.62 delta -0.08
+('security_incidents', 'urgency') acc 0.48 delta -0.08
+Paired item delta 0.02 SE 0.012359766142426698 improved/worse (59, 40)
+Security severity groups:
+low False n 8 accuracy base/oldlow/refined [0.25, 0.25, 0.375] pred Counter({2: 5, 0: 2, 1: 1})
+low True n 12 accuracy base/oldlow/refined [0.417, 0.333, 0.5] pred Counter({3: 6, 2: 4, 0: 1, 1: 1})
+medium False n 9 accuracy base/oldlow/refined [0.778, 0.778, 0.778] pred Counter({2: 7, 3: 1, 0: 1})
+medium True n 8 accuracy base/oldlow/refined [0.25, 0.5, 0.375] pred Counter({3: 4, 2: 3, 4: 1})
+high False n 5 accuracy base/oldlow/refined [0.4, 0.6, 0.6] pred Counter({3: 3, 2: 2})
+high True n 3 accuracy base/oldlow/refined [0.333, 1.0, 0.667] pred Counter({3: 3})
+crown_jewel False n 3 accuracy base/oldlow/refined [0.0, 0.0, 0.0] pred Counter({2: 2, 3: 1})
+crown_jewel True n 2 accuracy base/oldlow/refined [0.0, 1.0, 1.0] pred Counter({4: 2})
+PosixPath('/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/security_specific_moderate')
+```
+[forward passes used: 17 of 25; Python runs used: 51 of 300]

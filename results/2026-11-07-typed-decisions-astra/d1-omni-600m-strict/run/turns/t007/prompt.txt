@@ -1,0 +1,28 @@
+OUTPUT of Python run 5 of at most 300:
+```
+
+ train_809 ('invoice_processing', 'urgency')
+{"delivery": {"condition": "accepted", "date": "2026-03-16", "received_qty": 80}, "invoice": {"currency": "USD", "id": "INV-2026-4623", "lines": [{"qty": 80, "sku": "SKU-665", "total_usd": 22786.4, "unit_usd": 284.83}], "total_usd": 22786.4, "vendor": "Pallas Industrial"}, "payment": {"days_until_due": -3, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "overdue", "terms": "net 60"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-7949", "lines": [{"qty": 100, "unit_usd": 284.83}], "total_usd": 28483.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 31, "prior_invoice_ids": ["INV-2026-3629"]}}
+P {'0': 0.021620706288911332, '1': 0.8597640924228782, '2': 0.0828471750560938, '3': 0.035768026232116515} G {'0': 0.023333, '1': 0.243333, '2': 0.533333, '3': 0.2}
+
+ train_791 ('invoice_processing', 'urgency')
+{"delivery": {"condition": "accepted with exceptions", "date": "2026-03-02", "received_qty": 950}, "invoice": {"currency": "USD", "id": "INV-2026-7774", "lines": [{"qty": 950, "sku": "SKU-347", "total_usd": 393927.0, "unit_usd": 414.66}], "total_usd": 393927.0, "vendor": "Acme Fabrication"}, "payment": {"days_until_due": -9, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "overdue", "terms": "net 30"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-1902", "lines": [{"qty": 1000, "unit_usd": 414.66}], "total_usd": 414660.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 45, "prior_invoice_ids": ["INV-2026-8511"]}}
+P {'0': 0.02670633164593497, '1': 0.8293641115751776, '2': 0.1016185345552817, '3': 0.04231102222360555} G {'0': 0.0, '1': 0.133333, '2': 0.566667, '3': 0.3}
+
+ train_439 ('customer_service', 'action')
+{"account": {"lifetime_value_usd": 351, "prior_tickets_90d": 1, "seats": 1, "tenure_months": 8, "tier": "standard"}, "thread": [{"role": "customer", "text": "I need the CSV export of last month's transaction data right now; the system is still processing and it's holding up my audit."}, {"role": "agent", "text": "I understand the urgency. Could you tell me which account ID you’re exporting from?"}, {"role": "customer", "text": "It's account 45219; please expedite the export."}]}
+P {'answer_directly': 0.8536786092506542, 'close_no_action': 0.002532864308607095, 'escalate_to_human': 0.05743274343268297, 'execute_refund': 3.238365138382344e-05, 'request_information': 0.08632339935667199} G {'answer_directly': 0.183333, 'close_no_action': 0.033333, 'escalate_to_human': 0.483333, 'execute_refund': 0.0, 'request_information': 0.3}
+
+ train_531 ('customer_service', 'action')
+{"account": {"lifetime_value_usd": 303, "prior_tickets_90d": 1, "seats": 12, "tenure_months": 5, "tier": "premium"}, "thread": [{"role": "customer", "text": "Since the last update, the sync process has been taking around 15 minutes for a few megabytes, which is much slower than before."}]}
+P {'answer_directly': 0.8030405419669553, 'close_no_action': 0.002841711131249417, 'escalate_to_human': 0.0650315845552535, 'execute_refund': 0.0010506383718340924, 'request_information': 0.1280355239747078} G {'answer_directly': 0.2, 'close_no_action': 0.0, 'escalate_to_human': 0.1, 'execute_refund': 0.0, 'request_information': 0.7}
+
+Scorer weight statistics
+head.scorer.0.weight norm 31.441221237182617 mean 0.9825142621994019 std 0.0068454435095191 range (0.9624815583229065, 1.0045206546783447)
+head.scorer.1.weight norm 19.35112953186035 mean -1.528145730844699e-05 std 0.01889779046177864 range (-0.0581231452524662, 0.056424036622047424)
+head.scorer.1.bias norm 0.6305368542671204 mean -0.004959281533956528 std 0.01907929591834545 range (-0.04790913313627243, 0.05574227124452591)
+head.scorer.3.weight norm 0.3527959883213043 mean -0.0003247329732403159 std 0.011025476269423962 range (-0.03181774541735649, 0.03414463624358177)
+
+Read request: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/read_a.json
+```
+[forward passes used: 1 of 25; Python runs used: 5 of 300]

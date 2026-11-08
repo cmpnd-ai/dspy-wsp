@@ -1,0 +1,75 @@
+OUTPUT of Python run 66 of at most 300:
+```
+PAYMENT GAIN4 VS ORIGINAL
+Overall accuracy 0.574
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.54 delta 0.02
+('agent_trace_observability', 'risk') acc 0.4 delta 0.0
+('agent_trace_observability', 'urgency') acc 0.36 delta 0.0
+('customer_service', 'action') acc 0.52 delta 0.12
+('customer_service', 'category') acc 0.96 delta 0.02
+('customer_service', 'churn_risk') acc 0.42 delta -0.02
+('customer_service', 'needs_human') acc 0.68 delta 0.02
+('customer_service', 'urgency') acc 0.56 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.04
+('invoice_processing', 'disposition') acc 0.3 delta -0.08
+('invoice_processing', 'duplicate') acc 0.84 delta 0.0
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.62 delta 0.24
+('security_incidents', 'credential_compromise') acc 0.78 delta 0.0
+('security_incidents', 'disposition') acc 0.58 delta 0.02
+('security_incidents', 'severity') acc 0.4 delta 0.0
+('security_incidents', 'true_positive') acc 0.72 delta 0.02
+('security_incidents', 'urgency') acc 0.52 delta -0.04
+Paired item delta 0.017 SE 0.008714050342225147 improved/worse (41, 24)
+
+PAYMENT4+VIOLATION2 VS PAYMENT4
+Overall accuracy 0.588
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.12
+('agent_trace_observability', 'risk') acc 0.52 delta 0.12
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.08
+('customer_service', 'action') acc 0.52 delta 0.0
+('customer_service', 'category') acc 0.96 delta 0.0
+('customer_service', 'churn_risk') acc 0.42 delta 0.0
+('customer_service', 'needs_human') acc 0.68 delta 0.0
+('customer_service', 'urgency') acc 0.54 delta -0.02
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.0
+('invoice_processing', 'disposition') acc 0.32 delta 0.02
+('invoice_processing', 'duplicate') acc 0.86 delta 0.02
+('invoice_processing', 'matches_order') acc 0.66 delta 0.02
+('invoice_processing', 'urgency') acc 0.64 delta 0.02
+('security_incidents', 'credential_compromise') acc 0.74 delta -0.04
+('security_incidents', 'disposition') acc 0.58 delta 0.0
+('security_incidents', 'severity') acc 0.38 delta -0.02
+('security_incidents', 'true_positive') acc 0.7 delta -0.02
+('security_incidents', 'urgency') acc 0.5 delta -0.02
+Paired item delta 0.013999999999999999 SE 0.007831132304196445 improved/worse (20, 14)
+
+GATED SECURITY VS BASE
+Overall accuracy 0.595
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.0
+('agent_trace_observability', 'risk') acc 0.52 delta 0.0
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.0
+('customer_service', 'action') acc 0.52 delta 0.0
+('customer_service', 'category') acc 0.96 delta 0.0
+('customer_service', 'churn_risk') acc 0.42 delta 0.0
+('customer_service', 'needs_human') acc 0.68 delta 0.0
+('customer_service', 'urgency') acc 0.54 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.0
+('invoice_processing', 'disposition') acc 0.32 delta 0.0
+('invoice_processing', 'duplicate') acc 0.86 delta 0.0
+('invoice_processing', 'matches_order') acc 0.66 delta 0.0
+('invoice_processing', 'urgency') acc 0.64 delta 0.0
+('security_incidents', 'credential_compromise') acc 0.74 delta 0.0
+('security_incidents', 'disposition') acc 0.58 delta 0.0
+('security_incidents', 'severity') acc 0.52 delta 0.14
+('security_incidents', 'true_positive') acc 0.7 delta 0.0
+('security_incidents', 'urgency') acc 0.5 delta 0.0
+Paired item delta 0.007000000000000001 SE 0.003287711244335587 improved/worse (9, 2)
+```
+[forward passes used: 21 of 25; Python runs used: 66 of 300]

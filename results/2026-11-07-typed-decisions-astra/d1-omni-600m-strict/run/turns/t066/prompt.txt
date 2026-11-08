@@ -1,0 +1,80 @@
+OUTPUT of Python run 47 of at most 300:
+```
+Overall accuracy 0.581
+('agent_trace_observability', 'action') acc 0.52 delta 0.02
+('agent_trace_observability', 'needs_review') acc 0.6 delta -0.04
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.0
+('agent_trace_observability', 'risk') acc 0.54 delta 0.02
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.0
+('customer_service', 'action') acc 0.44 delta -0.08
+('customer_service', 'category') acc 0.92 delta -0.04
+('customer_service', 'churn_risk') acc 0.42 delta 0.0
+('customer_service', 'needs_human') acc 0.68 delta 0.0
+('customer_service', 'urgency') acc 0.54 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.42 delta -0.08
+('invoice_processing', 'disposition') acc 0.4 delta 0.08
+('invoice_processing', 'duplicate') acc 0.86 delta 0.0
+('invoice_processing', 'matches_order') acc 0.6 delta -0.06
+('invoice_processing', 'urgency') acc 0.64 delta 0.0
+('security_incidents', 'credential_compromise') acc 0.7 delta -0.04
+('security_incidents', 'disposition') acc 0.62 delta 0.04
+('security_incidents', 'severity') acc 0.46 delta 0.08
+('security_incidents', 'true_positive') acc 0.68 delta -0.02
+('security_incidents', 'urgency') acc 0.48 delta -0.02
+Paired item delta -0.007000000000000001 SE 0.00922935016794861 improved/worse (31, 36)
+Versus original:
+Overall accuracy 0.581
+('agent_trace_observability', 'action') acc 0.52 delta 0.02
+('agent_trace_observability', 'needs_review') acc 0.6 delta -0.04
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.14
+('agent_trace_observability', 'risk') acc 0.54 delta 0.14
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.08
+('customer_service', 'action') acc 0.44 delta 0.04
+('customer_service', 'category') acc 0.92 delta -0.02
+('customer_service', 'churn_risk') acc 0.42 delta -0.02
+('customer_service', 'needs_human') acc 0.68 delta 0.02
+('customer_service', 'urgency') acc 0.54 delta -0.02
+('invoice_processing', 'discrepancy_severity') acc 0.42 delta -0.04
+('invoice_processing', 'disposition') acc 0.4 delta 0.02
+('invoice_processing', 'duplicate') acc 0.86 delta 0.02
+('invoice_processing', 'matches_order') acc 0.6 delta -0.06
+('invoice_processing', 'urgency') acc 0.64 delta 0.26
+('security_incidents', 'credential_compromise') acc 0.7 delta -0.08
+('security_incidents', 'disposition') acc 0.62 delta 0.06
+('security_incidents', 'severity') acc 0.46 delta 0.06
+('security_incidents', 'true_positive') acc 0.68 delta -0.02
+('security_incidents', 'urgency') acc 0.48 delta -0.08
+Paired item delta 0.024000000000000004 SE 0.011909204244140043 improved/worse (55, 39)
+Severity remaining errors on discovery B:
+train_900 gold/pred 1 2 low ['repo:read'] dormant_account_use allowlisted False
+train_903 gold/pred 3 0 low ['deploy:production', 'secrets:read'] disabled_logging allowlisted True
+train_916 gold/pred 2 4 medium ['repo:read'] suspicious_process allowlisted False
+train_920 gold/pred 2 4 low ['repo:read'] malware_signature allowlisted False
+train_923 gold/pred 2 4 medium ['repo:read'] data_egress allowlisted True
+train_926 gold/pred 0 2 low ['repo:read'] new_country_login allowlisted True
+train_944 gold/pred 3 4 high ['repo:read'] suspicious_process allowlisted True
+train_949 gold/pred 1 0 low ['repo:read'] new_country_login allowlisted False
+train_961 gold/pred 2 3 low ['deploy:production', 'secrets:read'] data_egress allowlisted True
+train_964 gold/pred 3 2 medium ['repo:read'] privilege_escalation allowlisted False
+train_975 gold/pred 1 2 low ['repo:read'] new_country_login allowlisted False
+train_984 gold/pred 2 3 medium ['repo:read'] brute_force allowlisted False
+train_1016 gold/pred 3 4 high ['repo:read'] data_egress allowlisted False
+train_1049 gold/pred 4 3 low ['deploy:production', 'secrets:read'] privilege_escalation allowlisted False
+train_1055 gold/pred 2 3 low ['deploy:production', 'secrets:read'] config_drift allowlisted False
+train_1059 gold/pred 3 4 crown_jewel ['repo:read'] new_country_login allowlisted False
+train_1083 gold/pred 1 2 low ['repo:read'] mass_download allowlisted True
+train_1084 gold/pred 3 2 medium ['deploy:production', 'secrets:read'] disabled_logging allowlisted True
+train_1093 gold/pred 3 1 low ['deploy:production', 'secrets:read'] disabled_logging allowlisted False
+train_1106 gold/pred 2 3 low ['deploy:production', 'secrets:read'] data_egress allowlisted True
+train_1112 gold/pred 3 2 high ['repo:read'] config_drift allowlisted False
+train_1156 gold/pred 2 3 medium ['deploy:production', 'secrets:read'] config_drift allowlisted True
+train_1158 gold/pred 2 0 medium ['repo:read'] disabled_logging allowlisted False
+train_1169 gold/pred 1 4 low ['repo:read'] suspicious_process allowlisted True
+train_1173 gold/pred 3 4 medium ['deploy:production', 'secrets:read'] malware_signature allowlisted False
+train_1175 gold/pred 3 2 low ['deploy:production', 'secrets:read'] impossible_travel allowlisted True
+train_1189 gold/pred 3 2 high ['repo:read'] dormant_account_use allowlisted True
+production False 3-2 margins base/low/high [-0.634, -0.679, -0.724]
+production True 3-2 margins base/low/high [-0.79, 0.092, 0.973]
+PosixPath('/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/security_high')
+```
+[forward passes used: 16 of 25; Python runs used: 47 of 300]

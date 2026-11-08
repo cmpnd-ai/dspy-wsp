@@ -1,0 +1,134 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict",
+ "final_answer": "Left the **best validated repair (`best_2`)** in `work/edited`.\n\n### What changed\nModified **12 scorer neurons** across three tensors:\n- `head.scorer.1.weight`\n- `head.scorer.1.bias`\n- `head.scorer.3.weight`\n\nThe edits strengthen readouts for **invoice deadlines, explicit agent constraint violations, and security asset criticality/privileges**. Security readouts include a question-specific gate. All encoder weights, normalizations, temperatures and other tensors remain original.\n\n### Evidence for the mechanism\nMatched counterfactuals showed that the head represented these cues, but the scorer often still preferred routine urgency, partial outcomes or medium severity.\n\nActual interventions at multiple strengths produced the predicted selective changes. For example, explicit violations increased the harmful-versus-partial margin while clean traces barely changed. The security gate reduced off-target logit-change RMS from **0.412 to 0.00003**, preserving its severity effect and leaving all 950 unrelated discovery-question rankings unchanged. Exported head inputs remained **bit-identical**, localizing the repair to the scorer\u2014not the encoder.\n\n### Measured results\nGains and standard errors are in percentage points; SEs are paired over cases.\n\n| Evaluation | Original | Edited | Gain \u00b1 SE |\n|---|---:|---:|---:|\n| Discovery, 400 cases\u2014in-sample | 55.75% | 60.35% | **+4.60 \u00b1 0.72** |\n| Independent practice, 500 cases | 57.20% | 59.76% | **+2.56 \u00b1 0.71** |\n| Hidden validation, 300 cases | 57.53% | 59.80% | **+2.27 \u00b1 0.85** |\n\nThe independent-practice result includes the small 50-case reserve, which regressed **\u22122.00 \u00b1 2.23 points**; improvement was not uniform. An additional violation-gating experiment also failed to improve accuracy and was discarded.\n\nI expect the retained repair to help because it corrects identifiable cue-reading failures, has causal dose-response evidence, and improves both independent practice and hidden validation\u2014not merely development examples.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 75
+ },
+ "turns": 104,
+ "conversations": 3,
+ "validation_runs": [
+  {
+   "pass": 13,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.1.bias",
+    "head.scorer.1.weight",
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5913333333333334,
+    "score_se_over_items": 0.012248571307339372,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 281
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.5913333333333334,
+    "gain": 0.016,
+    "se": 0.008448941672459066,
+    "improved": 69,
+    "worsened": 45
+   }
+  },
+  {
+   "pass": 21,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.1.bias",
+    "head.scorer.1.weight",
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.598,
+    "score_se_over_items": 0.012366928242627813,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 279
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.598,
+    "gain": 0.022666666666666665,
+    "se": 0.008503305584972426,
+    "improved": 75,
+    "worsened": 43
+   }
+  }
+ ],
+ "validation_size": 300,
+ "simulate_head": false,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.5335,
+   "score_se_over_items": 0.01069955963771887,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 384
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.561,
+   "score_se_over_items": 0.011292311133103668,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 372
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.5335,
+   "edited": 0.561,
+   "gain": 0.0275,
+   "se": 0.007549958920368251,
+   "improved": 93,
+   "worsened": 56
+  }
+ },
+ "patch": "3 tensors, 12,312 entries changed\n  head.scorer.1.bias float32[1024]: 12 entries (sparse), relative change 42.7572\n  head.scorer.1.weight float32[1024, 1024]: 12,288 entries (sparse), relative change 1.7988\n  head.scorer.3.weight float32[1, 1024]: 12 entries (sparse), relative change 23.5452"
+}

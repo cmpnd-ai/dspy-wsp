@@ -1,0 +1,72 @@
+OUTPUT of Python run 58 of at most 300:
+```
+ted outcome26/40->24/40, risk14/40->16/40. Checkpoint payment4_violation2.
+
+## Pass 11 planned: violation dose response, gain4
+Payment cue remains gain4; violation cue gains now +/-4 (same directions and rows). [{"name": "head.scorer.1.bias", "delta_norm": 0.039755020290613174, "relative_delta": 0.06304948031902313, "sha256": "4cfbf3f37a85c6537bce5a38da53069b6d2011c71f8837aa4ef8443266d77b22"}, {"name": "head.scorer.1.weight", "delta_norm": 2.3214051723480225, "relative_delta": 0.11996226012706757, "sha256": "f45585e4b7174096c7e3ae73aad5687d6824f0ee11ab7a9004d605cfaa9aaa3c"}, {"name": "head.scorer.3.weight", "delta_norm": 8.00000286102295, "relative_delta": 22.676002502441406, "sha256": "403c2dbf64d5a4ef1e8e485fb7c5cf31073cb6a5c89c8a5c6f6cf58a399c3641"}]
+Read same 200 discovery-B records/1000 questions, payment_read_b.json. Compare violation gains0/2/4; look for saturation and collateral effects.
+
+
+Pass 11 result: payment4+violation4 read completed; comparing discovery-B dose response against gains0/2. Checkpoint payment4_violation4.
+
+
+Pass11 payment4+violation4: discovery B .585 vs .557, paired +.0280 SE .01099. Increment over violation2 -.0030 SE .00539. Violated outcome10/10, risk10/10, urgency8/10; collateral errors increase. Prefer violation2. Features compare only at valid options (padding may contain NaNs).
+
+
+## Pass 12 planned: independent practice confirmation
+Exact edit: restored payment4_violation2 (payment +/-4 rows594/746, violation +/-2 rows518/33), all other tensors original. [{"name": "head.scorer.1.bias", "delta_norm": 0.039755020290613174, "relative_delta": 0.06304948031902313, "sha256": "4cfbf3f37a85c6537bce5a38da53069b6d2011c71f8837aa4ef8443266d77b22"}, {"name": "head.scorer.1.weight", "delta_norm": 2.3214051723480225, "relative_delta": 0.11996226012706757, "sha256": "f45585e4b7174096c7e3ae73aad5687d6824f0ee11ab7a9004d605cfaa9aaa3c"}, {"name": "head.scorer.3.weight", "delta_norm": 6.324559688568115, "relative_delta": 17.926959991455078, "sha256": "765d6e14cf8aff4bb61a605c8280513b6481b5b23cc370bb1d04cf35189c27ac"}]
+DECIDE both on 450 predesignated confirmation IDs in confirm_initial.json; none used to derive/select directions. Valid exported head features are bit-identical; previous equality failure was NaN padding.
+
+
+Pass12 independent confirmation (450 cases): original .564889, edited .585333, paired gain +.020444 SE .007220; 103 improved,64 worsened. No confirmation records inspected to construct edits.
+
+
+## Pass 13 planned: hidden validation of initial repair
+Exact edits unchanged: payment4_violation2, [{"name": "head.scorer.1.bias", "delta_norm": 0.039755020290613174, "relative_delta": 0.06304948031902313, "sha256": "4cfbf3f37a85c6537bce5a38da53069b6d2011c71f8837aa4ef8443266d77b22"}, {"name": "head.scorer.1.weight", "delta_norm": 2.3214051723480225, "relative_delta": 0.11996226012706757, "sha256": "f45585e4b7174096c7e3ae73aad5687d6824f0ee11ab7a9004d605cfaa9aaa3c"}, {"name": "head.scorer.3.weight", "delta_norm": 6.324559688568115, "relative_delta": 17.926959991455078, "sha256": "765d6e14cf8aff4bb61a605c8280513b6481b5b23cc370bb1d04cf35189c27ac"}]
+DECIDE both on all 300 hidden validation cases; aggregate confirmation only. No validation examples accessible.
+
+
+Pass13 hidden validation, initial repair: original .575333, edited .591333, paired +.016000 SE .008449;69 improved,45 worsened. Positive but modest-power confirmation; best validated checkpoint best_1.
+
+
+## Pass 14 planned: causal security impact cues
+Current edits unchanged best_1 payment4_violation2, but READ ORIGINAL. Original reads 20 discovery-A security seeds x8 asset-criticality/privilege variants, 160 requests/800 questions (security_counterfactuals.json). Asset low/medium/high/crown_jewel crossed with repo:read vs deploy:production,secrets:read; alert evidence otherwise held fixed. Test whether severity-contrast representations track these explicit state cues while raw logits default to medium.
+
+
+## Pass 15 planned: security impact readout, low dose
+Exact edit: payment4+violation2 plus crown2,production2,highasset1 on scorer pairs [(993, 924), (166, 732), (381, 365)]. Directions from matched discovery-A counterfactual contrasts, projected off 194-212 nuisance means/PCs. Residual norms crown .03004, production .01264, highasset .01788. [{"name": "head.scorer.1.bias", "delta_norm": 0.06409169733524323, "relative_delta": 0.10164623707532883, "sha256": "79499dd4774f2403dc9947fc88f108c43e0656e2d8c983e8cbd944db23ba9bf8"}, {"name": "head.scorer.1.weight", "delta_norm": 3.740475654602051, "relative_delta": 0.193294957280159, "sha256": "ae98c0a1730c5f02b42410b463b940f7c66733bc0f4d3557f17d3ef556c43bbf"}, {"name": "head.scorer.3.weight", "delta_norm": 7.615800857543945, "relative_delta": 21.58698272705078, "sha256": "0e5fbbee4a809929556ccef98940539166e381da4468701bd7bb16790d858bbf"}]
+Read 200 discovery-B cases/1000 questions via payment_read_b.json. Predict selective security severity changes. Baseline for additional edit is pass10. No confirmation records used for directions.
+
+
+Pass15 security low (crown2/prod2/high1): discovery B accuracy .596, gain vs original +.0390 SE .01019; increment vs base repair +.0080 SE .00692. Security severity .38->.50. Production-access 3-2 margin -.790->+.092; unprivileged -.634->-.679. Some customer/action collateral (-.06) and invoice/disposition improvement (+.06). Checkpoint security_low.
+
+
+## Pass 16 planned: security readout dose response, high
+Exact edit: payment4+violation2 unchanged, security crown4/prod4/highasset2, same six rows/directions as pass15. [{"name": "head.scorer.1.bias", "delta_norm": 0.06409169733524323, "relative_delta": 0.10164623707532883, "sha256": "79499dd4774f2403dc9947fc88f108c43e0656e2d8c983e8cbd944db23ba9bf8"}, {"name": "head.scorer.1.weight", "delta_norm": 3.740475654602051, "relative_delta": 0.193294957280159, "sha256": "ae98c0a1730c5f02b42410b463b940f7c66733bc0f4d3557f17d3ef556c43bbf"}, {"name": "head.scorer.3.weight", "delta_norm": 10.58304214477539, "relative_delta": 29.99762535095215, "sha256": "8a55109179dc26d217f31e4931610634cb6383a137bf9d4c70267ff975192fab"}]
+Read 200 discovery-B cases/1000 questions via payment_read_b.json. Compare security strengths0/low/high; no confirmation data used to select strength.
+
+
+Pass16 high security dose: discovery B .581 vs original .557, +.0240 SE .01191; increment vs base repair -.0070 SE .00923. Severity .46 versus .50 low dose. Production margin increases monotonically -.790,+.092,+.973, but high dose creates collateral errors. Reject high; refine specificity using discovery-A nuisance geometry only.
+
+
+## Pass 17 planned: narrative-protected security cues, moderate dose
+Exact edit: base payment4+violation2 plus security crown3,production3,highasset2,lowimpact6 on pairs [(993, 924), (166, 732), (381, 365), (624, 477)]. Cue directions from same matched discovery-A counterfactuals, remove 128 unrelated-question PCs plus 48 within-condition narrative PCs and fixed nuisance means. Low-impact direction is low unprivileged minus medium unprivileged, contrast low-vs-medium, protected against privileged/high/crown means. [{"name": "head.scorer.1.bias", "delta_norm": 0.07639878988265991, "relative_delta": 0.12116467207670212, "sha256": "e785175e6afcabe438ab2dc29cd232ec8d7d1282f37b542354d043d70875b5df"}, {"name": "head.scorer.1.weight", "delta_norm": 4.094645023345947, "relative_delta": 0.21159720420837402, "sha256": "d0afb4307f15a0fb1582246cbff35b9d43a10edfe4010e0959eba3ced2a3422a"}, {"name": "head.scorer.3.weight", "delta_norm": 12.490035057067871, "relative_delta": 35.40299606323242, "sha256": "526781dd39a04a7397f76b1292c5afe6f3b1b5f34dfab32a71d7426fa1fc5675"}]
+Read discovery B 200 cases/1000 questions via payment_read_b.json. Compare actual model output; no network simulation. Expect lower contamination of criticality readout by alert wording.
+
+
+Pass17 refined security moderate: discovery B .577, gain +.0200 SE .01236 vs original, -.0110 SE .00932 vs validated base. Severity .52 but substantial unrelated errors; reject as global linear add-on. Next test localized nonlinear gate using question-identifying feature direction.
+
+
+## Pass 18 planned: gate-localized security readouts, moderate dose
+Exact edit: base payment4+violation2 plus same four security cue directions/gains3,3,2,6 as pass17. Security pairs now rows (12*question_gate +/- cue)/scorerLN_gain, biases cancel LN offset then subtract9.5, outputs +/-gain/2. Gate derived from discovery-A question means protected against option/content/cue variation. B gate projections security severity [.0352,.0635], others[-.0213,.0146], clear separation. [{"name": "head.scorer.1.bias", "delta_norm": 26.959999084472656, "relative_delta": 42.7572135925293, "sha256": "ace43f55971dff4c7cb63641c38deab390d5a09271ff85350ce0d17d0b0d1844"}, {"name": "head.scorer.1.weight", "delta_norm": 34.80899429321289, "relative_delta": 1.7988094091415405, "sha256": "180975c53d243831aadd7d6fa17cb85797f976942fc39adc6eeeda22ec7f2ae9"}, {"name": "head.scorer.3.weight", "delta_norm": 8.306654930114746, "relative_delta": 23.545207977294922, "sha256": "5a31b4a219e9dcef3ba346d060185267126b68ea1e2670d0dc0b376c0345ee33"}]
+Read discovery B 200 cases/1000 questions via payment_read_b.json. Predict preserved severity effects but disappearance of unrelated changes versus validated base repair pass10. Gating has not yet been accepted causally.
+
+
+Pass18 gated security moderate: discovery B .595 vs original .557, +.0380 SE .01016; increment vs base repair +.0070 SE .00329 (9 improved,2 worsened). Security severity .38->.52. Gate preserves severity centered logit RMS .75687 (ungated .75686) while off-target RMS .41233->.00003; all 950 unrelated question rankings unchanged. Causal localization confirmed. Checkpoint security_gated_moderate.
+
+
+## Pass 19 planned: gated security dose response, strong
+Exact edit: validated base payment4+violation2 plus gated security crown6,production6,highasset4,lowimpact12, same gate/directions as pass1
+[output cut at 10,000 characters]
+```
+[forward passes used: 20 of 25; Python runs used: 58 of 300]

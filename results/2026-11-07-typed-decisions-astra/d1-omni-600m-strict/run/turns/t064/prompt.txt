@@ -1,0 +1,11 @@
+OUTPUT of Python run 46 of at most 300:
+```
+dropped edit head.scorer.1.bias
+dropped edit head.scorer.1.weight
+dropped edit head.scorer.3.weight
+saved edit head.scorer.1.weight: 10,240 of 1,048,576 entries changed, relative change 0.1933
+saved edit head.scorer.1.bias: 10 of 1,024 entries changed, relative change 0.1016
+saved edit head.scorer.3.weight: 10 of 1,024 entries changed, relative change 29.9976
+[{'name': 'head.scorer.1.bias', 'delta_norm': 0.06409169733524323, 'relative_delta': 0.10164623707532883, 'sha256': '79499dd4774f2403dc9947fc88f108c43e0656e2d8c983e8cbd944db23ba9bf8'}, {'name': 'head.scorer.1.weight', 'delta_norm': 3.740475654602051, 'relative_delta': 0.193294957280159, 'sha256': 'ae98c0a1730c5f02b42410b463b940f7c66733bc0f4d3557f17d3ef556c43bbf'}, {'name': 'head.scorer.3.weight', 'delta_norm': 10.58304214477539, 'relative_delta': 29.99762535095215, 'sha256': '8a55109179dc26d217f31e4931610634cb6383a137bf9d4c70267ff975192fab'}]
+```
+[forward passes used: 15 of 25; Python runs used: 46 of 300]

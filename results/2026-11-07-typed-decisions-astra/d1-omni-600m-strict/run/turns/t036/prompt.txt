@@ -1,0 +1,16 @@
+OUTPUT of Python run 25 of at most 300:
+```
+Refined violation {'contrast_norm': 0.285673588514328, 'residual_norm': 0.044324512161394554, 'protected_rank': 150}
+clean {'outcome': 0.0, 'risk': 0.0, 'urgency': 0.0}
+dry {'outcome': 0.0, 'risk': 0.0, 'urgency': 0.0}
+error1 {'outcome': 0.0, 'risk': 0.0, 'urgency': -0.0}
+error4 {'outcome': -0.0, 'risk': 0.0, 'urgency': -0.0}
+irreversible {'outcome': 0.0, 'risk': 0.0, 'urgency': 0.0}
+violation1 {'outcome': 0.0326, 'risk': 0.0714, 'urgency': 0.0232}
+violation3 {'outcome': 0.0324, 'risk': 0.0813, 'urgency': 0.025}
+uncontrolled {'outcome': 0.0312, 'risk': 0.0775, 'urgency': 0.0218}
+B violations False [('outcome', 0.0026), ('risk', 0.0096), ('urgency', -0.0029)]
+B violations True [('outcome', 0.0299), ('risk', 0.0701), ('urgency', 0.0199)]
+Unrelated B mean span 0.003916745539754629
+```
+[forward passes used: 9 of 25; Python runs used: 25 of 300]

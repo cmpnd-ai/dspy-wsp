@@ -1,0 +1,10 @@
+OUTPUT of Python run 67 of at most 300:
+```
+GATE RESIDUAL 0.04060165431233278 NUISANCE RANK 136
+A other [-0.0116 -0.0067  0.      0.0067  0.0119]
+A agent [0.03   0.0322 0.0406 0.0481 0.052 ]
+B other [-0.0156 -0.0075  0.0001  0.0069  0.0147]
+B agent [0.029  0.0321 0.0408 0.0496 0.0537]
+CUE ROW CHECK 0.0
+```
+[forward passes used: 21 of 25; Python runs used: 67 of 300]

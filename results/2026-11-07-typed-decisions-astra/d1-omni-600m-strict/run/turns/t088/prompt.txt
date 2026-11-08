@@ -1,0 +1,44 @@
+OUTPUT of Python run 63 of at most 300:
+```
+ANALYSIS HELPERS
+load (name)
+load_original (name)
+save_edit (name, tensor)
+drop_edit (name)
+edited ()
+note (text)
+answers (record)
+top (probs)
+canonical (x)
+unit_center_features (x)
+load_read (k, valid_ids)
+edit_manifest ()
+clear_edits ()
+read_summary (arr, info, base_arr=None, base_info=None)
+deadline_summary (arr, info)
+centered_options (L, info)
+install_linear_cues (cues)
+backup_edits (name)
+agent_cue_direction (targets, variant_pairs, protected_variants, protect_other_agent_questions=True)
+fn (arr, info)
+val (cues)
+security_contrast (seed, crit, priv, a, b)
+null_project_direction (raw, nuisance)
+off_rms (direction)
+install_gated_security (gains, gate_scale=12.0, gate_threshold=9.5)
+read_jsonl (path)
+paired_score_summary (before, after)
+obj (targets, variant_pairs, protected_variants, protect_other_agent_questions=True)
+v (targets, variant_pairs, protected_variants, protect_other_agent_questions=True)
+
+ARRAYS
+[('g', (4,)), ('valid2', (1000, 5)), ('H2', (1000, 5, 1024)), ('T2', (1000, 5, 1024)), ('C2', (1000, 5, 1024)), ('U2', (1000, 5, 1024)), ('d', (1024,)), ('c', (1024,)), ('W1', (1024, 1024)), ('w3', (1024,)), ('gain0', (1024,)), ('effective', (1024,)), ('D2', (442, 1024)), ('mean_diff2', (1024,)), ('eff_unit', (1024,)), ('residual2', (1024,)), ('d_residual', (1024,)), ('delta', (4,)), ('cr', (1024,)), ('TU2', (1000, 5, 1024)), ('near', (50,)), ('feats', (1000, 5, 1024)), ('contrasts', (50, 1024)), ('shared', (1024,)), ('deadline', (1024,)), ('d_deadline', (1024,)), ('other_contrasts', (19, 1024)), ('universal', (1024,)), ('basis', (1024, 3)), ('Q', (1024, 3)), ('inv_contrast', (1024,)), ('d_invoice', (1024,)), ('gaps', (21,)), ('U3', (1000, 5, 1024)), ('TU3', (1000, 5, 1024)), ('uf', (1000, 5, 1024)), ('vh', (1024, 1024)), ('HH', (3550, 1024)), ('TT', (3550, 1024)), ('delta_HT', (3550, 1024)), ('sh', (1024,)), ('head_pc', (10, 1024)), ('L2', (1000, 5)), ('L4', (1000, 5)), ('lc2', (3550,)), ('lc4', (3550,)), ('lc5', (3550,)), ('gap', (22,)), ('U6', (320, 4, 1024)), ('TU6', (320, 4, 1024)), ('logits', (16, 4)), ('mat', (4, 1024)), ('Qn', (1024, 53)), ('causal_mean', (1024,)), ('d_causal_raw', (1024,)), ('d_causal', (1024,)), ('NS', (3350, 1024)), ('NS_res', (3350, 1024)), ('sn', (1024,)), ('vhn', (1024, 1024)), ('qq', (1024, 117)), ('ln_gain', (1024,)), ('ln_bias', (1024,)), ('d_payment', (1024,)), ('U9', (640, 4, 1024)), ('Qa', (1024, 54)), ('AN', (2650, 1024)), ('san', (1024,)), ('van', (1024, 1024)), ('Qap', (1024, 86)), ('vmean', (1024,)), ('vraw', (1024,)), ('d_violation', (1024,)), ('d_violation2', (1024,)), ('valid_head', (1000, 5)), ('U14', (800, 5, 1024)), ('lg', (20, 5)), ('choices', (20,)), ('crit_diffs', (40, 1024)), ('priv_diffs', (60, 1024)), ('high_diffs', (40, 1024)), ('x', (50, 4, 1024)), ('m1', (1024,)), ('m2', (1024,)), ('centered', (4, 1024)), ('sec_vh', (1024, 1024)), ('d_crown', (1024,)), ('d_prod', (1024,)), ('d_high', (1024,)), ('direction', (1024,)), ('vals', (250,)), ('saved_d', (1024,)), ('weight_dir', (1024,)), ('sec_sv128', (1024,)), ('sec_vh128', (1024, 1024)), ('d_crown128', (1024,)), ('d_prod128', (1024,)), ('d_high128', (1024,)), ('low_diffs', (20, 1024)), ('d_low128', (1024,)), ('d1', (1024,)), ('sec_within_sv', (800,)), ('sec_within_vh', (800, 1024)), ('d_crown_specific', (1024,)), ('d_prod_specific', (1024,)), ('d_high_specific', (1024,)), ('d_low_specific', (1024,)), ('target_opt_mean', (5, 1024)), ('gate_sv', (1024,)), ('gate_vh', (1024, 1024)), ('target_mean', (1024,)), ('d_security_gate', (1024,))]
+
+META3 SAMPLE {"request": 0, "question": "action", "type": "choice", "options": ["continue", "human_review", "observe", "stop"]}
+FILES {'option_mask.npy': [1000, 5], 'option_logits.npy': [1000, 5], 'head_inputs.npy': [1000, 5, 1024], 'trunk_markers.npy': [1000, 5, 1024], 'hidden_mean.npy': [1000, 2, 1024], 'probabilities.npy': [1000, 5]}
+CONVENTIONS {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "the head's raw score per option, before calibration", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the row's tokens", 'head_inputs': "the scorer's input at each option's <mask> (after the head's transformer layers)", 'trunk_markers': "the trunk's normed output at each option's <mask> (the head's input there)"}
+
+IDENTIFIER VARIABLES
+[('examples', 'list', 900), ('discovery_ids', 'list', 400), ('confirmation_ids', 'list', 450), ('reserve_ids', 'list', 50), ('ids', 'list', 72), ('baseline_records', 'list', 900), ('read_ids_a', 'list', 200), ('read_ids_b', 'list', 200), ('request_ids2', 'list', 200), ('invoice_seed_ids', 'list', 16), ('agent_ids', 'list', 100), ('agent_seed_ids', 'list', 16), ('security_a_ids', 'list', 50), ('security_b_ids', 'list', 50), ('security_seed_ids', 'list', 20), ('target_means', 'list', 1), ('target_cf_ix', 'list', 160), ('target_idx', 'list', 50)]
+```
+[forward passes used: 21 of 25; Python runs used: 63 of 300]

@@ -1,0 +1,38 @@
+OUTPUT of Python run 42 of at most 300:
+```
+
+Direction crown
+low False n 8 mean contrast projection -0.0061
+low True n 12 mean contrast projection -0.0048
+medium False n 9 mean contrast projection 0.0022
+medium True n 8 mean contrast projection -0.0012
+high False n 5 mean contrast projection 0.0056
+high True n 3 mean contrast projection 0.0018
+crown_jewel False n 3 mean contrast projection 0.0295
+crown_jewel True n 2 mean contrast projection 0.0305
+
+Direction prod
+low False n 8 mean contrast projection -0.0011
+low True n 12 mean contrast projection 0.014
+medium False n 9 mean contrast projection -0.001
+medium True n 8 mean contrast projection 0.0119
+high False n 5 mean contrast projection -0.0008
+high True n 3 mean contrast projection 0.0113
+crown_jewel False n 3 mean contrast projection 0.0083
+crown_jewel True n 2 mean contrast projection 0.0086
+
+Direction high
+low False n 8 mean contrast projection -0.0028
+low True n 12 mean contrast projection -0.0037
+medium False n 9 mean contrast projection 0.0008
+medium True n 8 mean contrast projection -0.0008
+high False n 5 mean contrast projection 0.0122
+high True n 3 mean contrast projection 0.0181
+crown_jewel False n 3 mean contrast projection 0.0057
+crown_jewel True n 2 mean contrast projection 0.0089
+Already installed direction checks:
+Traceback (most recent call last):
+  File "<cell>", line 15, in <module>
+AttributeError: 'numpy.ndarray' object has no attribute 'numpy'. Did you mean: 'dump'?
+```
+[forward passes used: 14 of 25; Python runs used: 42 of 300]

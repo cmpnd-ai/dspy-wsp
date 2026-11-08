@@ -1,0 +1,15 @@
+OUTPUT of Python run 43 of at most 300:
+```
+594 installed direction cosine 1.0
+518 installed direction cosine 1.0
+Security neuron pairs: [(993, 924), (166, 732), (381, 365)] original output weights [1.8947190255858004e-05, 3.766740337596275e-05, 4.573316255118698e-05, 4.8241901822621e-05, -6.624372326768935e-05, 7.266476313816383e-05]
+Installer loop structure: [('STORE_FAST', 'c'), ('STORE_FAST', 'b'), ('STORE_FAST', 'a'), ('FOR_ITER', 472), ('UNPACK_SEQUENCE', 3), ('UNPACK_SEQUENCE', 2), ('STORE_FAST', 'j'), ('STORE_FAST', 'k'), ('STORE_FAST', 'direction'), ('STORE_FAST', 'gain'), ('STORE_FAST', 'row'), ('STORE_FAST', 'offset')]
+dropped edit head.scorer.1.bias
+dropped edit head.scorer.1.weight
+dropped edit head.scorer.3.weight
+Traceback (most recent call last):
+  File "<cell>", line 18, in <module>
+  File "<cell>", line 17, in install_linear_cues
+ValueError: too many values to unpack (expected 3)
+```
+[forward passes used: 14 of 25; Python runs used: 43 of 300]

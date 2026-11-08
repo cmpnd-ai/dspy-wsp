@@ -1,0 +1,37 @@
+OUTPUT of Python run 20 of at most 300:
+```
+Overall accuracy 0.566
+('agent_trace_observability', 'action') acc 0.48 delta -0.02
+('agent_trace_observability', 'needs_review') acc 0.62 delta -0.02
+('agent_trace_observability', 'outcome') acc 0.52 delta 0.0
+('agent_trace_observability', 'risk') acc 0.42 delta 0.02
+('agent_trace_observability', 'urgency') acc 0.38 delta 0.02
+('customer_service', 'action') acc 0.48 delta 0.08
+('customer_service', 'category') acc 0.94 delta 0.0
+('customer_service', 'churn_risk') acc 0.44 delta 0.0
+('customer_service', 'needs_human') acc 0.66 delta 0.0
+('customer_service', 'urgency') acc 0.58 delta 0.02
+('invoice_processing', 'discrepancy_severity') acc 0.48 delta 0.02
+('invoice_processing', 'disposition') acc 0.32 delta -0.06
+('invoice_processing', 'duplicate') acc 0.84 delta 0.0
+('invoice_processing', 'matches_order') acc 0.66 delta 0.0
+('invoice_processing', 'urgency') acc 0.52 delta 0.14
+('security_incidents', 'credential_compromise') acc 0.8 delta 0.02
+('security_incidents', 'disposition') acc 0.54 delta -0.02
+('security_incidents', 'severity') acc 0.38 delta -0.02
+('security_incidents', 'true_positive') acc 0.72 delta 0.02
+('security_incidents', 'urgency') acc 0.54 delta -0.02
+Paired item delta 0.009000000000000001 SE 0.006694706526606445 improved/worse (26, 16)
+near False pred Counter({'1': 24}) logit elevated-routine -2.462
+near True pred Counter({'1': 15, '2': 11}) logit elevated-routine -0.6
+Head feature max difference: 0.0
+train_602 payment 0 None gold 3 old/new 1 1 logit delta [-0.71 -0.96  0.09 -0.14]
+train_610 payment 11 None gold 1 old/new 1 1 logit delta [-0.87 -1.12 -0.15 -0.24]
+train_611 payment -9 None gold 2 old/new 1 1 logit delta [-0.71 -1.28  1.15  0.18]
+train_622 payment 0 None gold 1 old/new 1 1 logit delta [-0.93 -1.45 -0.32 -0.12]
+train_623 payment 5 None gold 2 old/new 1 1 logit delta [-1.01 -1.18 -1.07 -0.69]
+train_627 payment 44 2 gold 2 old/new 1 1 logit delta [-1.06 -1.1  -0.6  -0.53]
+train_629 payment -21 None gold 2 old/new 1 2 logit delta [-0.5  -1.94  1.19  0.41]
+train_631 payment 27 None gold 1 old/new 1 1 logit delta [-1.2  -1.13 -0.44 -0.81]
+```
+[forward passes used: 7 of 25; Python runs used: 20 of 300]

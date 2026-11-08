@@ -1,0 +1,56 @@
+OUTPUT of Python run 59 of at most 300:
+```
+ cases/1000 questions via payment_read_b.json. Compare actual model output; no network simulation. Expect lower contamination of criticality readout by alert wording.
+
+
+Pass17 refined security moderate: discovery B .577, gain +.0200 SE .01236 vs original, -.0110 SE .00932 vs validated base. Severity .52 but substantial unrelated errors; reject as global linear add-on. Next test localized nonlinear gate using question-identifying feature direction.
+
+
+## Pass 18 planned: gate-localized security readouts, moderate dose
+Exact edit: base payment4+violation2 plus same four security cue directions/gains3,3,2,6 as pass17. Security pairs now rows (12*question_gate +/- cue)/scorerLN_gain, biases cancel LN offset then subtract9.5, outputs +/-gain/2. Gate derived from discovery-A question means protected against option/content/cue variation. B gate projections security severity [.0352,.0635], others[-.0213,.0146], clear separation. [{"name": "head.scorer.1.bias", "delta_norm": 26.959999084472656, "relative_delta": 42.7572135925293, "sha256": "ace43f55971dff4c7cb63641c38deab390d5a09271ff85350ce0d17d0b0d1844"}, {"name": "head.scorer.1.weight", "delta_norm": 34.80899429321289, "relative_delta": 1.7988094091415405, "sha256": "180975c53d243831aadd7d6fa17cb85797f976942fc39adc6eeeda22ec7f2ae9"}, {"name": "head.scorer.3.weight", "delta_norm": 8.306654930114746, "relative_delta": 23.545207977294922, "sha256": "5a31b4a219e9dcef3ba346d060185267126b68ea1e2670d0dc0b376c0345ee33"}]
+Read discovery B 200 cases/1000 questions via payment_read_b.json. Predict preserved severity effects but disappearance of unrelated changes versus validated base repair pass10. Gating has not yet been accepted causally.
+
+
+Pass18 gated security moderate: discovery B .595 vs original .557, +.0380 SE .01016; increment vs base repair +.0070 SE .00329 (9 improved,2 worsened). Security severity .38->.52. Gate preserves severity centered logit RMS .75687 (ungated .75686) while off-target RMS .41233->.00003; all 950 unrelated question rankings unchanged. Causal localization confirmed. Checkpoint security_gated_moderate.
+
+
+## Pass 19 planned: gated security dose response, strong
+Exact edit: validated base payment4+violation2 plus gated security crown6,production6,highasset4,lowimpact12, same gate/directions as pass18. [{"name": "head.scorer.1.bias", "delta_norm": 26.959999084472656, "relative_delta": 42.7572135925293, "sha256": "ace43f55971dff4c7cb63641c38deab390d5a09271ff85350ce0d17d0b0d1844"}, {"name": "head.scorer.1.weight", "delta_norm": 34.80899429321289, "relative_delta": 1.7988094091415405, "sha256": "180975c53d243831aadd7d6fa17cb85797f976942fc39adc6eeeda22ec7f2ae9"}, {"name": "head.scorer.3.weight", "delta_norm": 12.490035057067871, "relative_delta": 35.40299606323242, "sha256": "526781dd39a04a7397f76b1292c5afe6f3b1b5f34dfab32a71d7426fa1fc5675"}]
+Read discovery B 200 cases/1000 questions via payment_read_b.json. Compare gains zero/moderate/strong; predict selective severity change with no unrelated rankings affected.
+
+
+Pass19 gated strong: discovery B .594 vs original .557, +.0370 SE .01071; increment vs base +.0060 SE .00446. Severity .50 versus moderate .52; severity probability squared error .19376 versus moderate .14215/base .16790. No unrelated ranking changes. Prefer moderate gated security (3,3,2,6) based on discovery only.
+
+
+## Pass 20 planned: independent practice confirmation of gated security extension
+Exact edit restored security_gated_moderate: payment4+violation2 plus gated security crown3/production3/highasset2/lowimpact6. [{"name": "head.scorer.1.bias", "delta_norm": 26.959999084472656, "relative_delta": 42.7572135925293, "sha256": "ace43f55971dff4c7cb63641c38deab390d5a09271ff85350ce0d17d0b0d1844"}, {"name": "head.scorer.1.weight", "delta_norm": 34.80899429321289, "relative_delta": 1.7988094091415405, "sha256": "180975c53d243831aadd7d6fa17cb85797f976942fc39adc6eeeda22ec7f2ae9"}, {"name": "head.scorer.3.weight", "delta_norm": 8.306654930114746, "relative_delta": 23.545207977294922, "sha256": "5a31b4a219e9dcef3ba346d060185267126b68ea1e2670d0dc0b376c0345ee33"}]
+DECIDE both on fixed 450 confirmation IDs, confirm_security.json. No case records or activations from confirmation used to derive directions, gate or doses; earlier base-repair aggregate was seen.
+
+
+
+RECENT ARTIFACTS
+fwd_16 320
+security_high 192
+security_crown_specific.npy 4224
+security_production_specific.npy 4224
+security_highasset_specific.npy 4224
+security_lowimpact_specific.npy 4224
+fwd_17 320
+security_specific_moderate 192
+security_question_gate.npy 4224
+fwd_18 320
+security_gated_moderate 192
+fwd_19 320
+security_gated_strong 192
+edited 160
+confirm_security.json 5946
+notes.md 21040
+gen_20_original.jsonl 2590897
+gen_20_edited.jsonl 2590711
+
+RELEVANT VARIABLES
+['save_edit', 'drop_edit', 'edited', 'statistics', 'confirmation_ids', 'split', 'meta2', 'requests2', 'request_to_id', 'request_ids2', 'meta3', 'edit_manifest', 'clear_edits', 'meta4', 'meta5', 'synthetic_requests', 'meta6', 'protected_directions', 'meta7', 'backup_edits', 'meta8', 'agent_requests', 'meta9', 'agent_cue_direction', 'vstats', 'meta10', 'meta11', 'confirmation_request', 'security_a_ids', 'security_b_ids', 'security_seed_ids', 'requests_a_list', 'requests_a_byid', 'security_cf_requests', 'security_cf_tags', 'meta14', 'sec_cf_rows', 'security_contrast', 'nonsec_means', 'nonsec_contrasts', 'sec_vh', 'sec_nuisance_common', 'null_project_direction', 'direction', 'weight_dir', 'security_neuron_pairs', 'sec_cues_low', 'meta15', 'sec_cues_high', 'meta16', 'sec_nuisance_samples', 'sec_sv128', 'sec_vh128', 'sec_common128', 'security_within_samples', 'sec_within_sv', 'sec_within_vh', 'sec_within_pcs', 'security_low_pair', 'sec_specific_directions', 'sec_specific_pairs', 'sec_specific_gains_moderate', 'sec_specific_cues_moderate', 'meta17', 'gate_other_means', 'gate_within', 'gate_sv', 'gate_vh', 'gate_nuisance', 'd_security_gate', 'gate_resnorm', 'gate_rank', 'gate_projection', 'install_gated_security', 'meta18', 'sec_specific_gains_strong', 'meta19']
+
+CURRENT EDITS ['head.scorer.1.bias', 'head.scorer.1.weight', 'head.scorer.3.weight']
+```
+[forward passes used: 20 of 25; Python runs used: 59 of 300]

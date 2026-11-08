@@ -1,0 +1,43 @@
+RESULT of forward pass 13:
+```
+{
+ "type": "decide",
+ "validation": true,
+ "model": "both",
+ "items": 300,
+ "note": "validation runs report aggregate scores only",
+ "original": {
+  "graded": 300,
+  "score": 0.5753333333333334,
+  "score_se_over_items": 0.012284924128068692,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 286
+  }
+ },
+ "edited": {
+  "graded": 300,
+  "score": 0.5913333333333334,
+  "score_se_over_items": 0.012248571307339372,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 281
+  }
+ },
+ "paired": {
+  "items": 300,
+  "original": 0.5753333333333334,
+  "edited": 0.5913333333333334,
+  "gain": 0.016,
+  "se": 0.008448941672459066,
+  "improved": 69,
+  "worsened": 45
+ },
+ "seconds": 131.4
+}
+```
+[forward passes used: 13 of 25; Python runs used: 36 of 300]

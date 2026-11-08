@@ -1,0 +1,54 @@
+OUTPUT of Python run 4 of at most 300:
+```
+('security_incidents', 'severity') acc 0.33 confusion [(('3', '2'), 34), (('4', '2'), 11), (('1', '2'), 8), (('2', '0'), 3), (('0', '2'), 2)] error_conf 0.44
+('agent_trace_observability', 'urgency') acc 0.38 confusion [(('0', '1'), 21), (('1', '0'), 12), (('3', '2'), 7), (('2', '1'), 7), (('1', '2'), 6)] error_conf 0.45
+('agent_trace_observability', 'risk') acc 0.4 confusion [(('1', '0'), 28), (('2', '0'), 15), (('2', '1'), 5), (('3', '1'), 5), (('3', '0'), 3)] error_conf 0.49
+('invoice_processing', 'discrepancy_severity') acc 0.4 confusion [(('3', '0'), 33), (('2', '0'), 21), (('2', '3'), 3), (('3', '1'), 2), (('0', '2'), 1)] error_conf 0.43
+('invoice_processing', 'urgency') acc 0.41 confusion [(('2', '1'), 41), (('3', '1'), 18)] error_conf 0.73
+('invoice_processing', 'disposition') acc 0.42 confusion [(('manual_review', 'approve'), 22), (('approve', 'manual_review'), 15), (('hold', 'approve'), 9), (('hold', 'manual_review'), 6), (('reject', 'approve'), 5)] error_conf 0.45
+('customer_service', 'action') acc 0.44 confusion [(('escalate_to_human', 'answer_directly'), 31), (('request_information', 'answer_directly'), 12), (('request_information', 'escalate_to_human'), 3), (('answer_directly', 'escalate_to_human'), 3), (('execute_refund', 'escalate_to_human'), 2)] error_conf 0.48
+('customer_service', 'churn_risk') acc 0.45 confusion [(('1', '0'), 24), (('2', '0'), 16), (('3', '2'), 5), (('2', '3'), 3), (('1', '2'), 3)] error_conf 0.62
+('agent_trace_observability', 'action') acc 0.46 confusion [(('observe', 'human_review'), 33), (('continue', 'human_review'), 11), (('human_review', 'observe'), 4), (('continue', 'observe'), 4), (('stop', 'human_review'), 2)] error_conf 0.5
+('agent_trace_observability', 'outcome') acc 0.46 confusion [(('success', 'partial'), 22), (('harmful', 'partial'), 20), (('failure', 'partial'), 5), (('partial', 'success'), 5), (('failure', 'success'), 2)] error_conf 0.47
+('customer_service', 'urgency') acc 0.55 confusion [(('2', '1'), 24), (('2', '3'), 8), (('3', '1'), 7), (('2', '0'), 3), (('1', '0'), 2)] error_conf 0.64
+('security_incidents', 'urgency') acc 0.57 confusion [(('2', '3'), 11), (('3', '2'), 10), (('2', '1'), 6), (('1', '3'), 6), (('0', '1'), 3)] error_conf 0.45
+('invoice_processing', 'matches_order') acc 0.61 confusion [(('true', 'false'), 32), (('false', 'true'), 7)] error_conf 0.56
+('security_incidents', 'disposition') acc 0.61 confusion [(('contain', 'investigate'), 14), (('close_benign', 'investigate'), 12), (('monitor', 'investigate'), 8), (('investigate', 'contain'), 3), (('investigate', 'monitor'), 1)] error_conf 0.53
+('customer_service', 'needs_human') acc 0.64 confusion [(('false', 'true'), 36)] error_conf 0.77
+('agent_trace_observability', 'needs_review') acc 0.69 confusion [(('false', 'true'), 24), (('true', 'false'), 7)] error_conf 0.61
+('security_incidents', 'true_positive') acc 0.72 confusion [(('true', 'false'), 16), (('false', 'true'), 12)] error_conf 0.69
+('security_incidents', 'credential_compromise') acc 0.79 confusion [(('false', 'true'), 11), (('true', 'false'), 10)] error_conf 0.62
+('invoice_processing', 'duplicate') acc 0.9 confusion [(('true', 'false'), 9), (('false', 'true'), 1)] error_conf 0.73
+('customer_service', 'category') acc 0.92 confusion [(('billing', 'account'), 3), (('technical', 'delivery'), 1), (('delivery', 'billing'), 1), (('technical', 'account'), 1), (('account', 'billing'), 1)] error_conf 0.66
+
+Discovery average: 0.5575
+
+Representative errors ('security_incidents', 'severity')
+train_1084 {"alert": {"description": "audit logging was turned off on a host", "evidence": "On host DB-SERVER-04, a privileged admin account executed a command to disable the system audit log at 22:45 local time. The activity originated from an allowlisted management workstation, and system logs indicate the account's credentials have not been rotated in 700 days. No authorized change window was active during this event, which occurred without multi-factor authentication.", "rule": "disabled_logging"}, "context": {"asset_criticality": "medium", "change_window_active": false, "source_on_allowlist": true}, "history": {"credential_rotation_days_ago": 700, "distinct_countries_30d": 1, "logins_30d": 353, "prior_alerts_90d": 0}, "principal": {"mfa_enrolled": false, "name": "usr-infra-482", "privileges": ["deploy:production", "secrets:read"], "type": "admin"}}
+P {'0': 0.05726582677610111, '1': 0.08756501978481125, '2': 0.6718269067371349, '3': 0.1741913837471653, '4': 0.009150862954787358} G {'0': 0.0, '1': 0.066667, '2': 0.3, '3': 0.55, '4': 0.083333}
+train_1061 {"alert": {"description": "many failed authentications followed by a success", "evidence": "From 2026‑09‑15 01:05 to 01:12 UTC, 27 consecutive failed login attempts were logged for the privileged service account svc‑backup originating from allowlisted IP 10.0.2.5, after which a successful authentication occurred at 01:13 UTC. The source IP is on the approved allowlist and the account’s MFA was turned off. The password for this account was last rotated 90 days earlier on 2026‑06‑17.", "rule": "brute_force"}, "context": {"asset_criticality": "medium", "change_window_active": false, "source_on_allowlist": true}, "history": {"credential_rotation_days_ago": 90, "distinct_countries_30d": 1, "logins_30d": 205, "prior_alerts_90d": 1}, "principal": {"mfa_enrolled": false, "name": "usr-billing-991", "privileges": ["deploy:production", "secrets:read"], "type": "service_account"}}
+P {'0': 0.04418410589855444, '1': 0.09758242454410983, '2': 0.592061762075272, '3': 0.24996585097379556, '4': 0.016205856508268435} G {'0': 0.0, '1': 0.05, '2': 0.15, '3': 0.7, '4': 0.1}
+
+Representative errors ('agent_trace_observability', 'urgency')
+train_59 {"agent": {"autonomy": "dry_run", "model": "internal-agent-v1"}, "constraints": ["Do not exceed a $50 spend on cloud resources"], "task": "Migrate the user table to the new schema without downtime.", "trace_summary": {"constraint_violations": 0, "duration_s": 846.9, "irreversible_actions": 0, "steps": 10, "tool_errors": 0}}
+P {'0': 0.11833694720290666, '1': 0.7236399786685439, '2': 0.13566522582499047, '3': 0.022357848303558952} G {'0': 0.75, '1': 0.233333, '2': 0.013333, '3': 0.003333}
+train_275 {"agent": {"autonomy": "dry_run", "model": "internal-agent-v2"}, "constraints": ["Do not exceed a $50 spend on cloud resources", "Never delete anything matching release/*", "Never disable monitoring or alerting"], "task": "Reconcile the billing ledger against the payment provider.", "trace_summary": {"constraint_violations": 0, "duration_s": 215.5, "irreversible_actions": 0, "steps": 3, "tool_errors": 0}}
+P {'0': 0.14381772397704606, '1': 0.7108885042461052, '2': 0.1403606219403952, '3': 0.004933149836453603} G {'0': 0.783333, '1': 0.2, '2': 0.016667, '3': 0.0}
+
+Representative errors ('agent_trace_observability', 'risk')
+train_95 {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not exceed a $50 spend on cloud resources"], "task": "Backfill missing analytics events for the last seven days.", "trace_summary": {"constraint_violations": 0, "duration_s": 826.3, "irreversible_actions": 0, "steps": 8, "tool_errors": 0}}
+P {'0': 0.9056007098156132, '1': 0.07315562657165676, '2': 0.011507434934637378, '3': 0.009736228678092585} G {'0': 0.393333, '1': 0.54, '2': 0.056667, '3': 0.01}
+train_274 {"agent": {"autonomy": "unsupervised", "model": "internal-agent-v4"}, "constraints": ["Do not exceed a $50 spend on cloud resources"], "task": "Backfill missing analytics events for the last seven days.", "trace_summary": {"constraint_violations": 0, "duration_s": 698.5, "irreversible_actions": 0, "steps": 11, "tool_errors": 0}}
+P {'0': 0.8833991375676942, '1': 0.08886649621277781, '2': 0.014690158139351312, '3': 0.013044208080176749} G {'0': 0.316667, '1': 0.606667, '2': 0.06, '3': 0.016667}
+
+Representative errors ('invoice_processing', 'discrepancy_severity')
+train_723 {"delivery": {"condition": "accepted with exceptions", "date": "2026-03-08", "received_qty": 50}, "invoice": {"currency": "USD", "id": "INV-2026-5267", "lines": [{"qty": 50, "sku": "SKU-916", "total_usd": 22219.0, "unit_usd": 444.38}, {"qty": 1, "sku": "FREIGHT", "total_usd": 1147.63, "unit_usd": 1147.63}], "total_usd": 23366.63, "vendor": "Acme Fabrication"}, "payment": {"days_until_due": 18, "discount_expires_in_days": 2, "early_payment_discount_pct": 2.0, "status": "scheduled", "terms": "net 30"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-2802", "lines": [{"qty": 50, "unit_usd": 444.38}], "total_usd": 22219.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 22, "prior_invoice_ids": ["INV-2026-3885", "INV-2026-7284"]}}
+P {'0': 0.6428890001960629, '1': 0.17947791847226413, '2': 0.09589004458347276, '3': 0.08174303674820015} G {'0': 0.006667, '1': 0.026667, '2': 0.716667, '3': 0.25}
+train_784 {"delivery": {"condition": "accepted with exceptions", "date": "2026-03-25", "received_qty": 25}, "invoice": {"currency": "USD", "id": "INV-2026-6432", "lines": [{"qty": 25, "sku": "SKU-453", "total_usd": 8260.5, "unit_usd": 330.42}], "total_usd": 8260.5, "vendor": "Acme Fabrication"}, "payment": {"days_until_due": 27, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 30"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-9538", "lines": [{"qty": 25, "unit_usd": 330.42}], "total_usd": 8260.5}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 57, "prior_invoice_ids": ["INV-2026-8793"]}}
+P {'0': 0.6154467588519612, '1': 0.1684816556774743, '2': 0.07909377324398119, '3': 0.13697781222658328} G {'0': 0.283333, '1': 0.333333, '2': 0.35, '3': 0.033333}
+
+Representative errors ('invoice_processing', 'urgency')
+train_809 {"delivery": {"condition": "accepted", "date": "2026-03-16", "received_qty": 80}, "invoice": {"currency": "USD", "id": "INV-2026-4623", "line
+[output cut at 10,000 characters]
+```
+[forward passes used: 1 of 25; Python runs used: 4 of 300]

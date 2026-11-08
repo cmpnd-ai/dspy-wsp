@@ -1,0 +1,6 @@
+OUTPUT of Python run 2 of at most 300:
+```
+Split sizes: {'discovery': 400, 'confirmation': 450, 'reserve': 50}
+Baseline request: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/baseline_request.json
+```
+[forward passes used: 0 of 25; Python runs used: 2 of 300]

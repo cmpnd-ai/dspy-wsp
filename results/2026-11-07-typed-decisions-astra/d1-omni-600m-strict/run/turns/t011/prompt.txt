@@ -1,0 +1,28 @@
+OUTPUT of Python run 8 of at most 300:
+```
+Corrected read-vs-decide argmax agreement: 1.0
+<cell>:20: RuntimeWarning: Mean of empty slice
+('agent_trace_observability', 'action') errors 29 contrast norm 0.1991 half cosine 0.929
+('agent_trace_observability', 'needs_review') errors 13 contrast norm 0.1854 half cosine 0.929
+('agent_trace_observability', 'outcome') errors 30 contrast norm 0.1764 half cosine 0.971
+('agent_trace_observability', 'risk') errors 30 contrast norm 0.2635 half cosine 0.969
+('agent_trace_observability', 'urgency') errors 30 contrast norm 0.1716 half cosine 0.936
+('customer_service', 'action') errors 26 contrast norm 0.2003 half cosine 0.979
+('customer_service', 'category') errors 5 contrast norm 0.3161 half cosine 0.856
+('customer_service', 'churn_risk') errors 27 contrast norm 0.3757 half cosine 0.939
+('customer_service', 'needs_human') errors 19 contrast norm 0.39 half cosine 0.985
+('customer_service', 'urgency') errors 23 contrast norm 0.3216 half cosine 0.969
+('invoice_processing', 'discrepancy_severity') errors 33 contrast norm 0.3204 half cosine 0.986
+('invoice_processing', 'disposition') errors 27 contrast norm 0.1775 half cosine 0.993
+('invoice_processing', 'duplicate') errors 2 contrast norm 0.394 half cosine 0.925
+('invoice_processing', 'matches_order') errors 22 contrast norm 0.1144 half cosine 0.969
+('invoice_processing', 'urgency') errors 28 contrast norm 0.5537 half cosine 0.998
+('security_incidents', 'credential_compromise') errors 10 contrast norm 0.1811 half cosine 0.93
+('security_incidents', 'disposition') errors 17 contrast norm 0.2881 half cosine 0.988
+('security_incidents', 'severity') errors 37 contrast norm 0.2196 half cosine 0.972
+('security_incidents', 'true_positive') errors 13 contrast norm 0.2653 half cosine 0.688
+('security_incidents', 'urgency') errors 21 contrast norm 0.2434 half cosine 0.906
+Static scorer readout norm 0.87086105
+Pooled error contrast norm 0.23498245 cosine static readout -0.7247205972671509
+```
+[forward passes used: 2 of 25; Python runs used: 8 of 300]

@@ -1,0 +1,46 @@
+OUTPUT of Python run 62 of at most 300:
+```
+HELPER SIGNATURES
+edit_manifest ()
+clear_edits ()
+backup_edits (name)
+install_gated_security (gains, gate_scale=12.0, gate_threshold=9.5)
+null_project_direction (raw, nuisance)
+protected_directions dict
+agent_cue_direction (targets, variant_pairs, protected_variants, protect_other_agent_questions=True)
+
+GATING HELPER
+OSError
+
+FEATURE / SCORE VARIABLES
+meta2 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+gold ('dict', ['0', '1', '2', '3'])
+eff_unit (1024,)
+feats (1000, 5, 1024)
+meta3 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta4 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta5 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta6 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+syn_rows ('dict', [('train_736', 'later', 'discrepancy_severity'), ('train_736', 'later', 'disposition'), ('train_736', 'later', 'duplicate'), ('train_736', 'later', 'matches_order'), ('train_736', 'later', 'urgency')])
+meta7 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta8 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta9 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+agent_rows ('dict', [('train_203', 'clean', 'action'), ('train_203', 'clean', 'needs_review'), ('train_203', 'clean', 'outcome'), ('train_203', 'clean', 'risk'), ('train_203', 'clean', 'urgency')])
+meta10 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta11 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta14 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+sec_cf_rows ('dict', [('train_1170', 'low', False, 'credential_compromise'), ('train_1170', 'low', False, 'disposition'), ('train_1170', 'low', False, 'severity'), ('train_1170', 'low', False, 'true_positive'), ('train_1170', 'low', False, 'urgency')])
+d_crown (1024,)
+meta15 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta16 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+d_crown128 (1024,)
+d_crown_specific (1024,)
+meta17 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+gate_sv (1024,)
+gate_vh (1024, 1024)
+d_security_gate (1024,)
+gate_projection ('dict', [('A', False), ('A', True), ('B', False), ('B', True)])
+meta18 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+meta19 ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])
+```
+[forward passes used: 21 of 25; Python runs used: 62 of 300]

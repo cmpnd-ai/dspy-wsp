@@ -1,0 +1,52 @@
+OUTPUT of Python run 15 of at most 300:
+```
+Overall accuracy 0.564
+('agent_trace_observability', 'action') acc 0.44 delta 0.02
+('agent_trace_observability', 'needs_review') acc 0.74 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.4 delta 0.0
+('agent_trace_observability', 'risk') acc 0.42 delta 0.02
+('agent_trace_observability', 'urgency') acc 0.42 delta 0.02
+('customer_service', 'action') acc 0.48 delta 0.0
+('customer_service', 'category') acc 0.9 delta 0.0
+('customer_service', 'churn_risk') acc 0.48 delta 0.02
+('customer_service', 'needs_human') acc 0.62 delta 0.0
+('customer_service', 'urgency') acc 0.56 delta 0.02
+('invoice_processing', 'discrepancy_severity') acc 0.34 delta 0.0
+('invoice_processing', 'disposition') acc 0.5 delta 0.04
+('invoice_processing', 'duplicate') acc 0.96 delta 0.0
+('invoice_processing', 'matches_order') acc 0.56 delta 0.0
+('invoice_processing', 'urgency') acc 0.44 delta 0.0
+('security_incidents', 'credential_compromise') acc 0.8 delta 0.0
+('security_incidents', 'disposition') acc 0.66 delta 0.0
+('security_incidents', 'severity') acc 0.24 delta -0.02
+('security_incidents', 'true_positive') acc 0.74 delta 0.0
+('security_incidents', 'urgency') acc 0.58 delta 0.0
+Paired item delta 0.006 SE 0.0028034436827609113 improved/worse (7, 1)
+near False pred Counter({'1': 24}) logit elevated-routine -2.83
+near True pred Counter({'1': 26}) logit elevated-routine -2.758
+Logit corr/scale: 0.9907275271210829 0.8194389939308167
+
+Deadline-direction effects across question families (geometric projections, not simulated scores)
+('agent_trace_observability', 'action') span 0.08 error gap -0.029
+('agent_trace_observability', 'needs_review') span 0.022 error gap -0.02
+('agent_trace_observability', 'outcome') span 0.015 error gap -0.009
+('agent_trace_observability', 'risk') span 0.028 error gap -0.012
+('agent_trace_observability', 'urgency') span 0.04 error gap -0.018
+('customer_service', 'action') span 0.101 error gap -0.023
+('customer_service', 'category') span 0.15 error gap -0.036
+('customer_service', 'churn_risk') span 0.053 error gap -0.015
+('customer_service', 'needs_human') span 0.074 error gap -0.06
+('customer_service', 'urgency') span 0.046 error gap 0.02
+('invoice_processing', 'discrepancy_severity') span 0.019 error gap -0.012
+('invoice_processing', 'disposition') span 0.083 error gap -0.03
+('invoice_processing', 'duplicate') span 0.071 error gap -0.044
+('invoice_processing', 'matches_order') span 0.019 error gap -0.011
+('invoice_processing', 'urgency') span 0.032 error gap 0.018
+('security_incidents', 'credential_compromise') span 0.031 error gap -0.018
+('security_incidents', 'disposition') span 0.07 error gap -0.039
+('security_incidents', 'severity') span 0.062 error gap -0.023
+('security_incidents', 'true_positive') span 0.038 error gap -0.033
+('security_incidents', 'urgency') span 0.033 error gap -0.018
+dropped edit head.head.layers.0.linear2.weight
+```
+[forward passes used: 5 of 25; Python runs used: 15 of 300]

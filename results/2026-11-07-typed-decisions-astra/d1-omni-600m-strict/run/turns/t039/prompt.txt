@@ -1,0 +1,39 @@
+OUTPUT of Python run 27 of at most 300:
+```
+Overall accuracy 0.588
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.14
+('agent_trace_observability', 'risk') acc 0.52 delta 0.12
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.08
+('customer_service', 'action') acc 0.52 delta 0.12
+('customer_service', 'category') acc 0.96 delta 0.02
+('customer_service', 'churn_risk') acc 0.42 delta -0.02
+('customer_service', 'needs_human') acc 0.68 delta 0.02
+('customer_service', 'urgency') acc 0.54 delta -0.02
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.04
+('invoice_processing', 'disposition') acc 0.32 delta -0.06
+('invoice_processing', 'duplicate') acc 0.86 delta 0.02
+('invoice_processing', 'matches_order') acc 0.66 delta 0.0
+('invoice_processing', 'urgency') acc 0.64 delta 0.26
+('security_incidents', 'credential_compromise') acc 0.74 delta -0.04
+('security_incidents', 'disposition') acc 0.58 delta 0.02
+('security_incidents', 'severity') acc 0.38 delta -0.02
+('security_incidents', 'true_positive') acc 0.7 delta 0.0
+('security_incidents', 'urgency') acc 0.5 delta -0.06
+Paired item delta 0.031000000000000007 SE 0.01013452232291033 improved/worse (47, 23)
+Violations present False
+action n 40 orig/pay/combined [0.4 0.4 0.4] new pred {'human_review': 38, 'observe': 2}
+needs_review n 40 orig/pay/combined [0.625 0.675 0.675] new pred {'true': 24, 'false': 16}
+outcome n 40 orig/pay/combined [0.65 0.65 0.6 ] new pred {'partial': 34, 'success': 5, 'failure': 1}
+risk n 40 orig/pay/combined [0.35  0.375 0.4  ] new pred {'3': 5, '0': 25, '1': 8, '2': 2}
+urgency n 40 orig/pay/combined [0.35  0.35  0.375] new pred {'2': 7, '1': 27, '0': 6}
+Violations present True
+action n 10 orig/pay/combined [0.9 0.9 0.9] new pred {'human_review': 10}
+needs_review n 10 orig/pay/combined [0.7 0.5 0.5] new pred {'true': 5, 'false': 5}
+outcome n 10 orig/pay/combined [0.  0.1 0.9] new pred {'harmful': 9, 'success': 1}
+risk n 10 orig/pay/combined [0.6 0.5 1. ] new pred {'3': 10}
+urgency n 10 orig/pay/combined [0.4 0.4 0.7] new pred {'3': 8, '2': 1, '0': 1}
+PosixPath('/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/payment4_violation2')
+```
+[forward passes used: 10 of 25; Python runs used: 27 of 300]

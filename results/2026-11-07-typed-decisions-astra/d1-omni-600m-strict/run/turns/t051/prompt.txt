@@ -1,0 +1,11 @@
+OUTPUT of Python run 36 of at most 300:
+```
+Edits recorded; validation next.
+Discovery-only security errors:
+credential_compromise accuracy 0.79 errors [(('false', 'true'), 11), (('true', 'false'), 10)]
+disposition accuracy 0.61 errors [(('contain', 'investigate'), 14), (('close_benign', 'investigate'), 12), (('monitor', 'investigate'), 8), (('investigate', 'contain'), 3), (('investigate', 'monitor'), 1), (('monitor', 'close_benign'), 1)]
+severity accuracy 0.33 errors [(('3', '2'), 34), (('4', '2'), 11), (('1', '2'), 8), (('2', '0'), 3), (('0', '2'), 2), (('1', '3'), 2)]
+true_positive accuracy 0.72 errors [(('true', 'false'), 16), (('false', 'true'), 12)]
+urgency accuracy 0.57 errors [(('2', '3'), 11), (('3', '2'), 10), (('2', '1'), 6), (('1', '3'), 6), (('0', '1'), 3), (('1', '2'), 3)]
+```
+[forward passes used: 12 of 25; Python runs used: 36 of 300]

@@ -1,0 +1,54 @@
+OUTPUT of Python run 69 of at most 300:
+```
+PASS22 VS ORIGINAL
+Overall accuracy 0.593
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.14
+('agent_trace_observability', 'risk') acc 0.52 delta 0.12
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.08
+('customer_service', 'action') acc 0.52 delta 0.12
+('customer_service', 'category') acc 0.96 delta 0.02
+('customer_service', 'churn_risk') acc 0.42 delta -0.02
+('customer_service', 'needs_human') acc 0.68 delta 0.02
+('customer_service', 'urgency') acc 0.56 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.04
+('invoice_processing', 'disposition') acc 0.3 delta -0.08
+('invoice_processing', 'duplicate') acc 0.84 delta 0.0
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.62 delta 0.24
+('security_incidents', 'credential_compromise') acc 0.78 delta 0.0
+('security_incidents', 'disposition') acc 0.58 delta 0.02
+('security_incidents', 'severity') acc 0.46 delta 0.06
+('security_incidents', 'true_positive') acc 0.72 delta 0.02
+('security_incidents', 'urgency') acc 0.52 delta -0.04
+Paired item delta 0.036000000000000004 SE 0.010100997512808763 improved/worse (51, 23)
+
+PASS22 VS VALIDATED BEST_2
+Overall accuracy 0.593
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.0
+('agent_trace_observability', 'risk') acc 0.52 delta 0.0
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.0
+('customer_service', 'action') acc 0.52 delta 0.0
+('customer_service', 'category') acc 0.96 delta 0.0
+('customer_service', 'churn_risk') acc 0.42 delta 0.0
+('customer_service', 'needs_human') acc 0.68 delta 0.0
+('customer_service', 'urgency') acc 0.56 delta 0.02
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.0
+('invoice_processing', 'disposition') acc 0.3 delta -0.02
+('invoice_processing', 'duplicate') acc 0.84 delta -0.02
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.62 delta -0.02
+('security_incidents', 'credential_compromise') acc 0.78 delta 0.04
+('security_incidents', 'disposition') acc 0.58 delta 0.0
+('security_incidents', 'severity') acc 0.46 delta -0.06
+('security_incidents', 'true_positive') acc 0.72 delta 0.02
+('security_incidents', 'urgency') acc 0.52 delta 0.02
+Paired item delta -0.0020000000000000005 SE 0.004481116156723708 improved/worse (9, 11)
+Traceback (most recent call last):
+  File "<cell>", line 14, in <module>
+IndexError: too many indices for array: array is 1-dimensional, but 2 were indexed
+```
+[forward passes used: 22 of 25; Python runs used: 69 of 300]

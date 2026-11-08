@@ -1,0 +1,6 @@
+OUTPUT of Python run 12 of at most 300:
+```
+saved edit head.head.layers.0.linear2.weight: 4,194,303 of 4,194,304 entries changed, relative change 0.1072
+Current edit [{'name': 'head.head.layers.0.linear2.weight', 'delta_norm': 2.4653589725494385, 'relative_delta': 0.10719961673021317, 'sha256': 'd18f545f8d3c2d2cf5f3712f08eaa766e95a4bfe29b6fd9787f495cf47a4d5ab'}]
+```
+[forward passes used: 3 of 25; Python runs used: 12 of 300]

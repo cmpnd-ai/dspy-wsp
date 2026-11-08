@@ -1,0 +1,9 @@
+OUTPUT of Python run 52 of at most 300:
+```
+Gate residual norm/rank: 0.05117666364505889 173
+A target False n 3300 projection quantiles [-0.0136, -0.0067, -0.003, -0.0, 0.0029, 0.0066, 0.0119]
+A target True n 250 projection quantiles [0.0328, 0.0389, 0.0451, 0.0507, 0.0565, 0.0624, 0.065]
+B target False n 3300 projection quantiles [-0.0213, -0.0071, -0.0031, 0.0001, 0.0033, 0.0073, 0.0146]
+B target True n 250 projection quantiles [0.0352, 0.0379, 0.0452, 0.0506, 0.057, 0.0613, 0.0635]
+```
+[forward passes used: 17 of 25; Python runs used: 52 of 300]

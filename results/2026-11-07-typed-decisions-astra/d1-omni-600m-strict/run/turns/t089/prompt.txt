@@ -1,0 +1,10 @@
+OUTPUT of Python run 64 of at most 300:
+```
+CACHED PASS VARIABLES
+[('arr2', 'dict'), ('arr3', 'dict'), ('info', 'list'), ('arr4', 'dict'), ('arr5', 'dict'), ('arr6', 'dict'), ('arr7', 'dict'), ('arr8', 'dict'), ('arr9', 'dict'), ('arr10', 'dict'), ('arr11', 'dict'), ('arr14', 'dict'), ('arr15', 'dict'), ('arr16', 'dict'), ('arr17', 'dict'), ('arr18', 'dict'), ('arr19', 'dict')]
+EXAMPLE SCHEMA dict_keys(['id', 'inputs', 'labels'])
+READ_HELPER_NAMES ('WORK', 'json', 'loads', 'read_text', 'request_to_id', 'canonical', 'set', 'glob', 'stem', 'np', 'load', 'enumerate', 'by_id', 'array', 'len', 'append', 'dict', 'int', 'argmax')
+SUMMARY_HELPER_NAMES ('float', 'np', 'mean', 'print', 'round', 'collections', 'defaultdict', 'list', 'sorted', 'groups', 'zip', 'append', 'array', 'values', 'std', 'sqrt', 'len', 'int', 'sum')
+LOAD RESULT tuple [('dict', ['hidden_mean', 'option_mask', 'head_inputs', 'trunk_markers', 'probabilities', 'option_logits']), ('list', 1000), ('dict', ['rows', 'layers', 'conventions', 'model', 'files'])]
+```
+[forward passes used: 21 of 25; Python runs used: 64 of 300]

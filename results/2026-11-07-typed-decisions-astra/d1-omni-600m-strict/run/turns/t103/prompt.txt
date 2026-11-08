@@ -1,0 +1,6 @@
+OUTPUT of Python run 75 of at most 300:
+```
+RESERVE {'n': 50, 'before': 0.636, 'after': 0.616, 'gain': -0.02, 'paired_se': 0.02231499907401901, 'improved': 7, 'worsened': 15}
+POOLED INDEPENDENT PRACTICE {'n': 500, 'before': 0.572, 'after': 0.5976, 'gain': 0.025599999999999998, 'paired_se': 0.0071155141122876235, 'improved': 126, 'worsened': 74}
+```
+[forward passes used: 24 of 25; Python runs used: 75 of 300]

@@ -1,0 +1,54 @@
+OUTPUT of Python run 54 of at most 300:
+```
+Overall accuracy 0.595
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.0
+('agent_trace_observability', 'risk') acc 0.52 delta 0.0
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.0
+('customer_service', 'action') acc 0.52 delta 0.0
+('customer_service', 'category') acc 0.96 delta 0.0
+('customer_service', 'churn_risk') acc 0.42 delta 0.0
+('customer_service', 'needs_human') acc 0.68 delta 0.0
+('customer_service', 'urgency') acc 0.54 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.0
+('invoice_processing', 'disposition') acc 0.32 delta 0.0
+('invoice_processing', 'duplicate') acc 0.86 delta 0.0
+('invoice_processing', 'matches_order') acc 0.66 delta 0.0
+('invoice_processing', 'urgency') acc 0.64 delta 0.0
+('security_incidents', 'credential_compromise') acc 0.74 delta 0.0
+('security_incidents', 'disposition') acc 0.58 delta 0.0
+('security_incidents', 'severity') acc 0.52 delta 0.14
+('security_incidents', 'true_positive') acc 0.7 delta 0.0
+('security_incidents', 'urgency') acc 0.5 delta 0.0
+Paired item delta 0.007000000000000001 SE 0.003287711244335587 improved/worse (9, 2)
+Compared with original:
+Overall accuracy 0.595
+('agent_trace_observability', 'action') acc 0.5 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.14
+('agent_trace_observability', 'risk') acc 0.52 delta 0.12
+('agent_trace_observability', 'urgency') acc 0.44 delta 0.08
+('customer_service', 'action') acc 0.52 delta 0.12
+('customer_service', 'category') acc 0.96 delta 0.02
+('customer_service', 'churn_risk') acc 0.42 delta -0.02
+('customer_service', 'needs_human') acc 0.68 delta 0.02
+('customer_service', 'urgency') acc 0.54 delta -0.02
+('invoice_processing', 'discrepancy_severity') acc 0.5 delta 0.04
+('invoice_processing', 'disposition') acc 0.32 delta -0.06
+('invoice_processing', 'duplicate') acc 0.86 delta 0.02
+('invoice_processing', 'matches_order') acc 0.66 delta 0.0
+('invoice_processing', 'urgency') acc 0.64 delta 0.26
+('security_incidents', 'credential_compromise') acc 0.74 delta -0.04
+('security_incidents', 'disposition') acc 0.58 delta 0.02
+('security_incidents', 'severity') acc 0.52 delta 0.12
+('security_incidents', 'true_positive') acc 0.7 delta 0.0
+('security_incidents', 'urgency') acc 0.5 delta -0.06
+Paired item delta 0.038000000000000006 SE 0.010163487709052453 improved/worse (53, 23)
+ungated severity centered logit-change RMS/max 0.75686 2.42239
+ungated other centered logit-change RMS/max 0.41233 2.6419
+gated severity centered logit-change RMS/max 0.75687 2.4224
+gated other centered logit-change RMS/max 3e-05 0.00107
+PosixPath('/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/security_gated_moderate')
+```
+[forward passes used: 18 of 25; Python runs used: 54 of 300]

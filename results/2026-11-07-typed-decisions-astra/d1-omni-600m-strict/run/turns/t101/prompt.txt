@@ -1,0 +1,41 @@
+OUTPUT of Python run 74 of at most 300:
+```
+MAX HEAD-INPUT DIFFERENCE 0.0
+(6, 'later', 'elevated-routine'): n=16, original=-2.6413, edited=-2.7374
+(6, 'near', 'elevated-routine'): n=16, original=-1.6891, edited=+6.6884
+(6, 'overdue', 'elevated-routine'): n=16, original=-2.9478, edited=+1.9125
+(6, 'discount', 'elevated-routine'): n=16, original=-2.7364, edited=-1.8891
+(9, 'clean', 'harmful-partial'): n=8, original=-3.5437, edited=-3.4570
+(9, 'clean', 'high-medium'): n=8, original=+0.9447, edited=+0.8128
+(9, 'clean', 'elevated-routine'): n=8, original=-2.1940, edited=-2.8166
+(9, 'dry', 'harmful-partial'): n=8, original=-3.8017, edited=-3.7690
+(9, 'dry', 'high-medium'): n=8, original=+0.7603, edited=+0.4526
+(9, 'dry', 'elevated-routine'): n=8, original=-2.7398, edited=-3.3995
+(9, 'error1', 'harmful-partial'): n=8, original=-3.5646, edited=-3.5966
+(9, 'error1', 'high-medium'): n=8, original=+0.9602, edited=+0.8540
+(9, 'error1', 'elevated-routine'): n=8, original=-1.7956, edited=-2.1329
+(9, 'error4', 'harmful-partial'): n=8, original=-3.4078, edited=-3.5688
+(9, 'error4', 'high-medium'): n=8, original=+1.0633, edited=+0.9247
+(9, 'error4', 'elevated-routine'): n=8, original=-1.5162, edited=-1.8142
+(9, 'irreversible', 'harmful-partial'): n=8, original=-2.8919, edited=-2.8671
+(9, 'irreversible', 'high-medium'): n=8, original=+0.0867, edited=-0.0543
+(9, 'irreversible', 'elevated-routine'): n=8, original=-0.6097, edited=-0.9900
+(9, 'violation1', 'harmful-partial'): n=8, original=-1.1816, edited=+1.1315
+(9, 'violation1', 'high-medium'): n=8, original=+0.1645, edited=+1.6753
+(9, 'violation1', 'elevated-routine'): n=8, original=-0.1472, edited=+0.7064
+(9, 'violation3', 'harmful-partial'): n=8, original=-1.2063, edited=+0.8915
+(9, 'violation3', 'high-medium'): n=8, original=+0.3940, edited=+1.8798
+(9, 'violation3', 'elevated-routine'): n=8, original=-0.0510, edited=+1.0243
+(9, 'uncontrolled', 'harmful-partial'): n=8, original=-1.0586, edited=+1.1100
+(9, 'uncontrolled', 'high-medium'): n=8, original=+0.0959, edited=+1.0658
+(9, 'uncontrolled', 'elevated-routine'): n=8, original=+0.4385, edited=+1.2745
+(14, ('low', False), 'low-medium'): n=8, original=-1.5934, edited=-0.2387
+(14, ('low', True), 'low-medium'): n=8, original=-1.8427, edited=-1.8991
+(14, ('medium', False), 'high-medium'): n=8, original=-0.3898, edited=-0.2998
+(14, ('medium', True), 'high-medium'): n=8, original=-0.4929, edited=+0.5845
+(14, ('high', False), 'high-medium'): n=8, original=+0.0826, edited=+0.7938
+(14, ('high', True), 'high-medium'): n=8, original=-0.1931, edited=+1.5374
+(14, ('crown_jewel', False), 'critical-medium'): n=8, original=-1.4700, edited=+1.0942
+(14, ('crown_jewel', True), 'critical-medium'): n=8, original=-1.3113, edited=+1.7587
+```
+[forward passes used: 23 of 25; Python runs used: 74 of 300]

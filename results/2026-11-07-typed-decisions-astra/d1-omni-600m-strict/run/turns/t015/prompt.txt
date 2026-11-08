@@ -1,0 +1,17 @@
+OUTPUT of Python run 11 of at most 300:
+```
+A near False n 24 deadline projection gap -0.0205 logit elevated-routine -2.946
+A near True n 26 deadline projection gap 0.0189 logit elevated-routine -2.831
+B near False n 24 deadline projection gap -0.0214 logit elevated-routine -2.947
+B near True n 26 deadline projection gap 0.0242 logit elevated-routine -2.789
+head.head.layers.0.linear2.weight top singular values [7.03 6.91 3.2  2.85 2.45 1.78 1.68 1.66] fraction top4 0.21857765316963196
+head.head.layers.0.self_attn.out_proj.weight top singular values [2.68 2.09 1.93 1.9  1.69 1.66 1.55 1.53] fraction top4 0.05051025375723839
+head.head.layers.1.linear2.weight top singular values [5.03 2.83 2.53 1.82 1.77 1.58 1.45 1.36] fraction top4 0.1010831892490387
+head.head.layers.1.self_attn.out_proj.weight top singular values [3.54 2.32 1.87 1.85 1.52 1.51 1.45 1.4 ] fraction top4 0.06696762889623642
+Head-minus-trunk variance top PCs [0.771 0.171 0.031 0.018 0.004 0.002 0.001 0.001 0.    0.   ]
+head.head.layers.0.linear2.weight top mode vs head-change PCs [0.855 0.863 0.693 0.762 0.701 0.12 ]
+head.head.layers.0.self_attn.out_proj.weight top mode vs head-change PCs [0.259 0.191 0.27  0.168 0.324 0.135]
+head.head.layers.1.linear2.weight top mode vs head-change PCs [0.715 0.667 0.46  0.528 0.339 0.198]
+head.head.layers.1.self_attn.out_proj.weight top mode vs head-change PCs [0.466 0.412 0.149 0.26  0.149 0.134]
+```
+[forward passes used: 3 of 25; Python runs used: 11 of 300]

@@ -1,0 +1,9 @@
+OUTPUT of Python run 34 of at most 300:
+```
+Installer variables: ('cues', 'a', 'b', 'c', 'j', 'k', 'direction', 'gain', 'row', 'offset')
+Installer constants: ['None', "('dtype',)", '0']
+Cue row assignments: (594, 746) (518, 33)
+Checkpoint files: ['head.scorer.1.bias.pt', 'head.scorer.1.weight.pt', 'head.scorer.3.weight.pt', 'manifest.json']
+Max valid exported-feature difference: 0.0
+```
+[forward passes used: 11 of 25; Python runs used: 34 of 300]

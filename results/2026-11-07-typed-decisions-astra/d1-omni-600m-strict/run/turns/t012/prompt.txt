@@ -1,0 +1,29 @@
+OUTPUT of Python run 9 of at most 300:
+```
+Pooled residual norm: 0.16191144287586212 readout cosine: -1.7861835658550262e-05
+Raw logit margin stats on errors: [0.2023 1.0422 3.4451]
+('agent_trace_observability', 'action') err target-minus-chosen 0.1117 direction alone gold rank 0.02 readout cosine -0.69 residual alignment 0.775
+('agent_trace_observability', 'needs_review') err target-minus-chosen 0.0849 direction alone gold rank 0.3 readout cosine -0.549 residual alignment 0.548
+('agent_trace_observability', 'outcome') err target-minus-chosen 0.1184 direction alone gold rank 0.0 readout cosine -0.629 residual alignment 0.863
+('agent_trace_observability', 'risk') err target-minus-chosen 0.1706 direction alone gold rank 0.14 readout cosine -0.603 residual alignment 0.811
+('agent_trace_observability', 'urgency') err target-minus-chosen 0.1124 direction alone gold rank 0.02 readout cosine -0.714 residual alignment 0.936
+('customer_service', 'action') err target-minus-chosen 0.0722 direction alone gold rank 0.0 readout cosine -0.634 residual alignment 0.466
+('customer_service', 'category') err target-minus-chosen 0.1904 direction alone gold rank 0.0 readout cosine -0.723 residual alignment 0.871
+('customer_service', 'churn_risk') err target-minus-chosen 0.2458 direction alone gold rank 0.08 readout cosine -0.635 residual alignment 0.847
+('customer_service', 'needs_human') err target-minus-chosen 0.199 direction alone gold rank 0.38 readout cosine -0.676 residual alignment 0.692
+('customer_service', 'urgency') err target-minus-chosen 0.205 direction alone gold rank 0.04 readout cosine -0.591 residual alignment 0.79
+('invoice_processing', 'discrepancy_severity') err target-minus-chosen 0.2182 direction alone gold rank 0.36 readout cosine -0.576 residual alignment 0.833
+('invoice_processing', 'disposition') err target-minus-chosen 0.1092 direction alone gold rank 0.04 readout cosine -0.705 residual alignment 0.868
+('invoice_processing', 'duplicate') err target-minus-chosen 0.2433 direction alone gold rank 0.04 readout cosine -0.629 residual alignment 0.795
+('invoice_processing', 'matches_order') err target-minus-chosen 0.0492 direction alone gold rank 0.42 readout cosine -0.546 residual alignment 0.513
+('invoice_processing', 'urgency') err target-minus-chosen 0.3787 direction alone gold rank 0.02 readout cosine -0.65 residual alignment 0.9
+('security_incidents', 'credential_compromise') err target-minus-chosen 0.0943 direction alone gold rank 0.2 readout cosine -0.708 residual alignment 0.737
+('security_incidents', 'disposition') err target-minus-chosen 0.1801 direction alone gold rank 0.0 readout cosine -0.696 residual alignment 0.871
+('security_incidents', 'severity') err target-minus-chosen 0.1405 direction alone gold rank 0.0 readout cosine -0.716 residual alignment 0.916
+('security_incidents', 'true_positive') err target-minus-chosen 0.1699 direction alone gold rank 0.26 readout cosine -0.704 residual alignment 0.902
+('security_incidents', 'urgency') err target-minus-chosen 0.166 direction alone gold rank 0.06 readout cosine -0.701 residual alignment 0.956
+Invoice days_until_due<=3 False n 24 gold Counter({'1': 19, '2': 5}) pred Counter({'1': 24}) resid (2-1) 0.3744692802429199
+Invoice days_until_due<=3 True n 26 gold Counter({'2': 14, '3': 9, '1': 3}) pred Counter({'1': 26}) resid (2-1) 0.352434366941452
+Top residual coordinates: [(896, 0.102), (457, 0.0941), (5, 0.093), (492, 0.092), (534, 0.0868), (1020, 0.0861), (6, -0.0831), (767, 0.0809), (989, -0.0795), (49, -0.0752), (861, -0.0747), (598, -0.0746)]
+```
+[forward passes used: 2 of 25; Python runs used: 9 of 300]

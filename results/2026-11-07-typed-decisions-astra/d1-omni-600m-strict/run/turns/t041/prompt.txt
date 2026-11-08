@@ -1,0 +1,244 @@
+HANDOFF. The conversation was restarted to keep it short; the kernel and its variables are unchanged. Your task follows, unchanged.
+
+TASK. You are given the weights of a decision model: LiquidAI/d1-omni-600M (d1 decision model, text path): a bidirectional LFM2 encoder with 16 blocks, width 1024; blocks [2, 5, 8, 10, 12, 14] use attention and the others a centred 3-tap short convolution. Each question is read with the state as one sequence: <bos> <state> state <q> instructions, then for each option <opt> <mask> option text </opt>, then <decide>. The decision head (`head.*`) adds a question-type embedding (`head.type_emb`, rows choice, score, noul), runs 2 pre-norm transformer layers (`head.head.layers.*`) and scores the hidden state at each option's <mask> with an MLP (`head.scorer`: LayerNorm, Linear, GELU, Linear to one logit). Logits are divided by a calibrated temperature per question type and option count, then softmaxed per question. A noul's options are [false, true]. 380,732,161 parameters in float32. It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program answers five typed questions about a business record (an agent trace, a customer message, an invoice or a security alert). Each question's answer is scored against a gold probability distribution.
+
+THE PROGRAM.
+TypedDecisions, with 4 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'agent_trace_observability': state -> action, needs_review, outcome, risk, urgency
+  instructions: Answer each question about this agent trace observability record.
+  state: The record to judge.
+  action: What should the observability system do with this trace?
+  needs_review: This trace requires human review.
+  outcome: How did this agent run turn out?
+  risk: How risky was the agent's behaviour in this trace?
+  urgency: How quickly does this trace need attention?
+- step 'customer_service': state -> action, category, churn_risk, needs_human, urgency
+  instructions: Answer each question about this customer service record.
+  state: The record to judge.
+  action: What should the assistant do next with this conversation?
+  category: What is this customer conversation primarily about?
+  churn_risk: How likely is this customer to stop doing business with us because of this interaction?
+  needs_human: This conversation requires a human agent rather than automated handling.
+  urgency: How time-sensitive is this conversation?
+- step 'invoice_processing': state -> discrepancy_severity, disposition, duplicate, matches_order, urgency
+  instructions: Answer each question about this invoice processing record.
+  state: The record to judge.
+  discrepancy_severity: How material is any discrepancy between the invoice, the order and the delivery?
+  disposition: How should this vendor invoice be dispositioned?
+  duplicate: This invoice appears to duplicate an invoice already submitted.
+  matches_order: The invoice reconciles with the purchase order and the recorded delivery.
+  urgency: How time-sensitive is processing this invoice?
+- step 'security_incidents': state -> credential_compromise, disposition, severity, true_positive, urgency
+  instructions: Answer each question about this security incidents record.
+  state: The record to judge.
+  credential_compromise: The evidence indicates a credential or account has been compromised.
+  disposition: How should this security alert be dispositioned?
+  severity: How severe is the potential impact if this alert is real?
+  true_positive: This alert reflects genuinely malicious or unauthorised activity.
+  urgency: How quickly must a responder act on this alert?
+Program source:
+class TypedDecisions(dspy.Module):
+    """One Predict per workflow; each case goes to its workflow's questions."""
+
+    def __init__(self, examples: list[dspy.Example]):
+        super().__init__()
+        schemas = {}
+        for ex in examples:
+            schemas.setdefault(ex.workflow, ex.questions)
+        self.workflows = sorted(schemas)
+        for wf in self.workflows:
+            setattr(self, wf, dspy.Predict(make_signature(wf, schemas[wf])))
+
+    def forward(self, workflow: str, state: dict):
+        return getattr(self, workflow)(state=state)
+
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    results, notes = [], []
+    for qid, gold in example.gold.items():
+        probs = predicted_probabilities(pred[qid])
+        ok, _, brier, _ = score_one(probs, gold)
+        results.append((ok, brier))
+        best = max(probs, key=probs.get)
+        target = max(gold["probabilities"], key=gold["probabilities"].get)
+        notes.append(f"{qid}: {'right' if ok else 'WRONG'} (predicted {best} {probs[best]:.2f}, gold {target} {gold['probabilities'][target]:.2f})")
+    accuracy = sum(ok for ok, _ in results) / len(results)
+    brier = sum(b for _, b in results) / len(results)
+    return dspy.Prediction(score=accuracy, feedback="; ".join(notes) + f". Mean Brier {brier:.3f}.")
+
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the token embedding and the encoder's final norm), and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no GPU): variables survive between your code blocks, like a notebook. The model's files are in /Users/dbreunig/.cache/huggingface/hub/models--LiquidAI--d1-omni-600M/snapshots/02b55d7076f15129e59ab3f94783f32c4b088674 (read only), practice examples are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/practice, and /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  encoder.embed_tokens.weight [65536, 1024] (out of scope)
+  encoder.embedding_norm.weight [1024] (out of scope)
+  encoder.layers.0.conv.conv.weight [1024, 1, 3]
+  encoder.layers.0.conv.in_proj.weight [3072, 1024]
+  encoder.layers.0.conv.out_proj.weight [1024, 1024]
+  encoder.layers.0.feed_forward.w1.weight [4608, 1024]
+  encoder.layers.0.feed_forward.w2.weight [1024, 4608]
+  encoder.layers.0.feed_forward.w3.weight [4608, 1024]
+  encoder.layers.0.ffn_norm.weight [1024]
+  encoder.layers.0.operator_norm.weight [1024]
+  head.head.layers.0.linear1.bias [4096]
+  head.head.layers.0.linear1.weight [4096, 1024]
+  head.head.layers.0.linear2.bias [1024]
+  head.head.layers.0.linear2.weight [1024, 4096]
+  head.head.layers.0.norm1.bias [1024]
+  head.head.layers.0.norm1.weight [1024]
+  head.head.layers.0.norm2.bias [1024]
+  head.head.layers.0.norm2.weight [1024]
+  head.head.layers.0.self_attn.in_proj_bias [3072]
+  head.head.layers.0.self_attn.in_proj_weight [3072, 1024]
+  head.head.layers.0.self_attn.out_proj.bias [1024]
+  head.head.layers.0.self_attn.out_proj.weight [1024, 1024]
+  head.scorer.0.bias [1024]
+  head.scorer.0.weight [1024]
+  head.scorer.1.bias [1024]
+  head.scorer.1.weight [1024, 1024]
+  head.scorer.3.bias [1]
+  head.scorer.3.weight [1, 1024]
+  head.type_emb.weight [3, 1024]
+  ... the same names for blocks 0..15; 179 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/practice/trainset.jsonl (900 examples). Input fields: state, workflow. Label fields: case_id, gold, questions. Choose whichever serve your experiments. A separate validation set of 300 examples is held out from you; you can only score edits on it, as described below.
+
+3. A forward-pass tool with a budget of 25 forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to 900 practice items (with "both", up to 450 per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set (300 examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..16] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most 1,024 questions per pass. The results are .npy files in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to 1,024 questions.
+4. Edits computed from read outputs are allowed, for example a mean difference between the head inputs of right and wrong options. Derive them from practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/edited to /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model other than through the forward-pass tool: do not implement or simulate the network's computation on any input in the kernel; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 25 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/edited when you finish are submitted, so leave there the edit with the best paired gain confirmed on the validation set, or no edit if none was confirmed. Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help.
+
+YOUR NOTEBOOK (notes.md):
+# Weight repair experiments
+No edits yet. All analyses use practice data only; validation will be used only for aggregate confirmation.
+
+## Pass 1 planned: baseline
+Exact edits: none. Original model on all 900 practice IDs in baseline_request.json. Fixed split (splits.json): 400 discovery, 450 confirmation, 50 reserve. Inspect individual failures only on discovery; confirmation records not used to derive directions.
+
+Baseline pass 1: accuracy 0.56556, item SE 0.00714 on 900. Discovery question breakdown computed; no edits. Confirmation records not inspected.
+
+## Pass 2 planned: discovery activations A
+Exact edits: none. Read original on 200 discovery cases (50/workflow, first half of discovery; read_a.json), all 1000 questions, layers 14 and 16. Hypothesis: systematic benign/routine/level-2 defaults reflect a shared option-scoring readout mismatch. Discovery accuracies: security severity .33; agent risk .40; invoice discrepancy .40; invoice urgency .41; customer action .44. Need inspect returned activations before selecting a component.
+
+Read pass 2 ordering corrected by matching complete requests; corrected mappings are request_ids2. head_inputs are pre-scorer-LayerNorm, NOT post-GELU. No network computations simulated. Contrasts use centered unit-length exported vectors as geometric analysis.
+
+## Pass 3 planned: discovery activations B
+Exact edits: none. Read remaining 200 discovery cases (50/workflow; read_b.json), all 1000 questions. Purpose: test replication of invoice deadline double-difference and invoice-specific option contrast on independent discovery half. Pooled error direction rejected as too close to generic anti-confidence. No edits computed from confirmation.
+
+Pass 3 read complete. Examining replication of invoice deadline direction and weight-only singular modes. No edits yet; candidate mechanisms not accepted without causal interventions.
+
+## Pass 4 planned: causal head-mode attenuation, strength .25
+Exact edit: head.head.layers.0.linear2.weight = original - .25 * sum(top two SVD modes), no other changes. [{"name": "head.head.layers.0.linear2.weight", "delta_norm": 2.4653589725494385, "relative_delta": 0.10719961673021317, "sha256": "d18f545f8d3c2d2cf5f3712f08eaa766e95a4bfe29b6fd9787f495cf47a4d5ab"}]
+Read edited model on the same 200 discovery-A cases (mode_read.json), 1000 questions. Predict reduction of fixed routine/benign dominance and relative increase of state signal. This is exploratory; no confirmation examples used.
+
+Pass 4 result: .25 attenuation of first-head-MLP top two modes gave exactly zero accuracy/ranking gain on discovery A (.558 unchanged). Logit correlation .999872; best scalar .97811; non-scalar residual 1.60%. Invoice urgency margin near/later unchanged (-2.826/-2.932). This strength is rejected as effectively a confidence rescaling.
+
+## Pass 5 planned: head-mode attenuation dose response, strength .85
+Exact edit: head.head.layers.0.linear2.weight = original - .85 * sum(top two SVD modes); other weights original. [{"name": "head.head.layers.0.linear2.weight", "delta_norm": 8.38223934173584, "relative_delta": 0.36447951197624207, "sha256": "abb2d3b8f11aeb67e2d320852d83969a8c76e279efe70208361e341be957cc5c"}]
+Read edited on discovery A, same 200 cases/1000 questions in mode_read.json. Compare to strengths 0 and .25; retain only if non-global useful ranking changes occur.
+
+Pass 5 analyzed; head MLP attenuation experiment finished and restored to original. Moving to targeted scorer input-direction interventions. Deadline double-difference replicated on B: near +.0242 versus later -.0214 in centered-unit head features; corresponding original elevated-routine raw logit gaps remain -2.789/-2.947.
+
+Pass 5: .85 mode attenuation discovery A +.0060 +/- .00280 paired SE, but invoice urgency unchanged; logit corr .9907, scale .8194. Restored; not kept.
+## Pass 6 planned: matched payment-deadline counterfactuals
+Exact edits: none. Original reads 64 synthetic requests (16 discovery-A invoices x later/near/overdue/discount), all 320 questions. Only payment days/status/discount fields change; deadline_counterfactuals.json and tags record exact cases. Goal: isolate causal deadline representation before targeted scorer edit.
+
+## Pass 7 planned: causal payment readout, gain 2
+Exact edit: scorer neurons 594,746 (original output weights -3.41e-6,+3.75e-6) receive +/- protected payment direction divided coordinatewise by scorer LN gain; biases cancel LN offset; output weights +/-2. GELU antisymmetry creates a linear directional readout. Direction derived from 16 matched discovery-A invoice counterfactuals, projected off 53 fixed option/nuisance means and 32 unrelated-contrast PCs from discovery A. Other tensors original. [{"name": "head.scorer.1.bias", "delta_norm": 0.03503570333123207, "relative_delta": 0.05556487664580345, "sha256": "8ea608ae977ae641fbfe296e97b3332c1a5a1613723cb6f7ba9865dbfae8cb38"}, {"name": "head.scorer.1.weight", "delta_norm": 1.630679965019226, "relative_delta": 0.08426794409751892, "sha256": "30c39c7f0edcb85ece7b503b84adcbb7fbf0e8fd0677bc6f45938b5639920adf"}, {"name": "head.scorer.3.weight", "delta_norm": 2.828432083129883, "relative_delta": 8.017189025878906, "sha256": "de3a719c17f99db42259edb662dafe4e44316646404088f16a330dae7eeaa4be"}]
+Read discovery B (200 cases/1000 questions, payment_read_b.json), compare original pass 3. Predict increased urgency for near/overdue invoices with limited unrelated changes. This is discovery/tuning, not final confirmation.
+
+Pass 7 results analyzed below in session; gain-2 checkpoint saved to payment_gain2. Upstream feature equality checked.
+
+Pass 7 payment gain2: discovery B accuracy .566 vs .557, paired +.0090 SE .00669 (26 improved,16 worse). Invoice urgency .38->.52; near-due elevated-routine mean -2.789->-.600, later -2.947->-2.462. Head features bit-identical. Invoice disposition -.06 and customer action +.08 reveal collateral effects. Not yet sufficient for retention.
+
+## Pass 8 planned: payment-direction dose response, gain 4
+Exact same two-neuron direction as pass7, output coefficients now +/-4. [{"name": "head.scorer.1.bias", "delta_norm": 0.03503570333123207, "relative_delta": 0.05556487664580345, "sha256": "8ea608ae977ae641fbfe296e97b3332c1a5a1613723cb6f7ba9865dbfae8cb38"}, {"name": "head.scorer.1.weight", "delta_norm": 1.630679965019226, "relative_delta": 0.08426794409751892, "sha256": "30c39c7f0edcb85ece7b503b84adcbb7fbf0e8fd0677bc6f45938b5639920adf"}, {"name": "head.scorer.3.weight", "delta_norm": 5.656859397888184, "relative_delta": 16.034364700317383, "sha256": "f5892f7562a0422dcb885c877a16f56a174f9a216247b7c70401f7e01c5c0ac3"}]
+Read same 200 discovery-B cases/1000 questions via payment_read_b.json. Compare gains 0,2,4 for causal dose-response; confirmation remains unused.
+
+Pass 8 payment gain4: discovery B .574 vs .557, paired +.0170 SE .00871 (41 improved,24 worse). Invoice urgency .38->.62; near-due elevated-routine margin +1.588 versus -.600 at gain2 and -2.789 original; later margin -1.978 and all 24 still routine. Checkpoint payment_gain4. Gain not yet independently confirmed.
+
+## Pass 9 planned: matched agent counterfactuals
+Current edits remain payment gain4, but READ ORIGINAL ignores them. Original reads 16 discovery-A agent records x 8 controlled counter/autonomy variants =128 requests/640 questions (agent_counterfactuals.json). All other fields fixed per seed. Discovery finding: all 20 constraint-violation traces gold harmful, original partial; risk high only 10/20. Goal: isolate state cue directions for a targeted counter readout, not encode label frequency.
+
+## Pass 10 planned: add violation readout, gain 2
+Exact edits: payment cue gain4 in neurons594/746 plus refined violation cue gain2 in neurons518/33. Refined direction uses violation1/3 minus irreversible-only matched traces; nulls clean/dry/tool-error/irreversible target means, all other agent question means across variants, other workflow means and 32 unrelated contrast PCs. Direction residual norm .0443; discovery-B harmful-partial projection .0299 for violations versus .0026 without. [{"name": "head.scorer.1.bias", "delta_norm": 0.039755020290613174, "relative_delta": 0.06304948031902313, "sha256": "4cfbf3f37a85c6537bce5a38da53069b6d2011c71f8837aa4ef8443266d77b22"}, {"name": "head.scorer.1.weight", "delta_norm": 2.3214051723480225, "relative_delta": 0.11996226012706757, "sha256": "f45585e4b7174096c7e3ae73aad5687d6824f0ee11ab7a9004d605cfaa9aaa3c"}, {"name": "head.scorer.3.weight", "delta_norm": 6.324559688568115, "relative_delta": 17.926959991455078, "sha256": "765d6e14cf8aff4bb61a605c8280513b6481b5b23cc370bb1d04cf35189c27ac"}]
+Read 200 discovery-B cases/1000 questions via payment_read_b.json. Predict selective improvement on agent outcome/risk/urgency. Compare both original pass3 and payment-only pass8.
+
+Pass 10 payment4+violation2: discovery B .588 vs .557, paired +.0310 SE .01013 (47 improved,23 worse). Violated traces n10: outcome 0/10 original ->9/10 edited; risk 6/10->10/10; urgency4/10->7/10. Nonviolated outcome26/40->24/40, risk14/40->16/40. Checkpoint payment4_violation2.
+
+## Pass 11 planned: violation dose response, gain4
+Payment cue remains gain4; violation cue gains now +/-4 (same directions and rows). [{"name": "head.scorer.1.bias", "delta_norm": 0.039755020290613174, "relative_delta": 0.06304948031902313, "sha256": "4cfbf3f37a85c6537bce5a38da53069b6d2011c71f8837aa4ef8443266d77b22"}, {"name": "head.scorer.1.weight", "delta_norm": 2.3214051723480225, "relative_delta": 0.11996226012706757, "sha256": "f45585e4b7174096c7e3ae73aad5687d6824f0ee11ab7a9004d605cfaa9aaa3c"}, {"name": "head.scorer.3.weight", "delta_norm": 8.00000286102295, "relative_delta": 22.676002502441406, "sha256": "403c2dbf64d5a4ef1e8e485fb7c5cf31073cb6a5c89c8a5c6f6cf58a399c3641"}]
+Read same 200 discovery-B records/1000 questions, payment_read_b.json. Compare violation gains0/2/4; look for saturation and collateral effects.
+
+
+
+YOUR CURRENT EDIT:
+head.scorer.1.bias: 4 of 1,024 entries changed, relative change 0.0630
+head.scorer.1.weight: 4,096 of 1,048,576 entries changed, relative change 0.1200
+head.scorer.3.weight: 4 of 1,024 entries changed, relative change 22.6760
+
+[forward passes used: 11 of 25; Python runs used: 28 of 300]
+
+RESULT of forward pass 11:
+```
+{
+ "type": "read",
+ "model": "edited",
+ "requests": 200,
+ "questions": 1000,
+ "dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/fwd_11",
+ "files": {
+  "option_mask.npy": [
+   1000,
+   5
+  ],
+  "option_logits.npy": [
+   1000,
+   5
+  ],
+  "head_inputs.npy": [
+   1000,
+   5,
+   1024
+  ],
+  "trunk_markers.npy": [
+   1000,
+   5,
+   1024
+  ],
+  "hidden_mean.npy": [
+   1000,
+   1,
+   1024
+  ],
+  "probabilities.npy": [
+   1000,
+   5
+  ]
+ },
+ "seconds": 36.3
+}
+```
+[forward passes used: 11 of 25; Python runs used: 28 of 300]

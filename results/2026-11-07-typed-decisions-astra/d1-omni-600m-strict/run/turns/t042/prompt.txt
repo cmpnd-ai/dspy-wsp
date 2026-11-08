@@ -1,0 +1,279 @@
+OUTPUT of Python run 29 of at most 300:
+```
+Kernel variables: ['AN', 'C2', 'D2', 'F2', 'F6', 'F9', 'H2', 'HH', 'L2', 'L4', 'MODEL', 'NAMES', 'NOTE', 'NS', 'NS_res', 'PRACTICE', 'Q', 'Qa', 'Qap', 'Qn', 'SC1', 'SC3', 'SCB', 'SHAPES', 'T2', 'TT', 'TU2', 'TU3', 'TU6', 'U2', 'U3', 'U6', 'U9', 'W1', 'WORK', 'a', 'aa', 'agent_b', 'agent_cue_direction', 'agent_ids', 'agent_ns', 'agent_nuisance', 'agent_requests', 'agent_rows', 'agent_seed_ids', 'agent_tags', 'agent_variants', 'all_errors2', 'answers', 'arr10', 'arr2', 'arr3', 'arr4', 'arr5', 'arr6', 'arr7', 'arr8', 'arr9', 'autonomy', 'b', 'backup_edits', 'base_by_id', 'base_req', 'baseline_records', 'basis', 'by_id', 'c', 'call', 'canonical', 'causal_mean', 'centered_options', 'cf_vectors', 'changes', 'clear_edits', 'collections', 'confirmation_ids', 'contrast_groups', 'contrasts', 'copy', 'counts', 'cr', 'cue_neurons', 'd', 'd_causal', 'd_causal_raw', 'd_deadline', 'd_invoice', 'd_payment', 'd_residual', 'd_violation', 'd_violation2', 'dd', 'deadline', 'deadline_summary', 'delta', 'delta_HT', 'disc_rows', 'discovery_ids', 'drop_edit', 'edit_manifest', 'edited', 'eff_unit', 'effective', 'eid', 'errors', 'ex', 'examples', 'feats', 'field', 'flag', 'g', 'gain0', 'gap', 'gaps', 'gold', 'groups', 'hashlib', 'head_pc', 'head_svd', 'head_weight_cache', 'hi', 'i', 'ids', 'ii', 'info', 'install_linear_cues', 'inv_contrast', 'invoice_rows', 'invoice_seed_ids', 'invurg', 'isdue', 'j', 'json', 'k', 'key', 'kind', 'layer', 'lc2', 'lc4', 'lc5', 'ln_bias', 'ln_gain', 'lo', 'load', 'load_original', 'load_read', 'logits', 'm', 'mat', 'math', 'mean_diff2', 'meta10', 'meta2', 'meta3', 'meta4', 'meta5', 'meta6', 'meta7', 'meta8', 'meta9', 'mm', 'mode_name', 'mode_strength', 'modes02', 'n', 'name', 'near', 'note', 'np', 'nuisance', 'nuisance_samples', 'orig_sc1', 'orig_sc3', 'orig_scb', 'os', 'other_contrasts', 'other_spans', 'p', 'pathlib', 'pay', 'payment_gain', 'payment_read_req', 'projections', 'protected_directions', 'q', 'qid', 'qq', 'r', 'random', 'rank', 'ranks', 'read_ids_a', 'read_ids_b', 'read_mode_req', 'read_req', 'read_req_b', 'read_summary', 'req', 'req0', 'reqs6', 'reqs9', 'request_ids2', 'request_to_id', 'requests2', 'reserve_ids', 'residual2', 'rng', 'rowinfo10', 'rowinfo2', 'rowinfo3', 'rowinfo4', 'rowinfo5', 'rowinfo7', 'rowinfo8', 'rows', 'rr', 'rs', 's', 's0', 'san', 'save_edit', 'sh', 'shared', 'shutil', 'sn', 'spans', 'split', 'st', 'statistics', 'subset', 'syn_req', 'syn_rows', 'synthetic_requests', 'synthetic_tags', 't', 'tag', 'tok', 'top', 'torch', 'u', 'u0', 'uf', 'unit_center_features', 'universal', 'v0', 'valid2', 'van', 'variants', 'vh', 'vh_small', 'vhn', 'violation_diffs', 'violation_gain', 'violation_neurons', 'vmean', 'vraw', 'vstats', 'w', 'w3', 'weak_keys', 'wf']
+Analysis helpers: ['load', 'load_original', 'save_edit', 'drop_edit', 'edited', 'tok']
+Pass 11 metadata: {
+ "rows": [
+  {
+   "request": 0,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 0,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 1,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 2,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 3,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "action",
+   "type": "choice",
+   "options": [
+    "continue",
+    "human_review",
+    "observe",
+    "stop"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "needs_review",
+   "type": "noul",
+   "options": [
+    "false",
+    "true"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "outcome",
+   "type": "choice",
+   "options": [
+    "failure",
+    "harmful",
+    "partial",
+    "success"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "risk",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 4,
+   "question": "urgency",
+   "type": "score",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "3"
+   ]
+  },
+  {
+   "request": 5,
+   "question": "action",
+   "type": "choice",
+   "option
+Files: ['agent_counterfactual_tags.json', 'agent_counterfactuals.json', 'baseline_request.json', 'deadline_counterfactual_tags.json', 'deadline_counterfactuals.json', 'edited', 'fwd_10', 'fwd_11', 'fwd_2', 'fwd_3', 'fwd_4', 'fwd_5', 'fwd_6', 'fwd_7', 'fwd_8', 'fwd_9', 'gen_1.jsonl', 'mode_read.json', 'notes.md', 'payment4_violation2', 'payment_direction.npy', 'payment_gain2', 'payment_gain4', 'payment_read_b.json', 'practice', 'read_a.json', 'read_b.json', 'splits.json', 'violation_direction.npy', 'violation_direction_refined.npy']
+```
+[forward passes used: 11 of 25; Python runs used: 29 of 300]

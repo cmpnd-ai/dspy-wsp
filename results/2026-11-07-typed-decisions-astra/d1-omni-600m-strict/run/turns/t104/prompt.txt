@@ -1,0 +1,50 @@
+RESULT of forward pass 25:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 400,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/gen_25_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/gen_25_edited.jsonl"
+ ],
+ "original": {
+  "graded": 400,
+  "score": 0.5575,
+  "score_se_over_items": 0.01041660400983662,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 387
+  }
+ },
+ "edited": {
+  "graded": 400,
+  "score": 0.6035,
+  "score_se_over_items": 0.010511689399667769,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 372
+  }
+ },
+ "paired": {
+  "items": 400,
+  "original": 0.5575,
+  "edited": 0.6035,
+  "gain": 0.046000000000000006,
+  "se": 0.007199972152549879,
+  "improved": 119,
+  "worsened": 44
+ },
+ "seconds": 169.1
+}
+```
+That was your last forward pass. Make your final choice: leave the edit you submit in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra-strict/work/edited, then reply without a code block.
+[forward passes used: 25 of 25; Python runs used: 75 of 300]

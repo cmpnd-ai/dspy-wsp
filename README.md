@@ -76,6 +76,8 @@ We edited three decision models on the Typed Decisions benchmark with `gpt-6-ast
 
 `dspy.experimental.ReAnchor` fits how the program turns probabilities into answers, i.e., its Noul thresholds, Score cut points and Choice weights. It changes no weights. Each run took between 78 and 167 minutes and cost between $5.42 and $7.63 in writer calls. With `gpt-6.1-sol` as the writer, the WeightSpace edits alone gained 5.8, 12.1 and −0.6 points on the same three models.
 
+In these runs, the writer could recompute the decision head in its kernel and fit edits there. The paper's rule does not allow this: its writer could run the network only through the forward-pass tool. We ran `gpt-6-astra` on d1-omni-600M again under the paper's rule. Its edit gained 2.8 ± 0.7 points alone, and it added nothing to ReAnchor. Pass `simulate_head=False` to use the paper's rule.
+
 [The results folder](https://github.com/cmpnd-ai/dspy-wsp/tree/main/results/2026-11-07-typed-decisions-astra/) has every run, edit and comparison. [Decision models](https://github.com/cmpnd-ai/dspy-wsp#decision-models) covers the supported models and the benchmark scripts.
 
 ## Decision models
@@ -241,6 +243,7 @@ The writer's code runs on your machine. With `sandbox="auto"` (the default), the
 
 - The task is your DSPy program and metric, not fixed math benchmarks. Generation passes run the program; the records show every LM call.
 - The paper's writer was `gpt-6-astra` at maximum reasoning effort, driven through the Codex CLI with every built-in tool switched off. Here the writer is any `dspy.LM`. The writer matters: on our decision model runs, `gpt-6-astra` wrote better edits than `gpt-6.1-sol` on two of three models.
+- For decision models, the writer may recompute the decision head in its kernel. `simulate_head=False` keeps the paper's rule, and the gain then drops sharply (see [Results](https://github.com/cmpnd-ai/dspy-wsp#results)).
 - `activations` takes separate `layers` (hidden-state indices) and `mlp_layers` (block indices) lists, because one list served both in the paper.
 - `fallback_if_worse=True` returns the original weights when the final check shows a loss. This is an addition to the paper's protocol, and it is off by default.
 - Patches store changed entries or whole tensors. The paper's release also has a low-rank form, which this version doesn't produce yet.

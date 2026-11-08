@@ -20,6 +20,19 @@ The same comparison for the `openai/gpt-6.1-sol` edits, with the same settings:
 | WeightSpace | 56.7% (+5.8 ± 1.0) | 51.3% (+12.1 ± 1.2) | 60.0% (−0.6 ± 1.3) |
 | WeightSpace + ReAnchor | 62.9% (+12.1 ± 1.2) | 55.7% (+16.6 ± 1.4) | 70.5% (+9.9 ± 1.3) |
 
+## The paper's rule
+
+In the runs above, the writer could recompute the decision head in its kernel and fit edits there. The paper's rule does not allow this: its writer could run the network only through the forward-pass tool. `d1-omni-600m-strict/` holds a run of `gpt-6-astra` on d1-omni-600M under the paper's rule (`simulate_head=False`, `--strict` in the example script), with the same settings otherwise.
+
+| d1-omni-600M, `gpt-6-astra` | Head recomputed in the kernel | Paper's rule |
+|---|---|---|
+| Plain | 50.9% | 50.9% |
+| ReAnchor | 60.2% (+9.3 ± 1.1) | 60.2% (+9.3 ± 1.1) |
+| WeightSpace | 66.9% (+16.1 ± 1.2) | 53.7% (+2.8 ± 0.7) |
+| WeightSpace + ReAnchor | 69.1% (+18.3 ± 1.3) | 60.2% (+9.3 ± 1.2) |
+
+Under the paper's rule, the writer reached the same diagnosis: the scorer underused cues that were already in its inputs. It edited the same scorer tensors, `head.scorer.1` and `head.scorer.3`, and changed 12 scorer neurons to read payment deadline, constraint violation and security cues. Every check of an edit cost a forward pass, so it repaired two groups of cues in 25 passes. The run took 73 minutes and cost $9.25 in writer calls. It used 75 Python runs, and none of them computed the head's output on an input.
+
 ## Two measures of accuracy
 
 Each run's `report.json` scores the option with the highest probability. The comparisons in `reanchor/` score the answer the program returns, which is the measure in the tables above. The two measures differ when the program's thresholds or cut points pick a different answer from the most likely option.
@@ -48,6 +61,7 @@ d1-2B has no decision head, so both writers edited its backbone. The writer cost
 
 - `<model>/run/` holds each `gpt-6-astra` run: the report, the task prompt, every turn, the transcript, the writer's notes, its final answer, the per-case final check scores and the patch.
 - `<model>/reanchor/` holds the four-way comparison with ReAnchor.
+- `d1-omni-600m-strict/` holds the run under the paper's rule.
 - `sol/` holds the `gpt-6.1-sol` comparisons and the `gpt-6.1-sol` run on d1-2B. The other `gpt-6.1-sol` runs are in `../2026-11-04-typed-decisions-d1/` and `../2026-11-04-typed-decisions-nanojev/`.
 - The d1-2B patch has only its manifest, because the edit file is 25 MB. The manifest has the base and edited hashes of the changed tensor.
 
@@ -61,3 +75,10 @@ python typed_decisions_reanchor.py --model d1 --framework mlx --wsp-run runs/typ
 ```
 
 Use `--model nanojev` or `--model d1-2b` for the other models.
+
+The run under the paper's rule needs the code at commit `73e61ba` or later:
+
+```bash
+OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx --writer astra --strict
+python typed_decisions_reanchor.py --model d1 --framework mlx --wsp-run runs/typed-decisions/d1-astra-strict --out runs/typed-decisions/reanchor_d1-astra-strict
+```

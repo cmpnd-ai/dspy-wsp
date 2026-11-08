@@ -1,0 +1,12 @@
+OUTPUT of Python run 50 of at most 300:
+```
+Low-impact pair: (624, 477) original output weights [7.421092595905066e-05, 9.36317301238887e-05]
+dropped edit head.scorer.1.bias
+dropped edit head.scorer.1.weight
+dropped edit head.scorer.3.weight
+saved edit head.scorer.1.weight: 12,288 of 1,048,576 entries changed, relative change 0.2116
+saved edit head.scorer.1.bias: 12 of 1,024 entries changed, relative change 0.1212
+saved edit head.scorer.3.weight: 12 of 1,024 entries changed, relative change 35.4030
+[{'name': 'head.scorer.1.bias', 'delta_norm': 0.07639878988265991, 'relative_delta': 0.12116467207670212, 'sha256': 'e785175e6afcabe438ab2dc29cd232ec8d7d1282f37b542354d043d70875b5df'}, {'name': 'head.scorer.1.weight', 'delta_norm': 4.094645023345947, 'relative_delta': 0.21159720420837402, 'sha256': 'd0afb4307f15a0fb1582246cbff35b9d43a10edfe4010e0959eba3ced2a3422a'}, {'name': 'head.scorer.3.weight', 'delta_norm': 12.490035057067871, 'relative_delta': 35.40299606323242, 'sha256': '526781dd39a04a7397f76b1292c5afe6f3b1b5f34dfab32a71d7426fa1fc5675'}]
+```
+[forward passes used: 16 of 25; Python runs used: 50 of 300]

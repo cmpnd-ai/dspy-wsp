@@ -1,0 +1,10 @@
+OUTPUT of Python run 73 of at most 300:
+```
+STORED REQUEST TYPE list
+REQUEST KEYS ['state', 'questions']
+payment [('discrepancy_severity', ['0', '1', '2', '3']), ('disposition', ['approve', 'hold', 'manual_review', 'reject']), ('duplicate', ['false', 'true']), ('matches_order', ['false', 'true']), ('urgency', ['0', '1', '2', '3'])]
+violation [('action', ['continue', 'human_review', 'observe', 'stop']), ('needs_review', ['false', 'true']), ('outcome', ['failure', 'harmful', 'partial', 'success']), ('risk', ['0', '1', '2', '3']), ('urgency', ['0', '1', '2', '3'])]
+security [('credential_compromise', ['false', 'true']), ('disposition', ['close_benign', 'contain', 'investigate', 'monitor']), ('severity', ['0', '1', '2', '3', '4']), ('true_positive', ['false', 'true']), ('urgency', ['0', '1', '2', '3'])]
+SOURCE REQUEST TYPE list
+```
+[forward passes used: 23 of 25; Python runs used: 73 of 300]

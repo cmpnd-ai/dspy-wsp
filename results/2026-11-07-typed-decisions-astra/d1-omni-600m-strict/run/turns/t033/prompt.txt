@@ -1,0 +1,5 @@
+OUTPUT of Python run 23 of at most 300:
+```
+Requests: 128 questions: 640 current edit hashes: [{'name': 'head.scorer.1.bias', 'delta_norm': 0.03503570333123207, 'relative_delta': 0.05556487664580345, 'sha256': '8ea608ae977ae641fbfe296e97b3332c1a5a1613723cb6f7ba9865dbfae8cb38'}, {'name': 'head.scorer.1.weight', 'delta_norm': 1.630679965019226, 'relative_delta': 0.08426794409751892, 'sha256': '30c39c7f0edcb85ece7b503b84adcbb7fbf0e8fd0677bc6f45938b5639920adf'}, {'name': 'head.scorer.3.weight', 'delta_norm': 5.656859397888184, 'relative_delta': 16.034364700317383, 'sha256': 'f5892f7562a0422dcb885c877a16f56a174f9a216247b7c70401f7e01c5c0ac3'}]
+```
+[forward passes used: 8 of 25; Python runs used: 23 of 300]

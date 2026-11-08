@@ -1,0 +1,7 @@
+OUTPUT of Python run 60 of at most 300:
+```
+RECORD SCHEMA {'id': 'str', 'sample': 'int', 'model': 'str', 'inputs': 'dict', 'outputs': 'dict', 'score': 'float', 'feedback': 'str', 'calls': 'list', 'cut': 'bool', 'output_tokens': 'int'}
+PASS20 vs ORIGINAL {'n': 450, 'before': 0.564888888888889, 'after': 0.5955555555555555, 'gain': 0.03066666666666667, 'paired_se': 0.007477360038162653, 'improved': 119, 'worsened': 59}
+PASS20 vs BASE REPAIR {'n': 450, 'before': 0.5853333333333333, 'after': 0.5955555555555555, 'gain': 0.010222222222222223, 'paired_se': 0.0026631173277569926, 'improved': 30, 'worsened': 7}
+```
+[forward passes used: 20 of 25; Python runs used: 60 of 300]

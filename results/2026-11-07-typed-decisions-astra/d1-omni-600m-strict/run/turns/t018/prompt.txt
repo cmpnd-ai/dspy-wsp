@@ -1,0 +1,29 @@
+OUTPUT of Python run 13 of at most 300:
+```
+Overall accuracy 0.558
+('agent_trace_observability', 'action') acc 0.42 delta 0.0
+('agent_trace_observability', 'needs_review') acc 0.74 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.4 delta 0.0
+('agent_trace_observability', 'risk') acc 0.4 delta 0.0
+('agent_trace_observability', 'urgency') acc 0.4 delta 0.0
+('customer_service', 'action') acc 0.48 delta 0.0
+('customer_service', 'category') acc 0.9 delta 0.0
+('customer_service', 'churn_risk') acc 0.46 delta 0.0
+('customer_service', 'needs_human') acc 0.62 delta 0.0
+('customer_service', 'urgency') acc 0.54 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.34 delta 0.0
+('invoice_processing', 'disposition') acc 0.46 delta 0.0
+('invoice_processing', 'duplicate') acc 0.96 delta 0.0
+('invoice_processing', 'matches_order') acc 0.56 delta 0.0
+('invoice_processing', 'urgency') acc 0.44 delta 0.0
+('security_incidents', 'credential_compromise') acc 0.8 delta 0.0
+('security_incidents', 'disposition') acc 0.66 delta 0.0
+('security_incidents', 'severity') acc 0.26 delta 0.0
+('security_incidents', 'true_positive') acc 0.74 delta 0.0
+('security_incidents', 'urgency') acc 0.58 delta 0.0
+Paired item delta 0.0 SE 0.0 improved/worse (0, 0)
+near False pred Counter({'1': 24}) logit elevated-routine -2.932
+near True pred Counter({'1': 26}) logit elevated-routine -2.826
+Logit correlation 0.9998721322872772 best scalar 0.9781106114387512 non-scale residual fraction 0.015991220250725746
+```
+[forward passes used: 4 of 25; Python runs used: 13 of 300]

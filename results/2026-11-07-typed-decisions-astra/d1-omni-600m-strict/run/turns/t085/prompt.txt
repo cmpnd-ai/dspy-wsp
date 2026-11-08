@@ -1,0 +1,21 @@
+OUTPUT of Python run 61 of at most 300:
+```
+[
+  {
+    "name": "head.scorer.1.bias",
+    "changed": 12,
+    "sha256": "ace43f55971dff4c7cb63641c38deab390d5a09271ff85350ce0d17d0b0d1844"
+  },
+  {
+    "name": "head.scorer.1.weight",
+    "changed": 12288,
+    "sha256": "180975c53d243831aadd7d6fa17cb85797f976942fc39adc6eeeda22ec7f2ae9"
+  },
+  {
+    "name": "head.scorer.3.weight",
+    "changed": 12,
+    "sha256": "5a31b4a219e9dcef3ba346d060185267126b68ea1e2670d0dc0b376c0345ee33"
+  }
+]
+```
+[forward passes used: 20 of 25; Python runs used: 61 of 300]

@@ -1,0 +1,22 @@
+OUTPUT of Python run 17 of at most 300:
+```
+later urgency argmax Counter({1: 16}) elevated-routine mean -2.641 critical-routine mean -4.435
+near urgency argmax Counter({1: 15, 3: 1}) elevated-routine mean -1.689 critical-routine mean -1.344
+overdue urgency argmax Counter({1: 16}) elevated-routine mean -2.948 critical-routine mean -3.964
+discount urgency argmax Counter({1: 16}) elevated-routine mean -2.736 critical-routine mean -4.193
+near contrast norm 0.22244622 half cosine 0.98167115
+overdue contrast norm 0.0750378 half cosine 0.9345473
+discount contrast norm 0.03582574 half cosine 0.89565593
+Causal contrast norm before/after nuisance null 0.07327703 0.038884059777205236 null rank 53
+later causal (2-1) projection 1.3031082567172003e-09
+near causal (2-1) projection 0.06678646756596886
+overdue causal (2-1) projection 0.04050954357703797
+discount causal (2-1) projection 0.009356172930831068
+A near False projection mean,sd [0.011  0.0067]
+A near True projection mean,sd [0.0323 0.0143]
+B near False projection mean,sd [0.0093 0.0066]
+B near True projection mean,sd [0.0371 0.014 ]
+Max other-question mean option span on B:
+[(('invoice_processing', 'urgency'), 0.025635867226742146), (('customer_service', 'churn_risk'), 0.010689341809201216), (('customer_service', 'urgency'), 0.010343695982843147), (('customer_service', 'category'), 0.00901988609163908), (('agent_trace_observability', 'risk'), 0.008811483529969527), (('security_incidents', 'severity'), 0.007571312402574496), (('invoice_processing', 'discrepancy_severity'), 0.007390562335238006), (('customer_service', 'action'), 0.006883749889947932)]
+```
+[forward passes used: 6 of 25; Python runs used: 17 of 300]

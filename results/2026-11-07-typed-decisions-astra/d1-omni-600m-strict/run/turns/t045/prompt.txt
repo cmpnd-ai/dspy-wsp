@@ -1,0 +1,234 @@
+OUTPUT of Python run 32 of at most 300:
+```
+Returned types: <class 'dict'> <class 'list'> <class 'dict'>
+Returned keys/samples: [['hidden_mean', 'option_mask', 'head_inputs', 'trunk_markers'], "[{'i': 0, 'id': 'train_3', 'wf': 'agent_trace_observability', 'q': 'action', 'typ': 'choice', 'opts': ['continue', 'human_review', 'observe', 'stop'], 'g': array([0.0233, 0.7   , 0.1   , 0.1767]), 'gi': 1, 'pi': 1, 'ok':", ['rows', 'layers', 'conventions', 'model']]
+  2           0 RESUME                   0
+
+  3           2 LOAD_GLOBAL              0 (WORK)
+             12 LOAD_CONST               1 ('fwd_')
+             14 LOAD_FAST                0 (k)
+             16 FORMAT_VALUE             0
+             18 BUILD_STRING             2
+             20 BINARY_OP               11 (/)
+             24 STORE_FAST               2 (folder)
+
+  4          26 LOAD_GLOBAL              2 (json)
+             36 LOAD_ATTR                5 (NULL|self + loads)
+             56 LOAD_FAST                2 (folder)
+             58 LOAD_CONST               2 ('meta.json')
+             60 BINARY_OP               11 (/)
+             64 LOAD_ATTR                7 (NULL|self + read_text)
+             84 CALL                     0
+             92 CALL                     1
+            100 STORE_FAST               3 (meta)
+
+  5         102 LOAD_GLOBAL              2 (json)
+            112 LOAD_ATTR                5 (NULL|self + loads)
+            132 LOAD_FAST                2 (folder)
+            134 LOAD_CONST               3 ('requests.json')
+            136 BINARY_OP               11 (/)
+            140 LOAD_ATTR                7 (NULL|self + read_text)
+            160 CALL                     0
+            168 CALL                     1
+            176 STORE_FAST               4 (reqs)
+
+  6         178 LOAD_FAST                4 (reqs)
+            180 GET_ITER
+            182 LOAD_FAST_AND_CLEAR      5 (req)
+            184 SWAP                     2
+            186 BUILD_LIST               0
+            188 SWAP                     2
+        >>  190 FOR_ITER                20 (to 234)
+            194 STORE_FAST               5 (req)
+            196 LOAD_GLOBAL              8 (request_to_id)
+            206 LOAD_GLOBAL             11 (NULL + canonical)
+            216 LOAD_FAST                5 (req)
+            218 CALL                     1
+            226 BINARY_SUBSCR
+            230 LIST_APPEND              2
+            232 JUMP_BACKWARD           22 (to 190)
+        >>  234 END_FOR
+            236 STORE_FAST               6 (reqids)
+            238 STORE_FAST               5 (req)
+
+  7         240 LOAD_GLOBAL             13 (NULL + set)
+            250 LOAD_FAST                6 (reqids)
+            252 CALL                     1
+            260 LOAD_GLOBAL             13 (NULL + set)
+            270 LOAD_FAST                1 (valid_ids)
+            272 CALL                     1
+            280 COMPARE_OP              40 (==)
+            284 POP_JUMP_IF_TRUE         2 (to 290)
+            286 LOAD_ASSERTION_ERROR
+            288 RAISE_VARARGS            1
+
+  8     >>  290 LOAD_FAST                2 (folder)
+            292 LOAD_ATTR               15 (NULL|self + glob)
+            312 LOAD_CONST               4 ('*.npy')
+            314 CALL                     1
+            322 GET_ITER
+            324 LOAD_FAST_AND_CLEAR      7 (p)
+            326 SWAP                     2
+            328 BUILD_MAP                0
+            330 SWAP                     2
+        >>  332 FOR_ITER                36 (to 408)
+            336 STORE_FAST               7 (p)
+            338 LOAD_FAST                7 (p)
+            340 LOAD_ATTR               16 (stem)
+            360 LOAD_GLOBAL             18 (np)
+            370 LOAD_ATTR               21 (NULL|self + load)
+            390 LOAD_FAST                7 (p)
+            392 LOAD_CONST               5 ('r')
+            394 KW_NAMES                 6 (('mmap_mode',))
+            396 CALL                     2
+            404 MAP_ADD                  2
+            406 JUMP_BACKWARD           38 (to 332)
+        >>  408 END_FOR
+            410 STORE_FAST               8 (arrays)
+            412 STORE_FAST               7 (p)
+
+  9         414 BUILD_LIST               0
+            416 STORE_FAST               9 (info)
+
+ 10         418 LOAD_GLOBAL             23 (NULL + enumerate)
+            428 LOAD_FAST                3 (meta)
+            430 LOAD_CONST               7 ('rows')
+            432 BINARY_SUBSCR
+            436 CALL                     1
+            444 GET_ITER
+        >>  446 FOR_ITER               234 (to 918)
+            450 UNPACK_SEQUENCE          2
+            454 STORE_FAST              10 (i)
+            456 STORE_FAST              11 (m)
+
+ 11         458 LOAD_FAST                6 (reqids)
+            460 LOAD_FAST               11 (m)
+            462 LOAD_CONST               8 ('request')
+            464 BINARY_SUBSCR
+            468 BINARY_SUBSCR
+            472 STORE_FAST              12 (eid)
+
+ 12         474 LOAD_GLOBAL             24 (by_id)
+            484 LOAD_FAST               12 (eid)
+            486 BINARY_SUBSCR
+            490 LOAD_CONST               9 ('labels')
+            492 BINARY_SUBSCR
+            496 LOAD_CONST              10 ('gold')
+            498 BINARY_SUBSCR
+            502 LOAD_FAST               11 (m)
+            504 LOAD_CONST              11 ('question')
+            506 BINARY_SUBSCR
+            510 BINARY_SUBSCR
+            514 LOAD_CONST              12 ('probabilities')
+            516 BINARY_SUBSCR
+            520 STORE_FAST              13 (gg)
+
+ 13         522 LOAD_GLOBAL             18 (np)
+            532 LOAD_ATTR               27 (NULL|self + array)
+            552 LOAD_FAST               11 (m)
+            554 LOAD_CONST              13 ('options')
+            556 BINARY_SUBSCR
+            560 GET_ITER
+            562 LOAD_FAST_AND_CLEAR     14 (o)
+            564 SWAP                     2
+            566 BUILD_LIST               0
+            568 SWAP                     2
+        >>  570 FOR_ITER                 7 (to 588)
+            574 STORE_FAST              14 (o)
+            576 LOAD_FAST               13 (gg)
+            578 LOAD_FAST               14 (o)
+            580 BINARY_SUBSCR
+            584 LIST_APPEND              2
+            586 JUMP_BACKWARD            9 (to 570)
+        >>  588 END_FOR
+            590 SWAP                     2
+            592 STORE_FAST              14 (o)
+            594 CALL                     1
+            602 STORE_FAST              15 (g)
+
+ 14         604 LOAD_FAST                8 (arrays)
+            606 LOAD_CONST              12 ('probabilities')
+            608 BINARY_SUBSCR
+            612 LOAD_FAST               10 (i)
+            614 LOAD_CONST               0 (None)
+            616 LOAD_GLOBAL             29 (NULL + len)
+            626 LOAD_FAST               15 (g)
+            628 CALL                     1
+            636 BUILD_SLICE              2
+            638 BUILD_TUPLE              2
+            640 BINARY_SUBSCR
+            644 STORE_FAST              16 (pp)
+
+ 15         646 LOAD_FAST                9 (info)
+            648 LOAD_ATTR               31 (NULL|self + append)
+            668 LOAD_GLOBAL             33 (NULL + dict)
+            678 LOAD_FAST               10 (i)
+            680 LOAD_FAST               12 (eid)
+            682 LOAD_GLOBAL             24 (by_id)
+            692 LOAD_FAST               12 (eid)
+            694 BINARY_SUBSCR
+            698 LOAD_CONST              14 ('inputs')
+            700 BINARY_SUBSCR
+            704 LOAD_CONST              15 ('workflow')
+            706 BINARY_SUBSCR
+            710 LOAD_FAST               11 (m)
+            712 LOAD_CONST              11 ('question')
+            714 BINARY_SUBSCR
+            718 LOAD_FAST               11 (m)
+            720 LOAD_CONST              16 ('type')
+            722 BINARY_SUBSCR
+
+ 16         726 LOAD_FAST               11 (m)
+            728 LOAD_CONST              13 ('options')
+            730 BINARY_SUBSCR
+            734 LOAD_FAST               15 (g)
+            736 LOAD_GLOBAL             35 (NULL + int)
+            746 LOAD_FAST               15 (g)
+            748 LOAD_ATTR               37 (NULL|self + argmax)
+            768 CALL                     0
+            776 CALL                     1
+            784 LOAD_GLOBAL             35 (NULL + int)
+            794 LOAD_FAST               16 (pp)
+            796 LOAD_ATTR               37 (NULL|self + argmax)
+            816 CALL                     0
+            824 CALL                     1
+            832 LOAD_FAST               15 (g)
+            834 LOAD_ATTR               37 (NULL|self + argmax)
+            854 CALL                     0
+            862 LOAD_FAST               16 (pp)
+            864 LOAD_ATTR               37 (NULL|self + argmax)
+            884 CALL                     0
+            892 COMPARE_OP              40 (==)
+
+ 15         896 KW_NAMES                17 (('i', 'id', 'wf', 'q', 'typ', 'opts', 'g', 'gi', 'pi', 'ok'))
+            898 CALL                    10
+            906 CALL                     1
+            914 POP_TOP
+            916 JUMP_BACKWARD          236 (to 446)
+
+ 10     >>  918 END_FOR
+
+ 17         920 LOAD_FAST                8 (arrays)
+            922 LOAD_FAST                9 (info)
+            924 LOAD_FAST                3 (meta)
+            926 BUILD_TUPLE              3
+            928 RETURN_VALUE
+        >>  930 SWAP                     2
+            932 POP_TOP
+
+  6         934 SWAP                     2
+            936 STORE_FAST               5 (req)
+            938 RERAISE                  0
+        >>  940 SWAP                     2
+            942 POP_TOP
+
+  8         944 SWAP                     2
+            946 STORE_FAST               7 (p)
+            948 RERAISE                  0
+        >>  950 SWAP                     2
+            952 POP_TOP
+
+ 13         954 SWAP   
+[output cut at 10,000 characters]
+```
+[forward passes used: 11 of 25; Python runs used: 32 of 300]

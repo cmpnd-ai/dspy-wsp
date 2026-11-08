@@ -1,0 +1,6 @@
+OUTPUT of Python run 39 of at most 300:
+```
+Seeds: 20 Counter({'privilege_escalation': 3, 'token_reuse': 3, 'malware_signature': 2, 'dormant_account_use': 2, 'disabled_logging': 2, 'impossible_travel': 2, 'config_drift': 1, 'suspicious_process': 1, 'brute_force': 1, 'new_country_login': 1, 'data_egress': 1, 'mass_download': 1})
+Counterfactual requests: 160 questions 800
+```
+[forward passes used: 13 of 25; Python runs used: 39 of 300]

@@ -1,0 +1,65 @@
+OUTPUT of Python run 33 of at most 300:
+```
+Overall accuracy 0.585
+('agent_trace_observability', 'action') acc 0.48 delta -0.02
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.14
+('agent_trace_observability', 'risk') acc 0.56 delta 0.16
+('agent_trace_observability', 'urgency') acc 0.48 delta 0.12
+('customer_service', 'action') acc 0.48 delta 0.08
+('customer_service', 'category') acc 0.96 delta 0.02
+('customer_service', 'churn_risk') acc 0.42 delta -0.02
+('customer_service', 'needs_human') acc 0.68 delta 0.02
+('customer_service', 'urgency') acc 0.56 delta 0.0
+('invoice_processing', 'discrepancy_severity') acc 0.48 delta 0.02
+('invoice_processing', 'disposition') acc 0.34 delta -0.04
+('invoice_processing', 'duplicate') acc 0.86 delta 0.02
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.62 delta 0.24
+('security_incidents', 'credential_compromise') acc 0.74 delta -0.04
+('security_incidents', 'disposition') acc 0.56 delta 0.0
+('security_incidents', 'severity') acc 0.36 delta -0.04
+('security_incidents', 'true_positive') acc 0.68 delta -0.02
+('security_incidents', 'urgency') acc 0.5 delta -0.06
+Paired item delta 0.028000000000000004 SE 0.010985600442644322 improved/worse (47, 28)
+Increment over violation gain2:
+Overall accuracy 0.585
+('agent_trace_observability', 'action') acc 0.48 delta -0.02
+('agent_trace_observability', 'needs_review') acc 0.64 delta 0.0
+('agent_trace_observability', 'outcome') acc 0.66 delta 0.0
+('agent_trace_observability', 'risk') acc 0.56 delta 0.04
+('agent_trace_observability', 'urgency') acc 0.48 delta 0.04
+('customer_service', 'action') acc 0.48 delta -0.04
+('customer_service', 'category') acc 0.96 delta 0.0
+('customer_service', 'churn_risk') acc 0.42 delta 0.0
+('customer_service', 'needs_human') acc 0.68 delta 0.0
+('customer_service', 'urgency') acc 0.56 delta 0.02
+('invoice_processing', 'discrepancy_severity') acc 0.48 delta -0.02
+('invoice_processing', 'disposition') acc 0.34 delta 0.02
+('invoice_processing', 'duplicate') acc 0.86 delta 0.0
+('invoice_processing', 'matches_order') acc 0.64 delta -0.02
+('invoice_processing', 'urgency') acc 0.62 delta -0.02
+('security_incidents', 'credential_compromise') acc 0.74 delta 0.0
+('security_incidents', 'disposition') acc 0.56 delta -0.02
+('security_incidents', 'severity') acc 0.36 delta -0.02
+('security_incidents', 'true_positive') acc 0.68 delta -0.02
+('security_incidents', 'urgency') acc 0.5 delta 0.0
+Paired item delta -0.002999999999999999 SE 0.0053944881603876765 improved/worse (10, 13)
+
+Constraint violations: False
+action n 40 accuracy [base,pay4,viol2,viol4] [0.4, 0.4, 0.4, 0.375]
+needs_review n 40 accuracy [base,pay4,viol2,viol4] [0.625, 0.675, 0.675, 0.675]
+outcome n 40 accuracy [base,pay4,viol2,viol4] [0.65, 0.65, 0.6, 0.575]
+risk n 40 accuracy [base,pay4,viol2,viol4] [0.35, 0.375, 0.4, 0.45]
+urgency n 40 accuracy [base,pay4,viol2,viol4] [0.35, 0.35, 0.375, 0.4]
+
+Constraint violations: True
+action n 10 accuracy [base,pay4,viol2,viol4] [0.9, 0.9, 0.9, 0.9]
+needs_review n 10 accuracy [base,pay4,viol2,viol4] [0.7, 0.5, 0.5, 0.5]
+outcome n 10 accuracy [base,pay4,viol2,viol4] [0.0, 0.1, 0.9, 1.0]
+risk n 10 accuracy [base,pay4,viol2,viol4] [0.6, 0.5, 1.0, 1.0]
+urgency n 10 accuracy [base,pay4,viol2,viol4] [0.4, 0.4, 0.7, 0.8]
+features unchanged: False
+disc_rows sample: {'id': 'train_203', 'wf': 'agent_trace_observability', 'q': 'action', 'p': {'continue': 0.14330591481731986, 'human_review': 0.5855110815101424, 'observe': 0.26210805498284956, 'stop': 0.00907494868968818}, 'g': {'continue': 0.243333, 'human_review': 0.243333, 'observe': 0.48, 'stop': 0.033333}, 'pred': 'human_review', 'gold': 'observe', 'ok': False}
+```
+[forward passes used: 11 of 25; Python runs used: 33 of 300]

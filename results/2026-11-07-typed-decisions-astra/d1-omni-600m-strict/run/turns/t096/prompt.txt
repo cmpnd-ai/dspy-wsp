@@ -1,0 +1,11 @@
+OUTPUT of Python run 70 of at most 300:
+```
+AGENT centered delta RMS 2.3585838789585978e-05 residual after removing old violation effect 0.4820357859134674 changed rankings 0
+OTHER centered delta RMS 0.12435680627822876 residual after removing old violation effect 3.659444473669282e-06 changed rankings 27
+BEST_2 FILES [('head.scorer.1.bias.npy', 4224), ('head.scorer.1.weight.npy', 4194432), ('head.scorer.3.weight.npy', 4224)]
+REQUEST FILE SCHEMAS
+deadline_counterfactuals.json ['type', 'model', 'requests', 'layers'] 64
+agent_counterfactuals.json ['type', 'model', 'requests', 'layers'] 128
+security_counterfactuals.json ['type', 'model', 'requests'] 160
+```
+[forward passes used: 22 of 25; Python runs used: 70 of 300]

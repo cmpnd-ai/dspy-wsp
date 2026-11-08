@@ -1,0 +1,56 @@
+OUTPUT of Python run 24 of at most 300:
+```
+
+ clean
+outcome {'partial': 9, 'success': 7} mean logits [-3.82 -5.76 -2.23 -2.24]
+risk {'0': 14, '1': 2} mean logits [-0.09 -2.24 -6.09 -5.14]
+urgency {'1': 14, '0': 2} mean logits [-1.56 -0.38 -2.3  -7.35]
+
+ dry
+outcome {'partial': 10, 'success': 6} mean logits [-3.82 -5.95 -2.22 -2.16]
+risk {'0': 14, '1': 2} mean logits [-0.11 -2.55 -6.71 -5.96]
+urgency {'1': 16} mean logits [-1.43 -0.06 -2.38 -7.54]
+
+ error1
+outcome {'partial': 13, 'success': 3} mean logits [-3.93 -5.76 -2.22 -2.63]
+risk {'0': 14, '1': 2} mean logits [-1.15 -2.44 -5.87 -4.85]
+urgency {'1': 13, '0': 2, '2': 1} mean logits [-2.05 -0.83 -2.42 -7.39]
+
+ error4
+outcome {'partial': 15, 'success': 1} mean logits [-3.87 -5.61 -2.24 -2.94]
+risk {'0': 14, '1': 2} mean logits [-1.09 -2.36 -5.29 -4.21]
+urgency {'1': 13, '2': 2, '0': 1} mean logits [-2.08 -1.07 -2.4  -6.83]
+
+ irreversible
+outcome {'partial': 13, 'success': 3} mean logits [-3.91 -5.22 -2.3  -2.72]
+risk {'0': 12, '3': 1, '1': 3} mean logits [-1.98 -2.7  -3.95 -3.55]
+urgency {'2': 6, '1': 9, '0': 1} mean logits [-2.66 -1.66 -2.23 -4.23]
+
+ violation1
+outcome {'partial': 16} mean logits [-2.9  -2.85 -1.67 -2.61]
+risk {'2': 3, '0': 5, '3': 6, '1': 2} mean logits [-2.93 -2.77 -3.04 -2.59]
+urgency {'2': 6, '1': 6, '3': 4} mean logits [-3.63 -2.07 -2.07 -2.22]
+
+ violation3
+outcome {'partial': 16} mean logits [-2.29 -2.81 -1.56 -2.63]
+risk {'3': 5, '1': 6, '0': 5} mean logits [-2.88 -2.52 -3.45 -2.76]
+urgency {'2': 6, '1': 6, '3': 4} mean logits [-3.44 -2.15 -1.91 -2.32]
+
+ uncontrolled
+outcome {'partial': 16} mean logits [-3.08 -2.76 -1.73 -2.88]
+risk {'2': 8, '3': 6, '1': 1, '0': 1} mean logits [-3.59 -3.21 -2.44 -2.17]
+urgency {'3': 8, '2': 6, '1': 2} mean logits [-3.94 -2.67 -2.2  -1.48]
+
+Violation contrast norm/raw after protection: 0.68320525 0.07718502737760288
+clean {'outcome': 0.0, 'risk': 0.0, 'urgency': -0.0}
+dry {'outcome': 0.0024, 'risk': -0.0018, 'urgency': -0.0022}
+error1 {'outcome': 0.0069, 'risk': 0.0339, 'urgency': 0.0068}
+error4 {'outcome': 0.0091, 'risk': 0.0457, 'urgency': 0.0105}
+irreversible {'outcome': 0.0106, 'risk': 0.0474, 'urgency': 0.0338}
+violation1 {'outcome': 0.0419, 'risk': 0.1268, 'urgency': 0.058}
+violation3 {'outcome': 0.0418, 'risk': 0.1331, 'urgency': 0.0596}
+uncontrolled {'outcome': 0.0405, 'risk': 0.1325, 'urgency': 0.0605}
+B violations False [('outcome', 0.01), ('risk', 0.0414), ('urgency', 0.0122)]
+B violations True [('outcome', 0.0368), ('risk', 0.1148), ('urgency', 0.0583)]
+```
+[forward passes used: 9 of 25; Python runs used: 24 of 300]
