@@ -101,3 +101,15 @@ def test_trainset_needs_inputs(backend, tmp_path):
     opt, _ = make(backend, tmp_path, [])
     with pytest.raises(ValueError, match="with_inputs"):
         opt.compile(dspy.Predict("question -> answer"), trainset=[dspy.Example(question="q", answer="a")])
+
+
+def test_each_turn_records_the_writers_usage(backend, trainset, tmp_path):
+    opt, _ = make(backend, tmp_path, [EXPLORE, EDIT, MEASURE, FINAL])
+    opt.compile(dspy.Predict("question -> answer"), trainset=trainset)
+    run = tmp_path / "run"
+    keys = {"cache_hit", "tokens_in", "cached_in", "tokens_out", "reasoning_tokens", "usd"}
+    turns = [json.loads((run / "turns" / f"t{i:03d}" / "usage.json").read_text()) for i in range(1, 5)]
+    assert all(set(t) == keys for t in turns)
+    total = json.loads((run / "state.json").read_text())["writer_usage"]
+    assert total["calls"] == 4
+    assert total["tokens_in"] == sum(t["tokens_in"] for t in turns)

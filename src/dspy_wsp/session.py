@@ -61,6 +61,8 @@ class Session:
         self.since_handoff = 0
         self.done = False
         self.final_answer = ""
+        self.last_usage: dict | None = None
+        self.writer_usage = {"calls": 0, "tokens_in": 0, "cached_in": 0, "tokens_out": 0, "reasoning_tokens": 0, "usd": 0.0}
 
     # --- persistence ----------------------------------------------------------------
     @property
@@ -74,6 +76,7 @@ class Session:
             "since_handoff": self.since_handoff,
             "done": self.done,
             "budget": self.budget.to_dict(),
+            "writer_usage": self.writer_usage,
         }
         tmp = self.state_path.with_suffix(".tmp")
         tmp.write_text(json.dumps(state, indent=1))
@@ -86,6 +89,7 @@ class Session:
         self.turn, self.conversation, self.done = s["turn"], s["conversation"], s["done"]
         b = Budget.from_dict(s["budget"])
         self.budget.passes_used, self.budget.code_runs_used = b.passes_used, b.code_runs_used
+        self.writer_usage.update(s.get("writer_usage") or {})
         final = self.run_dir / "final_answer.md"
         self.final_answer = final.read_text() if final.exists() else ""
         return True
@@ -100,6 +104,8 @@ class Session:
         d.mkdir(parents=True, exist_ok=True)
         (d / "prompt.txt").write_text(prompt)
         (d / "answer.md").write_text(answer)
+        if self.last_usage is not None:
+            (d / "usage.json").write_text(json.dumps(self.last_usage, indent=1))
 
     # --- the writer -----------------------------------------------------------------
     def _ask(self, messages: list[dict]) -> str:
@@ -117,10 +123,35 @@ class Session:
                 if not retryable or attempt == WRITER_RETRIES:
                     raise
                 logger.warning("the writer's call failed (%s); retrying", e)
+        self._record_usage()
         first = out[0] if out else ""
         if isinstance(first, dict):
             first = first.get("text") or ""
         return str(first)
+
+    def _record_usage(self) -> None:
+        """Keep the last writer call's tokens and cost, and add them to the run's total."""
+        history = getattr(self.writer_lm, "history", None) or []
+        if not history:
+            self.last_usage = None
+            return
+        entry = history[-1]
+        u = entry.get("usage") or {}
+        hit = bool(getattr(entry.get("response"), "cache_hit", False))  # a cached reply keeps its old cost but bills nothing
+        self.last_usage = {
+            "cache_hit": hit,
+            "tokens_in": u.get("prompt_tokens") or 0,
+            "cached_in": (u.get("prompt_tokens_details") or {}).get("cached_tokens") or 0,
+            "tokens_out": u.get("completion_tokens") or 0,
+            "reasoning_tokens": (u.get("completion_tokens_details") or {}).get("reasoning_tokens") or 0,
+            "usd": 0.0 if hit else entry.get("cost") or 0.0,
+        }
+        total = self.writer_usage
+        total["calls"] += 1
+        for k, v in self.last_usage.items():
+            if k == "cache_hit":
+                continue
+            total[k] = round(total[k] + v, 6) if k == "usd" else total[k] + v
 
     def _handoff(self, kernel_restarted: bool) -> str:
         notes_path = self.work_dir / "notes.md"
