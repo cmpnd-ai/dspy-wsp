@@ -1,6 +1,7 @@
 """DSPy programs calling a decision backend through the TypeSafe client and the local server."""
 
 import json
+from typing import Literal
 
 import dspy
 import pytest
@@ -48,6 +49,20 @@ def test_predict_with_choice_noul_score(backend):
     direct = backend.system_one(history["state"], history["questions"])["answers"]
     assert pred.action.probabilities == pytest.approx(direct["action"]["probabilities"])
     assert pred.needs_review.probability == pytest.approx(direct["needs_review"]["noul"])
+
+
+class PlainTriage(dspy.Signature):
+    """Triage an agent trace."""
+
+    state: str = dspy.InputField()
+    needs_review: bool = dspy.OutputField(desc="Does this need review?")
+    action: Literal["stop", "continue", "review"] = dspy.OutputField(desc="What should happen?")
+
+
+def test_plain_bool_and_literal_outputs(backend):
+    pred = dspy.Predict(PlainTriage)(state=STATE, lm=backend.lm())
+    assert isinstance(pred.needs_review, bool)
+    assert pred.action in ("stop", "continue", "review")
 
 
 def test_calls_are_recorded(backend):
