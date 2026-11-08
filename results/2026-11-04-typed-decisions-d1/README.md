@@ -118,7 +118,7 @@ Before the full run, a three-pass smoke run used 250 training cases, 50 validati
 ## How to reproduce
 
 ```bash
-pip install -e ".[decision,examples]"
+pip install -e ".[examples]"
 cd examples
 python typed_decisions.py --model d1 --framework mlx --baseline protocol
 python typed_decisions.py --model d1 --framework mlx --baseline program

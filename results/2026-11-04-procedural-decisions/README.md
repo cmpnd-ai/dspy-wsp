@@ -125,7 +125,7 @@ For each model, `d1/` and `nanojev/` hold:
 ## How to reproduce
 
 ```bash
-pip install -e ".[decision,examples]"
+pip install -e ".[examples]"
 OPENAI_API_KEY=... examples/overnight_procedural.sh d1 nanojev
 ```
 

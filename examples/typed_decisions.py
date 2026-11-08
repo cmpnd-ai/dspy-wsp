@@ -6,7 +6,7 @@ and score). Every decision has a gold distribution. This example runs the
 decision model behind a local System One server, calls it from a DSPy program
 through DSPy's TypeSafe client, and lets a writer edit its weights.
 
-    pip install -e ".[decision,examples]"
+    pip install -e ".[examples]"
     python examples/typed_decisions.py --baseline protocol        # the benchmark's own request format
     python examples/typed_decisions.py --baseline program         # through the DSPy program
     OPENAI_API_KEY=... python examples/typed_decisions.py --smoke  # a short end-to-end run

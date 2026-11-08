@@ -103,7 +103,7 @@ Under the dataset scorer's protocol, the edited model improved on every measure:
 ## How to reproduce
 
 ```bash
-pip install -e ".[decision,examples]"
+pip install -e ".[examples]"
 cd examples
 python typed_decisions.py --model nanojev --framework mlx --baseline protocol
 python typed_decisions.py --model nanojev --framework mlx --baseline program

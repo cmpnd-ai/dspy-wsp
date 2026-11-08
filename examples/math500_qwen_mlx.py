@@ -6,7 +6,7 @@ top-k 20, presence penalty 1.5, up to 32,768 tokens). The writer practices on th
 paper's 7,275 MATH train problems. The final check uses MATH-500, which the writer
 never sees.
 
-    pip install -e ".[examples,mlx]"
+    pip install -e ".[examples]"
     python examples/math500_qwen_mlx.py --baseline 64   # the unedited model only; no writer, no API cost
     OPENAI_API_KEY=... python examples/math500_qwen_mlx.py
 
