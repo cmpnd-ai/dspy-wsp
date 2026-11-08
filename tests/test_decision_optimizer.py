@@ -79,6 +79,16 @@ def test_compile_runs_with_scripted_writer(backend, tmp_path):
     assert "you may recompute the decision head" in task
 
 
+def test_simulate_head_false_uses_the_papers_rule(backend, tmp_path):
+    opt, _ = make(backend, tmp_path, [FINAL], max_passes=1, simulate_head=False)
+    valset = [dspy.Example(workflow="w0", state='{"held": "out"}', action="stop").with_inputs("workflow", "state")]
+    compiled = opt.compile(Program(), trainset=trainset(), valset=valset)
+    task = (tmp_path / "run" / "task_prompt.txt").read_text()
+    assert "do not implement or simulate the network's computation on any input in the kernel" in task
+    assert "recompute the decision head" not in task
+    assert compiled.wsp_report["simulate_head"] is False
+
+
 def test_holdout_split_is_stratified_and_hidden(backend, tmp_path):
     opt, _ = make(backend, tmp_path, [DECIDE, DECIDE, FINAL])
     opt.compile(Program(), trainset=trainset())

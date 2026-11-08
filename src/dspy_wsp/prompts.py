@@ -85,10 +85,10 @@ HOW TO WORK.
 1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
 2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
 3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. $keep_rule Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to $max_reads questions.
-4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and $confirm_fit: an edit that fits the practice examples closely may not carry over.
+4. $closed_form
 5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep $work_dir/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy $work_dir/edited to $work_dir/best_1/).$explain
 
-RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) $rule_b (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
 
 HOW THE SESSION RUNS. $ending"""
 )
@@ -115,12 +115,34 @@ ROUND_KEEP_RULE = ("Leave your best edit in the edit folder when the round ends,
 ROUND_VALIDATION_PASS = "VALIDATION is not available to you in this run: the search scores the edit you leave in $work_dir/edited on the held-out validation set ($n_validation examples) after the round."
 
 
+# Rule (b) and work step 4 for decision models. HEAD_* lets the writer recompute the head in the kernel;
+# STRICT_* keeps the paper's rule, so the writer scores every candidate edit with a forward pass.
+HEAD_CLOSED_FORM = (
+    "Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from "
+    "them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares "
+    "solution. Fit such edits on practice examples only, and {confirm_fit}: an edit that fits the practice examples closely may not carry over."
+)
+STRICT_CLOSED_FORM = (
+    "Edits computed from read outputs are allowed, for example a mean difference between the head inputs of right and wrong "
+    "options. Derive them from practice examples only, and {confirm_fit}: an edit that fits the practice examples closely may not carry over."
+)
+HEAD_RULE_B = (
+    "running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read "
+    "outputs and derive edits in closed form, but do not implement or simulate the backbone;"
+)
+STRICT_RULE_B = (
+    "running the model other than through the forward-pass tool: do not implement or simulate the network's computation on any "
+    "input in the kernel;"
+)
+
+
 def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None, n_validation: int, work_dir: str, require_explanations: bool,
-                               search_round: bool = False, **fields) -> str:
+                               search_round: bool = False, simulate_head: bool = True, **fields) -> str:
     """The task prompt for a decision model: `build_task_prompt`'s fields, with decide, read and validation passes.
 
     With `search_round`, the prompt describes one round of a population search: the writer has no validation
     passes, the budget is the round's, and the round ends when the writer replies without a code block.
+    With `simulate_head=False`, rule (b) is the paper's: the writer may not recompute any part of the network.
     """
     validation_pass = Template(ROUND_VALIDATION_PASS if search_round else VALIDATION_PASS).substitute(n_validation=n_validation, work_dir=work_dir)
     forward = FORWARD_DECISION.substitute(
@@ -146,6 +168,7 @@ def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None,
             "with the best paired gain confirmed on the validation set, or no edit if none was confirmed. "
             "Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help."
         )
+    confirm_fit = "the search confirms them on the validation set" if search_round else "confirm them on the validation set"
     return TASK_DECISION.substitute(
         **{k: v for k, v in fields.items() if k not in ("sampling", "task_description", "n_practice", "input_keys", "label_keys", "max_output")},
         task_description=f" {fields['task_description'].strip()}" if fields.get("task_description") else "",
@@ -161,7 +184,8 @@ def build_decision_task_prompt(*, limits, max_passes: int, n_layers: int | None,
         ending=ending,
         validation_access="the search scores edits on it." if search_round else "you can only score edits on it, as described below.",
         keep_rule=ROUND_KEEP_RULE if search_round else KEEP_RULE,
-        confirm_fit="the search confirms them on the validation set" if search_round else "confirm them on the validation set",
+        closed_form=(HEAD_CLOSED_FORM if simulate_head else STRICT_CLOSED_FORM).format(confirm_fit=confirm_fit),
+        rule_b=HEAD_RULE_B if simulate_head else STRICT_RULE_B,
     )
 
 EXPLAIN = "\n6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun."

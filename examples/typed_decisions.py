@@ -13,6 +13,7 @@ through DSPy's TypeSafe client, and lets a writer edit its weights.
     OPENAI_API_KEY=... python examples/typed_decisions.py          # 25 passes, final check on the test split
     OPENAI_API_KEY=... python examples/typed_decisions.py --search gepa --rounds 10   # GEPA's population search
     OPENAI_API_KEY=... python examples/typed_decisions.py --writer astra              # gpt-6-astra writes the edit
+    OPENAI_API_KEY=... python examples/typed_decisions.py --writer astra --strict     # the paper's rule: no recomputing the head
 
 The writer practices on 900 training cases and validates on the other 300; the
 400 test cases are used only in the final check. Accuracy follows the dataset's
@@ -189,6 +190,7 @@ def main() -> None:
     parser.add_argument("--search", choices=["conversation", "gepa"], default="conversation")
     parser.add_argument("--rounds", type=int, default=10, help="with --search gepa: the rounds the budget must pay for")
     parser.add_argument("--writer", choices=sorted(WRITERS), default="sol")
+    parser.add_argument("--strict", action="store_true", help="keep the paper's rule: the writer may not recompute the decision head")
     parser.add_argument("--run-dir", type=Path)
     args = parser.parse_args()
 
@@ -220,10 +222,10 @@ def main() -> None:
             limits = Limits(max_generations=64, max_generations_both=64, max_reads=256)
             search = GEPASearch(min_rounds=2, passes_per_proposal=1) if search else None
             passes = search.min_passes() if search else 3
-        suffix = ("-gepa" if search else "") + ("" if args.writer == "sol" else f"-{args.writer}") + ("-smoke" if args.smoke else "")
+        suffix = ("-gepa" if search else "") + ("" if args.writer == "sol" else f"-{args.writer}") + ("-strict" if args.strict else "") + ("-smoke" if args.smoke else "")
         run_dir = args.run_dir or RUNS / f"{run_name(args.model)}{suffix}"
         optimize(backend, train, valset, run_dir=run_dir, passes=passes, limits=limits, holdout=holdout, task=TASK, search=search,
-                 writer=args.writer)
+                 writer=args.writer, simulate_head=not args.strict)
     finally:
         backend.close()
 
@@ -238,7 +240,7 @@ def make_search(kind: str, rounds: int) -> GEPASearch | None:
     return GEPASearch(min_rounds=rounds)
 
 
-def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK, search=None, writer="sol"):
+def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK, search=None, writer="sol", simulate_head=True):
     """Run WeightSpace with the writer on a decision benchmark whose examples carry `workflow`, `state`, `questions` and `gold`."""
     model, settings = WRITERS[writer]
     optimizer = WeightSpace(
@@ -254,6 +256,7 @@ def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout
         run_dir=run_dir,
         resume=True,
         search=search,
+        simulate_head=simulate_head,
     )
     compiled = optimizer.compile(TypedDecisions(train), trainset=train, valset=valset)
     print(compiled.wsp_patch.summary())

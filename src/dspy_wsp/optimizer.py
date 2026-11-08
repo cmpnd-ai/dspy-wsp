@@ -69,6 +69,9 @@ class WeightSpace(Teleprompter):
             the writer gets a short session that starts from a candidate edit, and GEPA keeps the
             children that beat their parents. It needs a decision backend and a holdout, and
             max_passes counts every pass, the writer's and GEPA's. With resume=True, a stopped search continues from its logs.
+        simulate_head: for decision models, let the writer recompute the decision head in its kernel and fit
+            edits there. False keeps the paper's rule: the writer may not run any part of the network outside
+            the forward-pass tool.
     """
 
     def __init__(
@@ -98,6 +101,7 @@ class WeightSpace(Teleprompter):
         holdout: int | float = 0,
         holdout_key: Callable | None = None,
         search: GEPASearch | None = None,
+        simulate_head: bool = True,
     ):
         super().__init__()
         self.metric = metric
@@ -130,6 +134,7 @@ class WeightSpace(Teleprompter):
         self.fallback_if_worse = fallback_if_worse
         self.resume = resume
         self.search = search
+        self.simulate_head = simulate_head
         if search is not None:
             if not self.decision:
                 raise ValueError("GEPA search needs a decision backend")
@@ -189,7 +194,7 @@ class WeightSpace(Teleprompter):
         if self.decision:  # list only the loaded network's tensors (d1 checkpoints also hold unused media encoders)
             shapes = {n: shape for n, shape in shapes.items() if n in editable}
         build = prompts.build_decision_task_prompt if self.decision else prompts.build_task_prompt
-        extra = {"n_validation": len(validation)} if self.decision else {}
+        extra = {"n_validation": len(validation), "simulate_head": self.simulate_head} if self.decision else {}
         if self.search is not None:
             extra["search_round"] = True
         task_prompt = build(
@@ -262,6 +267,7 @@ class WeightSpace(Teleprompter):
         if self.decision:
             report["validation_runs"] = forward.validation_log
             report["validation_size"] = len(validation)
+            report["simulate_head"] = self.simulate_head
         if valset:
             check = forward.paired_eval(valset, edits, n=self.val_samples, out_dir=run_dir / "final_check")
             report["validation"] = check
