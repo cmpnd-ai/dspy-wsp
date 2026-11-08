@@ -1,0 +1,9 @@
+OUTPUT of Python run 41 of at most 300:
+```
+Full minus prior-only, reserved test: {'gain': 0.02105263157894737, 'se': 0.009847499527089491, 'improved': 53, 'worsened': 36}
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5761
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1476
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 592.1420
+Prepared robustness requests 200 from 100 reserved examples.
+```
+[forward passes used: 22 of 25; Python runs used: 41 of 300]

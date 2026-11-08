@@ -1,0 +1,19 @@
+OUTPUT of Python run 7 of at most 300:
+```
+Read 2 alignment max errors {'source': np.float32(0.0), 'requested': np.float32(0.31913075)}
+Read 3 alignment max errors {'source': np.float32(0.0), 'requested': np.float32(0.2968408)}
+Read 4 alignment max errors {'source': np.float32(0.0), 'requested': inf}
+Baseline vs no set attention fit/dev: (0.36533333333333334, 0.3309897884843876) (0.36533333333333334, 0.3292010189269984) (0.37333333333333335, 0.32476431131610894) (0.37066666666666664, 0.3228294289142939)
+Fit rows/features: (7990, 1024) eigenvalue quantiles: [     0.          0.008       0.0505      1.0985     40.4266 167464.7162]
+ridge 0.01 delta_norm 100.348 fit (0.6387, 0.1341) dev (0.5453, 0.2109)
+ridge 0.03 delta_norm 69.1 fit (0.6298, 0.1401) dev (0.544, 0.2059)
+ridge 0.1 delta_norm 41.143 fit (0.6133, 0.1513) dev (0.52, 0.2031)
+ridge 0.3 delta_norm 24.193 fit (0.5938, 0.1643) dev (0.5133, 0.2029)
+ridge 1 delta_norm 13.56 fit (0.5649, 0.1788) dev (0.5067, 0.2041)
+ridge 3 delta_norm 8.263 fit (0.5378, 0.1905) dev (0.4947, 0.2064)
+ridge 10 delta_norm 4.721 fit (0.5022, 0.2027) dev (0.4653, 0.2109)
+ridge 30 delta_norm 2.647 fit (0.4773, 0.215) dev (0.4413, 0.2178)
+ridge 100 delta_norm 1.224 fit (0.4293, 0.2293) dev (0.408, 0.2275)
+ridge 300 delta_norm 0.534 fit (0.3889, 0.2398) dev (0.3787, 0.2357)
+```
+[forward passes used: 4 of 25; Python runs used: 7 of 300]

@@ -1,0 +1,6 @@
+OUTPUT of Python run 19 of at most 300:
+```
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 150.5025
+600-record correction norm 110.47257895391293 strength .75 fit-all score (0.6856666666666666, 0.15066185828228992)
+```
+[forward passes used: 11 of 25; Python runs used: 19 of 300]

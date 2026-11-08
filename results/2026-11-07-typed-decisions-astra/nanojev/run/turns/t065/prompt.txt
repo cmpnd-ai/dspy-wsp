@@ -1,0 +1,62 @@
+OUTPUT of Python run 40 of at most 300:
+```
+head_inputs maximum change 0.0
+path_ends maximum change 0.0
+set_delta maximum change 0.0
+Max scalar-edit reconstruction error: 0.00010466575622558594
+violations/action/0: P(stop) 0.468->0.159
+violations/needs_review/0: P(true) 0.804->0.306
+violations/outcome/0: P(harmful) 0.272->0.126
+violations/risk/0: expected level 1.375->1.141
+violations/action/1: P(stop) 0.511->0.251
+violations/needs_review/1: P(true) 0.779->0.598
+violations/outcome/1: P(harmful) 0.282->0.191
+violations/risk/1: expected level 1.404->1.403
+violations/action/3: P(stop) 0.524->0.229
+violations/needs_review/3: P(true) 0.784->0.564
+violations/outcome/3: P(harmful) 0.270->0.144
+violations/risk/3: expected level 1.377->1.305
+topic/category/account: P(account) 0.229->0.322; correct top 0/4 -> 4/4
+topic/category/billing: P(billing) 0.369->0.642; correct top 4/4 -> 4/4
+topic/category/delivery: P(delivery) 0.282->0.698; correct top 2/4 -> 4/4
+topic/category/refund: P(refund) 0.184->0.400; correct top 0/4 -> 4/4
+topic/category/technical: P(technical) 0.155->0.426; correct top 0/4 -> 4/4
+days_due/urgency/30: expected level 1.864->1.472
+days_due/urgency/7: expected level 1.872->1.471
+days_due/urgency/0: expected level 1.842->1.482
+days_due/urgency/-5: expected level 1.858->1.479
+asset_criticality/severity/low: expected level 2.361->2.273
+asset_criticality/severity/medium: expected level 2.368->2.350
+asset_criticality/severity/high: expected level 2.434->2.528
+asset_criticality/severity/critical: expected level 2.395->2.384
+duplicate_id/duplicate/0: P(true) 0.778->0.243
+duplicate_id/disposition/0: P(approve) 0.246->0.351
+duplicate_id/duplicate/1: P(true) 0.785->0.193
+duplicate_id/disposition/1: P(approve) 0.246->0.359
+invoice_amount_ratio/matches_order/1.0: P(true) 0.773->0.751
+invoice_amount_ratio/discrepancy_severity/1.0: expected level 1.798->1.058
+invoice_amount_ratio/disposition/1.0: P(approve) 0.242->0.365
+invoice_amount_ratio/matches_order/1.1: P(true) 0.762->0.647
+invoice_amount_ratio/discrepancy_severity/1.1: expected level 1.812->1.045
+invoice_amount_ratio/disposition/1.1: P(approve) 0.246->0.362
+invoice_amount_ratio/matches_order/1.5: P(true) 0.765->0.616
+invoice_amount_ratio/discrepancy_severity/1.5: expected level 1.803->1.138
+invoice_amount_ratio/disposition/1.5: P(approve) 0.247->0.357
+authorization_evidence/credential_compromise/authorized: P(true) 0.854->0.635
+authorization_evidence/true_positive/authorized: P(true) 0.858->0.813
+authorization_evidence/disposition/authorized: P(contain) 0.276->0.150
+authorization_evidence/credential_compromise/compromised: P(true) 0.861->0.695
+authorization_evidence/true_positive/compromised: P(true) 0.871->0.832
+authorization_evidence/disposition/compromised: P(contain) 0.260->0.154
+cancellation_intent/churn_risk/satisfied: expected level 1.615->1.562
+cancellation_intent/needs_human/satisfied: P(true) 0.858->0.511
+cancellation_intent/action/satisfied: P(escalate_to_human) 0.285->0.335
+cancellation_intent/churn_risk/frustrated: expected level 1.614->1.595
+cancellation_intent/needs_human/frustrated: P(true) 0.860->0.457
+cancellation_intent/action/frustrated: P(escalate_to_human) 0.292->0.336
+cancellation_intent/churn_risk/leaving: expected level 1.647->1.801
+cancellation_intent/needs_human/leaving: P(true) 0.856->0.453
+cancellation_intent/action/leaving: P(escalate_to_human) 0.313->0.386
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 75.8436
+```
+[forward passes used: 23 of 25; Python runs used: 40 of 300]

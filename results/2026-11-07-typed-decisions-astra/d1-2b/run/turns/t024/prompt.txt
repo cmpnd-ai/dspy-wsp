@@ -1,0 +1,5 @@
+OUTPUT of Python run 14 of at most 300:
+```
+Next: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/probe_odd_dev.json edit: ['model.language_model.layers.23.post_ffn_norm.weight']
+```
+[forward passes used: 9 of 25; Python runs used: 14 of 300]

@@ -1,0 +1,14 @@
+OUTPUT of Python run 30 of at most 300:
+```
+Nonfinite slots: 2175 in valid options: 0
+Valid nonfinite examples: []
+Full900 direction norm/cosine with600: 95.43608856201172 0.9000924531330823
+Full900 fitted (not held out): {'accuracy': 0.6537777777777778, 'gain': 0.28955555555555557, 'paired_se': 0.008456583719765088, 'brier_sum': 0.15720486640930176, 'items': 900}
+Fixed-recipe held fold 0 {'accuracy': 0.5646666666666665, 'gain': 0.19333333333333333, 'paired_se': 0.015684552990982613, 'brier_sum': 0.19211304187774658, 'items': 300}
+Fixed-recipe held fold 1 {'accuracy': 0.5886666666666667, 'gain': 0.2186666666666667, 'paired_se': 0.016266820183130703, 'brier_sum': 0.19746871292591095, 'items': 300}
+Fixed-recipe held fold 2 {'accuracy': 0.5506666666666667, 'gain': 0.19933333333333333, 'paired_se': 0.014430808530949695, 'brier_sum': 0.18913140892982483, 'items': 300}
+Combined cross-fit: {'accuracy': 0.568, 'gain': 0.2037777777777778, 'paired_se': 0.00893453549730807, 'brier_sum': 0.19290438294410706, 'items': 900}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 130.0175
+Installed scalar digest: 9e1a86a04ba8239034abca169edc53c784330a37405be9a1d54d191e2ece646b
+```
+[forward passes used: 16 of 25; Python runs used: 30 of 300]

@@ -1,0 +1,7 @@
+OUTPUT of Python run 39 of at most 300:
+```
+Shared-only vs cached maximum option-contrast error: 1.6450881958007812e-05
+Shared-only dev metrics: {'acc': 0.6705357432365417, 'gain': 0.1205357164144516, 'se': 0.016780376434326172, 'brier': 0.04183195158839226}
+Definition direction agreement: 0.0
+```
+[forward passes used: 20 of 25; Python runs used: 39 of 300]

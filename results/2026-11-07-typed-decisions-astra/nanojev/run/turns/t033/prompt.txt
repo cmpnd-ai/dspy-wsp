@@ -1,0 +1,5 @@
+OUTPUT of Python run 20 of at most 300:
+```
+mix600 vs soft450 on practice test: gain 0.011999999999999999 paired SE 0.01062002063792984
+```
+[forward passes used: 12 of 25; Python runs used: 20 of 300]

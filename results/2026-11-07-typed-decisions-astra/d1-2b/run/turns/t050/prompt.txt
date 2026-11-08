@@ -1,0 +1,13 @@
+OUTPUT of Python run 30 of at most 300:
+```
+Types: {'U': ('Tensor', 'torch.float64'), 'fit_u': ('ndarray', 'float32'), 'Y': ('ndarray', 'float32'), 'Yt': ('Tensor', 'torch.float64'), 'A_best': ('ndarray', 'float64')}
+U comparison: 0.0
+Target comparison: 0.0
+Target function globals: ('len', 'np', 'zeros', 'rank', 'float32', 'range', 'astype', 'float64', 'gn_np', 'B', 'gp_np', 'mean', 'log', 'maximum', 'linalg', 'pinv', 'append', 'norm', 'array')
+Combine function globals: ('np', 'concatenate')
+rank9_closed_form.npz [('B', (2048, 9)), ('A', (9, 2048)), ('lambda_', ()), ('alpha', ())]
+candidate_rank9_ridge1_factors.npz [('B', (2048, 9)), ('A', (9, 2048)), ('alpha', ()), ('ridge', ())]
+Reproduced coefficient relative error: 2.848549888340978e-10
+Dev target norm / linear residual median: 443.8917541503906 8.1773032027145e-16
+```
+[forward passes used: 18 of 25; Python runs used: 30 of 300]

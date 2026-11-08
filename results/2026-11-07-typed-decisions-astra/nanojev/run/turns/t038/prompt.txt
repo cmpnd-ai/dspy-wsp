@@ -1,0 +1,17 @@
+OUTPUT of Python run 23 of at most 300:
+```
+Weighted-contrast candidates: dev accuracy, Brier, fit accuracy, target, ridge, strength, norm
+(0.6013, 0.1893, 0.7169, 'top_margin', 0.003, 0.75, np.float64(123.7872))
+(0.5867, 0.2013, 0.736, 'top_margin', 0.003, 1.0, np.float64(123.7872))
+(0.5867, 0.1971, 0.7178, 'mixed_log', 0.003, 0.75, np.float64(151.0211))
+(0.584, 0.2162, 0.736, 'mixed_log', 0.003, 1.0, np.float64(151.0211))
+(0.584, 0.1968, 0.716, 'top_margin', 0.01, 1.0, np.float64(82.0995))
+(0.584, 0.188, 0.6893, 'top_margin', 0.01, 0.75, np.float64(82.0995))
+(0.5813, 0.2093, 0.7209, 'mixed_log', 0.01, 1.0, np.float64(99.6126))
+(0.58, 0.1935, 0.7009, 'mixed_log', 0.01, 0.75, np.float64(99.6126))
+(0.5787, 0.1956, 0.6929, 'top_margin', 0.03, 1.0, np.float64(51.415))
+(0.572, 0.1854, 0.6724, 'gold_log', 0.003, 0.75, np.float64(111.2851))
+(0.564, 0.2055, 0.6876, 'mixed_log', 0.03, 1.0, np.float64(61.5005))
+(0.5627, 0.1901, 0.6644, 'top_margin', 0.03, 0.75, np.float64(51.415))
+```
+[forward passes used: 14 of 25; Python runs used: 23 of 300]

@@ -1,0 +1,8 @@
+OUTPUT of Python run 31 of at most 300:
+```
+saved edit model.language_model.layers.23.feed_forward.w2.weight: 15,728,639 of 15,728,640 entries changed, relative change 2.8457
+Expanded coefficient norm: 130.57157596005533
+Relative update norm: 2.8446550369262695
+Expanded in-fit dev metrics (NOT holdout): {'acc': 0.8933333333333333, 'brier': 0.01882384557474653, 'gain': 0.27444444444444444, 'se': 0.017335235216927647}
+```
+[forward passes used: 18 of 25; Python runs used: 31 of 300]

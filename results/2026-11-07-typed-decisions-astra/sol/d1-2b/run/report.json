@@ -1,0 +1,91 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b",
+ "final_answer": "Kept the validated edit: **384 of 2,048 gains** in `layers.23.post_ffn_norm.weight`. All other tensors, including embeddings and the final norm, remain unchanged.\n\nThe repair selectively reweights the last MLP\u2019s contribution to the residual stream. Two independent causal gain probes localized decision-sensitive dimensions; a closed-form ridge solution derived the correction from practice examples. Strength tests showed a dose-response and degradation at excessive strength.\n\n| Evaluation | Original \u2192 Edited | Paired gain \u00b1 SE |\n|---|---:|---:|\n| Independent practice holdout, 450 records | 61.91% \u2192 68.44% | **+6.53 \u00b1 1.14 points** |\n| Hidden validation, 300 records | 60.67% \u2192 67.93% | **+7.27 \u00b1 1.31 points** |\n\nOverall practice accuracy rose from **61.33% to 68.64%**, though that includes fitting examples.\n\nThis is not merely a confidence adjustment: it changed the winning option on 700 of 2,250 holdout questions. Holdout mean Brier improved from **0.1616 to 0.1102**. Some question types regressed, but all four workflows improved overall on the practice holdout. The candidate was locked before holdout and validation testing, and the independent gains support keeping it.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 33
+ },
+ "turns": 59,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 18,
+   "model": "both",
+   "edited_tensors": [
+    "model.language_model.layers.23.post_ffn_norm.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.6066666666666667,
+    "score_se_over_items": 0.014379265802681115,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 264
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6793333333333333,
+    "score_se_over_items": 0.013013956433718157,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 240
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.6066666666666667,
+    "edited": 0.6793333333333333,
+    "gain": 0.07266666666666667,
+    "se": 0.01307548902447946,
+    "improved": 123,
+    "worsened": 58
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.622,
+   "score_se_over_items": 0.012130865374607126,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 350
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.665,
+   "score_se_over_items": 0.011010931000771888,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 343
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.622,
+   "edited": 0.665,
+   "gain": 0.043,
+   "se": 0.011585034854563608,
+   "improved": 157,
+   "worsened": 111
+  }
+ },
+ "patch": "1 tensors, 384 entries changed\n  model.language_model.layers.23.post_ffn_norm.weight bfloat16[2048]: 384 entries (sparse), relative change 3.8082"
+}

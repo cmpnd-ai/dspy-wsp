@@ -1,0 +1,161 @@
+{
+ "model": "LiquidAI/d1-omni-600M",
+ "wsp_run": "runs/typed-decisions/d1",
+ "practice_cases": 900,
+ "validation_cases": 300,
+ "test_cases": 400,
+ "conditions": {
+  "plain": {
+   "decided_accuracy": 0.5085000000000001,
+   "decided_se": 0.010634948534234405,
+   "probability_accuracy": 0.5335,
+   "probability_se": 0.01069955963771887,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.5316666666666666,
+     "probability_accuracy": 0.5316666666666666,
+     "decisions": 600
+    },
+    "noul": {
+     "decided_accuracy": 0.665,
+     "probability_accuracy": 0.665,
+     "decisions": 600
+    },
+    "score": {
+     "decided_accuracy": 0.37375,
+     "probability_accuracy": 0.43625,
+     "decisions": 800
+    }
+   }
+  },
+  "reanchor": {
+   "decided_accuracy": 0.6015,
+   "decided_se": 0.011024892090811369,
+   "probability_accuracy": 0.5335,
+   "probability_se": 0.01069955963771887,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.605,
+     "probability_accuracy": 0.5316666666666666,
+     "decisions": 600
+    },
+    "noul": {
+     "decided_accuracy": 0.6916666666666667,
+     "probability_accuracy": 0.665,
+     "decisions": 600
+    },
+    "score": {
+     "decided_accuracy": 0.53125,
+     "probability_accuracy": 0.43625,
+     "decisions": 800
+    }
+   }
+  },
+  "wsp": {
+   "decided_accuracy": 0.5665,
+   "decided_se": 0.011457423636707226,
+   "probability_accuracy": 0.606,
+   "probability_se": 0.011779511544651436,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.5833333333333334,
+     "probability_accuracy": 0.5833333333333334,
+     "decisions": 600
+    },
+    "noul": {
+     "decided_accuracy": 0.7066666666666667,
+     "probability_accuracy": 0.7066666666666667,
+     "decisions": 600
+    },
+    "score": {
+     "decided_accuracy": 0.44875,
+     "probability_accuracy": 0.5475,
+     "decisions": 800
+    }
+   }
+  },
+  "wsp_reanchor": {
+   "decided_accuracy": 0.629,
+   "decided_se": 0.011714973388947983,
+   "probability_accuracy": 0.606,
+   "probability_se": 0.011779511544651436,
+   "by_type": {
+    "choice": {
+     "decided_accuracy": 0.5966666666666667,
+     "probability_accuracy": 0.5833333333333334,
+     "decisions": 600
+    },
+    "noul": {
+     "decided_accuracy": 0.7016666666666667,
+     "probability_accuracy": 0.7066666666666667,
+     "decisions": 600
+    },
+    "score": {
+     "decided_accuracy": 0.59875,
+     "probability_accuracy": 0.5475,
+     "decisions": 800
+    }
+   }
+  }
+ },
+ "paired_decided": {
+  "reanchor_vs_plain": {
+   "items": 400,
+   "original": 0.5085000000000001,
+   "edited": 0.6015,
+   "gain": 0.09300000000000001,
+   "se": 0.011030943035871939,
+   "improved": 207,
+   "worsened": 70
+  },
+  "wsp_vs_plain": {
+   "items": 400,
+   "original": 0.5085000000000001,
+   "edited": 0.5665,
+   "gain": 0.057999999999999996,
+   "se": 0.009608371454362729,
+   "improved": 153,
+   "worsened": 70
+  },
+  "wsp_reanchor_vs_plain": {
+   "items": 400,
+   "original": 0.5085000000000001,
+   "edited": 0.629,
+   "gain": 0.12050000000000001,
+   "se": 0.011781186948469453,
+   "improved": 207,
+   "worsened": 63
+  },
+  "wsp_reanchor_vs_wsp": {
+   "items": 400,
+   "original": 0.5665,
+   "edited": 0.629,
+   "gain": 0.0625,
+   "se": 0.009365021841149812,
+   "improved": 149,
+   "worsened": 59
+  }
+ },
+ "reanchor_reports": {
+  "reanchor": {
+   "train_score_before": 0.5376,
+   "train_score": 0.6522,
+   "val_score_before": 0.542,
+   "val_score": 0.628,
+   "fitted_outputs": 20
+  },
+  "wsp_reanchor": {
+   "train_score_before": 0.6084,
+   "train_score": 0.6882,
+   "val_score_before": 0.5907,
+   "val_score": 0.6593,
+   "fitted_outputs": 20
+  }
+ },
+ "seconds": {
+  "plain": 83.5,
+  "reanchor": 977.0,
+  "wsp": 84.0,
+  "wsp_reanchor": 989.9
+ }
+}

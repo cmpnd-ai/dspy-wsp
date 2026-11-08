@@ -1,0 +1,8 @@
+OUTPUT of Python run 32 of at most 300:
+```
+Expanded minus first candidate, practice test: 0.007222222222222224 paired SE 0.005953772073665142
+call_probs signature: (record)
+Call structure: ['prompt', 'completion', 'finish_reason', 'input_tokens', 'output_tokens']
+Completion sample: {"action": {"choice": "human_review", "confidence": 0.33217684097335365, "probabilities": {"continue": 0.09984600852402438, "human_review": 0.49913263073001524, "observe": 0.3545504999384172, "stop": 0.046470860807543216}}, "needs_review": {"noul": 0.6070456738459605}, "outcome": {"choice": "partial", "confidence": 0.2546531971248515, "probabilities": {"failure": 0.13421563525084182, "harmful": 0.04745932661559423, "partial": 0.4409898978436386, "success": 0.3773351402899253}}, "risk": {"score": 1.5608616943275462, "confidence": 0.4029143645606521, "probabilities": {"0": 0.0811189861432413, "1": 0.3558739982694182, "2": 0.4840333507038933, "3": 0.07897366488344716}}, "urgency": {"score": 1.1446425444044164, "confidence": 0.4812811101857929, "probabilities": {"0": 0.1870381727048953, "1": 0.5236937670937506, "2": 0.24685540329339636, "3": 0.042412656907957695}}}
+```
+[forward passes used: 19 of 25; Python runs used: 32 of 300]

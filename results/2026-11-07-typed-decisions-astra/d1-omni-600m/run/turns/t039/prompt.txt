@@ -1,0 +1,8 @@
+OUTPUT of Python run 22 of at most 300:
+```
+Full conditional {'acc': 0.7008928656578064, 'gain': 0.15089285373687744, 'se': 0.01706094667315483, 'brier': 0.04147523269057274}
+Fixed prior only {'acc': 0.6669642925262451, 'gain': 0.11696428805589676, 'se': 0.017034942284226418, 'brier': 0.04188189283013344}
+State-dependent only {'acc': 0.6991071701049805, 'gain': 0.14910714328289032, 'se': 0.017363347113132477, 'brier': 0.041436679661273956}
+Targeted residual variability (RMS): prior 0.05060864984989166 state 0.6625369787216187
+```
+[forward passes used: 13 of 25; Python runs used: 22 of 300]

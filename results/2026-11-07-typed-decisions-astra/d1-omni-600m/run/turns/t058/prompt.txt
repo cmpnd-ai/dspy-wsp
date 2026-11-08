@@ -1,0 +1,8 @@
+OUTPUT of Python run 35 of at most 300:
+```
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5761
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1476
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 592.1420
+Restored best2. Reserved test count 228
+```
+[forward passes used: 18 of 25; Python runs used: 35 of 300]

@@ -1,0 +1,235 @@
+OUTPUT of Python run 28 of at most 300:
+```
+combine_data signature: (a, b)
+contrast_targets bytecode:
+ 42           0 RESUME                   0
+
+ 43           2 LOAD_GLOBAL              1 (NULL + len)
+             12 LOAD_FAST                0 (d)
+             14 LOAD_CONST               1 ('h')
+             16 BINARY_SUBSCR
+             20 CALL                     1
+             28 STORE_FAST               2 (n)
+             30 LOAD_GLOBAL              2 (np)
+             40 LOAD_ATTR                5 (NULL|self + zeros)
+             60 LOAD_FAST                2 (n)
+             62 LOAD_GLOBAL              6 (rank)
+             72 BUILD_TUPLE              2
+             74 LOAD_GLOBAL              2 (np)
+             84 LOAD_ATTR                8 (float32)
+            104 CALL                     2
+            112 STORE_FAST               3 (targets)
+            114 BUILD_LIST               0
+            116 STORE_FAST               4 (residuals)
+
+ 44         118 LOAD_GLOBAL             11 (NULL + range)
+            128 LOAD_FAST                2 (n)
+            130 CALL                     1
+            138 GET_ITER
+        >>  140 EXTENDED_ARG             2
+            142 FOR_ITER               547 (to 1240)
+            146 STORE_FAST               5 (i)
+
+ 45         148 LOAD_FAST                0 (d)
+            150 LOAD_CONST               2 ('mask')
+            152 BINARY_SUBSCR
+            156 LOAD_FAST                5 (i)
+            158 BINARY_SUBSCR
+            162 STORE_FAST               6 (m)
+            164 LOAD_FAST                0 (d)
+            166 LOAD_CONST               3 ('e')
+            168 BINARY_SUBSCR
+            172 LOAD_FAST                5 (i)
+            174 LOAD_FAST                6 (m)
+            176 BUILD_TUPLE              2
+            178 BINARY_SUBSCR
+            182 LOAD_ATTR               13 (NULL|self + astype)
+            202 LOAD_GLOBAL              2 (np)
+            212 LOAD_ATTR               14 (float64)
+            232 CALL                     1
+            240 STORE_FAST               7 (E)
+
+ 46         242 LOAD_FAST                0 (d)
+            244 LOAD_CONST               4 ('u')
+            246 BINARY_SUBSCR
+            250 LOAD_FAST                5 (i)
+            252 BINARY_SUBSCR
+            256 LOAD_ATTR               13 (NULL|self + astype)
+            276 LOAD_GLOBAL              2 (np)
+            286 LOAD_ATTR               14 (float64)
+            306 CALL                     1
+            314 STORE_FAST               8 (u)
+            316 LOAD_FAST                0 (d)
+            318 LOAD_CONST               1 ('h')
+            320 BINARY_SUBSCR
+            324 LOAD_FAST                5 (i)
+            326 BINARY_SUBSCR
+            330 LOAD_ATTR               13 (NULL|self + astype)
+            350 LOAD_GLOBAL              2 (np)
+            360 LOAD_ATTR               14 (float64)
+            380 CALL                     1
+            388 LOAD_GLOBAL             16 (gn_np)
+            398 BINARY_OP               11 (/)
+            402 STORE_FAST               9 (t)
+
+ 48         404 LOAD_GLOBAL             18 (B)
+            414 LOAD_ATTR               13 (NULL|self + astype)
+            434 LOAD_GLOBAL              2 (np)
+            444 LOAD_ATTR               14 (float64)
+            464 CALL                     1
+            472 LOAD_FAST                8 (u)
+            474 LOAD_CONST               0 (None)
+            476 LOAD_CONST               0 (None)
+            478 BUILD_SLICE              2
+            480 LOAD_CONST               0 (None)
+            482 BUILD_TUPLE              2
+            484 BINARY_SUBSCR
+            488 LOAD_FAST                8 (u)
+            490 LOAD_GLOBAL             18 (B)
+            500 BINARY_OP                4 (@)
+            504 LOAD_CONST               0 (None)
+            506 LOAD_CONST               0 (None)
+            508 LOAD_CONST               0 (None)
+            510 BUILD_SLICE              2
+            512 BUILD_TUPLE              2
+            514 BINARY_SUBSCR
+            518 BINARY_OP                5 (*)
+            522 LOAD_FAST                8 (u)
+            524 LOAD_FAST                8 (u)
+            526 BINARY_OP                4 (@)
+            530 BINARY_OP               11 (/)
+            534 BINARY_OP               10 (-)
+            538 STORE_FAST              10 (dwrite)
+
+ 49         540 LOAD_GLOBAL             20 (gp_np)
+            550 LOAD_CONST               0 (None)
+            552 LOAD_CONST               0 (None)
+            554 BUILD_SLICE              2
+            556 LOAD_CONST               0 (None)
+            558 BUILD_TUPLE              2
+            560 BINARY_SUBSCR
+            564 LOAD_FAST               10 (dwrite)
+            566 BINARY_OP                5 (*)
+            570 STORE_FAST              11 (dt)
+
+ 50         572 LOAD_GLOBAL             16 (gn_np)
+            582 LOAD_CONST               0 (None)
+            584 LOAD_CONST               0 (None)
+            586 BUILD_SLICE              2
+            588 LOAD_CONST               0 (None)
+            590 BUILD_TUPLE              2
+            592 BINARY_SUBSCR
+            596 LOAD_FAST               11 (dt)
+            598 LOAD_FAST                9 (t)
+            600 LOAD_CONST               0 (None)
+            602 LOAD_CONST               0 (None)
+            604 BUILD_SLICE              2
+            606 LOAD_CONST               0 (None)
+            608 BUILD_TUPLE              2
+            610 BINARY_SUBSCR
+            614 LOAD_FAST                9 (t)
+            616 LOAD_FAST               11 (dt)
+            618 BINARY_OP                4 (@)
+            622 LOAD_CONST               0 (None)
+            624 LOAD_CONST               0 (None)
+            626 LOAD_CONST               0 (None)
+            628 BUILD_SLICE              2
+            630 BUILD_TUPLE              2
+            632 BINARY_SUBSCR
+            636 BINARY_OP                5 (*)
+            640 LOAD_CONST               5 (2048)
+            642 BINARY_OP               11 (/)
+            646 BINARY_OP               10 (-)
+            650 BINARY_OP                5 (*)
+            654 STORE_FAST              12 (dh)
+
+ 51         656 LOAD_FAST                7 (E)
+            658 LOAD_FAST               12 (dh)
+            660 BINARY_OP                4 (@)
+            664 STORE_FAST              13 (J)
+
+ 52         666 LOAD_FAST               13 (J)
+            668 LOAD_FAST               13 (J)
+            670 LOAD_ATTR               23 (NULL|self + mean)
+            690 LOAD_CONST               6 (0)
+            692 KW_NAMES                 7 (('axis',))
+            694 CALL                     1
+            702 BINARY_OP               23 (-=)
+            706 STORE_FAST              13 (J)
+
+ 53         708 LOAD_FAST                0 (d)
+            710 LOAD_CONST               8 ('gold')
+            712 BINARY_SUBSCR
+            716 LOAD_FAST                5 (i)
+            718 LOAD_FAST                6 (m)
+            720 BUILD_TUPLE              2
+            722 BINARY_SUBSCR
+            726 LOAD_ATTR               13 (NULL|self + astype)
+            746 LOAD_GLOBAL              2 (np)
+            756 LOAD_ATTR               14 (float64)
+            776 CALL                     1
+            784 STORE_FAST              14 (gold)
+
+ 54         786 LOAD_FAST                0 (d)
+            788 LOAD_CONST               9 ('temp')
+            790 BINARY_SUBSCR
+            794 LOAD_FAST                5 (i)
+            796 BINARY_SUBSCR
+            800 LOAD_GLOBAL              2 (np)
+            810 LOAD_ATTR               25 (NULL|self + log)
+            830 LOAD_GLOBAL              2 (np)
+            840 LOAD_ATTR               27 (NULL|self + maximum)
+            860 LOAD_FAST               14 (gold)
+            862 LOAD_FAST                1 (floor)
+            864 CALL                     2
+            872 CALL                     1
+            880 BINARY_OP                5 (*)
+            884 STORE_FAST              15 (target)
+
+ 55         886 LOAD_FAST               15 (target)
+            888 LOAD_FAST               15 (target)
+            890 LOAD_ATTR               23 (NULL|self + mean)
+            910 CALL                     0
+            918 BINARY_OP               23 (-=)
+            922 STORE_FAST              15 (target)
+
+ 56         924 LOAD_FAST                0 (d)
+            926 LOAD_CONST              10 ('l')
+            928 BINARY_SUBSCR
+            932 LOAD_FAST                5 (i)
+            934 LOAD_FAST                6 (m)
+            936 BUILD_TUPLE              2
+            938 BINARY_SUBSCR
+            942 LOAD_ATTR               13 (NULL|self + astype)
+            962 LOAD_GLOBAL              2 (np)
+            972 LOAD_ATTR               14 (float64)
+            992 CALL                     1
+           1000 STORE_FAST              16 (orig)
+           1002 LOAD_FAST               16 (orig)
+           1004 LOAD_FAST               16 (orig)
+           1006 LOAD_ATTR               23 (NULL|self + mean)
+           1026 CALL                     0
+           1034 BINARY_OP               23 (-=)
+           1038 STORE_FAST              16 (orig)
+
+ 57        1040 LOAD_FAST               15 (target)
+           1042 LOAD_FAST               16 (orig)
+           1044 BINARY_OP               10 (-)
+           1048 STORE_FAST              17 (delta)
+
+ 58        1050 LOAD_GLOBAL              2 (np)
+           1060 LOAD_ATTR               28 (linalg)
+           1080 LOAD_ATTR               31 (NULL|self + pinv)
+           1100 LOAD_FAST               13 (J)
+           1102 LOAD_CONST              11 (1e-06)
+           1104 KW_NAMES                12 (('rcond',))
+           1106 CALL                     2
+           1114 LOAD_FAST               17 (delta)
+           1116 BINARY_OP                4 (@)
+           1120 STORE_FAST              18 (coef)
+
+ 59        1122 LOAD_FAST               18 (coef)
+           1124 
+[output cut at 10,000 characters]
+```
+[forward passes used: 18 of 25; Python runs used: 28 of 300]

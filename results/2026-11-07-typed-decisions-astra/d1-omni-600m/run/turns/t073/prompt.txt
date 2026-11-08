@@ -1,0 +1,8 @@
+OUTPUT of Python run 43 of at most 300:
+```
+Actual edited robustness: {'original_state_accuracy': 0.7279999852180481, 'metadata_added_accuracy': 0.6859999895095825, 'answer_flip_rate': 0.18799999356269836, 'mean_probability_total_variation': 0.13291071355342865}
+Replay max probability error: 0.0007319450378417969
+Robustness paired gains: {'unchanged': {'gain': 0.1340000030398369, 'paired_se': 0.024627323817256814}, 'metadata_added': {'gain': 0.11000000223517419, 'paired_se': 0.025800321536657934}}
+Final modified entries: 112860 of 380732161
+```
+[forward passes used: 24 of 25; Python runs used: 43 of 300]

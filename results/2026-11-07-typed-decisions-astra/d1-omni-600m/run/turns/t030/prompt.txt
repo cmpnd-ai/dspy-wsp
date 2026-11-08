@@ -1,0 +1,41 @@
+OUTPUT of Python run 16 of at most 300:
+```
+Counterfactual actual vs prediction max contrast error: 1.5735626220703125e-05
+Actual constraint_violations outcome 0.0945 -> 0.4163
+Actual constraint_violations risk 0.4106 -> 1.0435
+Actual constraint_violations needs_review 0.0184 -> 0.4374
+Actual days_until_due urgency 0.0429 -> 0.3792
+Actual discount urgency 0.0278 -> 0.0064
+Actual freight_terms discrepancy_severity 0.1345 -> 0.0507
+Actual privileges severity 0.1163 -> 0.1958
+Actual asset_criticality severity 0.3755 -> 0.4909
+Workflow residual agent_tr 0.003 norm 29.74 dev acc 0.6652 gain over current -0.0054
+Workflow residual agent_tr 0.01 norm 17.57 dev acc 0.6679 gain over current -0.0027
+Workflow residual agent_tr 0.03 norm 10.05 dev acc 0.6679 gain over current -0.0027
+Workflow residual agent_tr 0.1 norm 4.91 dev acc 0.6741 gain over current 0.0036
+Workflow residual agent_tr 0.3 norm 2.31 dev acc 0.6714 gain over current 0.0009
+Workflow residual agent_tr 1 norm 0.9 dev acc 0.6687 gain over current -0.0018
+Workflow residual customer 0.003 norm 19.17 dev acc 0.6652 gain over current -0.0054
+Workflow residual customer 0.01 norm 11.12 dev acc 0.6643 gain over current -0.0063
+Workflow residual customer 0.03 norm 6.04 dev acc 0.667 gain over current -0.0036
+Workflow residual customer 0.1 norm 2.67 dev acc 0.6714 gain over current 0.0009
+Workflow residual customer 0.3 norm 1.13 dev acc 0.6732 gain over current 0.0027
+Workflow residual customer 1 norm 0.4 dev acc 0.6705 gain over current 0.0
+Workflow residual invoice_ 0.003 norm 40.1 dev acc 0.6795 gain over current 0.0089
+Workflow residual invoice_ 0.01 norm 21.49 dev acc 0.6786 gain over current 0.008
+Workflow residual invoice_ 0.03 norm 11.1 dev acc 0.675 gain over current 0.0045
+Workflow residual invoice_ 0.1 norm 4.79 dev acc 0.675 gain over current 0.0045
+Workflow residual invoice_ 0.3 norm 2.01 dev acc 0.6696 gain over current -0.0009
+Workflow residual invoice_ 1 norm 0.72 dev acc 0.6679 gain over current -0.0027
+Workflow residual security 0.003 norm 39.59 dev acc 0.6616 gain over current -0.0089
+Workflow residual security 0.01 norm 24.2 dev acc 0.6589 gain over current -0.0116
+Workflow residual security 0.03 norm 14.06 dev acc 0.6625 gain over current -0.008
+Workflow residual security 0.1 norm 6.83 dev acc 0.6723 gain over current 0.0018
+Workflow residual security 0.3 norm 3.12 dev acc 0.675 gain over current 0.0045
+Workflow residual security 1 norm 1.17 dev acc 0.6732 gain over current 0.0027
+Gate agent_tr positive min/q05 0.3205559253692627 0.7375420928001404 negative max/q95 -0.5333226323127747 -0.8427864909172058 error 0
+Gate customer positive min/q05 0.2791058421134949 0.6206415891647339 negative max/q95 -0.5484797954559326 -0.856608510017395 error 0
+Gate invoice_ positive min/q05 0.6047972440719604 0.8266034126281738 negative max/q95 -0.4424331784248352 -0.7333686351776123 error 0
+Gate security positive min/q05 0.3977391719818115 0.7120432257652283 negative max/q95 -0.3425511121749878 -0.7802731990814209 error 0
+```
+[forward passes used: 10 of 25; Python runs used: 16 of 300]

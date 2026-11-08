@@ -1,0 +1,11 @@
+OUTPUT of Python run 15 of at most 300:
+```
+dropped edit model.language_model.layers.23.post_ffn_norm.weight
+fit_b anchor errors 5.0303434466882175e-08 4.395032505084193e-08
+dev anchor errors 5.0043946932401855e-08 4.4018825827437124e-08
+Option contrast rank: 9 singular values [0.2083 0.1929 0.1852 0.1811 0.1789 0.1758 0.1547 0.1333 0.1264 0.     0.     0.    ]
+Temperature quantiles: [1.3374 1.3374 1.3374 1.3374 1.3374]
+Target correction norm quantiles: [ 0.0233 12.3238 22.5053 45.4111] Jacobian fit max residual 2.2001542092638742e-14
+Gram eig time 0.4040100574493408 quantiles [       0.0002        0.0159        0.9913       80.537     10177.9856 11402627.4065]
+```
+[forward passes used: 10 of 25; Python runs used: 15 of 300]

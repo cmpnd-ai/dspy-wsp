@@ -1,0 +1,8 @@
+OUTPUT of Python run 33 of at most 300:
+```
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5761
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1476
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 1179.7875
+Installed conditional dose 2x; expected {'acc': 0.6919642686843872, 'gain': 0.14196428656578064, 'se': 0.018559131771326065, 'brier': 0.048655249178409576}
+```
+[forward passes used: 16 of 25; Python runs used: 33 of 300]

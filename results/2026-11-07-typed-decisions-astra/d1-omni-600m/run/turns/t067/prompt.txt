@@ -1,0 +1,8 @@
+OUTPUT of Python run 40 of at most 300:
+```
+Full minus shared-only, reserved test: {'gain': 0.01578947368421053, 'se': 0.009653513042658705, 'improved': 51, 'worsened': 38}
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5760
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1213
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 592.1420
+```
+[forward passes used: 21 of 25; Python runs used: 40 of 300]

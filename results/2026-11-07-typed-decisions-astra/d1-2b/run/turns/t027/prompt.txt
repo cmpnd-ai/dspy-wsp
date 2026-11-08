@@ -1,0 +1,46 @@
+OUTPUT of Python run 16 of at most 300:
+```
+Baseline fit/dev {'acc': 0.6161111111111112, 'brier': 0.1718115210533142, 'gain': 0.0, 'se': 0.0} {'acc': 0.6188888888888889, 'brier': 0.1610233336687088, 'gain': 0.0, 'se': 0.0}
+ridge     0.1 dev best alpha=0.75 acc=0.7622 brier=0.0658 fit_acc=0.8828
+ridge       1 dev best alpha=1.00 acc=0.7833 brier=0.0568 fit_acc=0.8906
+ridge      10 dev best alpha=1.00 acc=0.7800 brier=0.0563 fit_acc=0.8489
+ridge      30 dev best alpha=1.00 acc=0.7711 brier=0.0589 fit_acc=0.8244
+ridge     100 dev best alpha=1.00 acc=0.7567 brier=0.0631 fit_acc=0.7956
+ridge     300 dev best alpha=0.75 acc=0.7533 brier=0.0749 fit_acc=0.7567
+ridge    1000 dev best alpha=1.00 acc=0.7500 brier=0.0743 fit_acc=0.7556
+ridge    3000 dev best alpha=1.00 acc=0.7433 brier=0.0808 fit_acc=0.7361
+ridge   10000 dev best alpha=1.00 acc=0.7378 brier=0.0897 fit_acc=0.7211
+Top development settings:
+(1.0, 1.0, {'acc': 0.7833333333333333, 'brier': 0.05678224698566702, 'gain': 0.16444444444444445, 'se': 0.01790765716435891})
+(10.0, 1.0, {'acc': 0.78, 'brier': 0.05633860832844284, 'gain': 0.16111111111111112, 'se': 0.017411457105612645})
+(1.0, 0.75, {'acc': 0.7744444444444445, 'brier': 0.059236358984060176, 'gain': 0.15555555555555553, 'se': 0.014911745798860917})
+(30.0, 1.0, {'acc': 0.7711111111111111, 'brier': 0.05887240892104883, 'gain': 0.15222222222222223, 'se': 0.016703043273513622})
+(10.0, 0.75, {'acc': 0.7655555555555555, 'brier': 0.06203623520465382, 'gain': 0.14666666666666667, 'se': 0.0143209638714482})
+(30.0, 0.75, {'acc': 0.7633333333333333, 'brier': 0.06519537440679322, 'gain': 0.14444444444444443, 'se': 0.014186446312709121})
+(10.0, 1.25, {'acc': 0.7622222222222222, 'brier': 0.06544134469274997, 'gain': 0.14333333333333334, 'se': 0.020257498171144965})
+(0.1, 0.75, {'acc': 0.7622222222222222, 'brier': 0.06575577315582468, 'gain': 0.1433333333333333, 'se': 0.015054216111070285})
+(100.0, 1.0, {'acc': 0.7566666666666667, 'brier': 0.06313575083959877, 'gain': 0.1377777777777778, 'se': 0.01699226748513872})
+(0.1, 1.0, {'acc': 0.7566666666666667, 'brier': 0.07172641367186011, 'gain': 0.13777777777777775, 'se': 0.01866353318265487})
+Selected preliminary 1.0 1.0 {'acc': 0.7833333333333333, 'brier': 0.05678224698566702, 'gain': 0.16444444444444445, 'se': 0.01790765716435891}
+agent_trace_observability  /action                  0.356 -> 0.711
+agent_trace_observability  /needs_review            0.578 -> 0.822
+agent_trace_observability  /outcome                 0.600 -> 0.800
+agent_trace_observability  /risk                    0.756 -> 0.756
+agent_trace_observability  /urgency                 0.511 -> 0.756
+customer_service           /action                  0.378 -> 0.644
+customer_service           /category                0.844 -> 0.889
+customer_service           /churn_risk              0.533 -> 0.889
+customer_service           /needs_human             0.689 -> 0.756
+customer_service           /urgency                 0.533 -> 0.800
+invoice_processing         /discrepancy_severity    0.578 -> 0.778
+invoice_processing         /disposition             0.622 -> 0.867
+invoice_processing         /duplicate               0.911 -> 0.867
+invoice_processing         /matches_order           0.867 -> 0.933
+invoice_processing         /urgency                 0.689 -> 0.733
+security_incidents         /credential_compromise   0.578 -> 0.778
+security_incidents         /disposition             0.600 -> 0.822
+security_incidents         /severity                0.556 -> 0.622
+security_incidents         /true_positive           0.711 -> 0.844
+security_incidents         /urgency                 0.489 -> 0.600
+```
+[forward passes used: 10 of 25; Python runs used: 16 of 300]

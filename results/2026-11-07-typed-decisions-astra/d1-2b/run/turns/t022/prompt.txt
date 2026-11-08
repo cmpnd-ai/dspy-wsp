@@ -1,0 +1,8 @@
+OUTPUT of Python run 13 of at most 300:
+```
+Odd probe anchor error: 4.372645263525059e-08
+Final normalized residual RMS quantiles: [1. 1. 1.]
+Last-write/final-residual norm ratio: [0.3686 0.4109 0.4405]
+Pre-gain final-write RMS quantiles: [1.5021 1.8696 2.6952]
+```
+[forward passes used: 8 of 25; Python runs used: 13 of 300]

@@ -1,0 +1,11 @@
+OUTPUT of Python run 29 of at most 300:
+```
+Exact recipe reconstruction max difference: 4.1691588474446206e-05
+Full900 norm/cosine with600: nan nan
+Full900 fitted performance (NOT held out): {'accuracy': 0.2611111111111111, 'gain': -0.10311111111111111, 'paired_se': 0.013305091005153098, 'brier_sum': nan, 'items': 900}
+Fixed-recipe held fold 0 {'accuracy': 0.2773333333333333, 'gain': -0.09400000000000001, 'paired_se': 0.02361650123186715, 'brier_sum': nan, 'items': 300}
+Fixed-recipe held fold 1 {'accuracy': 0.254, 'gain': -0.11599999999999999, 'paired_se': 0.02271514260258923, 'brier_sum': nan, 'items': 300}
+Fixed-recipe held fold 2 {'accuracy': 0.252, 'gain': -0.09933333333333333, 'paired_se': 0.022851336391537958, 'brier_sum': nan, 'items': 300}
+Combined cross-fit: {'accuracy': 0.2611111111111111, 'gain': -0.10311111111111111, 'paired_se': 0.013305091005153098, 'brier_sum': nan, 'items': 900}
+```
+[forward passes used: 16 of 25; Python runs used: 29 of 300]

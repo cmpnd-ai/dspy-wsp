@@ -1,0 +1,24 @@
+OUTPUT of Python run 7 of at most 300:
+```
+Read 5 aligned 360 questions; max probability error 6e-08
+Feature covariance eigenvalues: [189.38233751909857, 219.89605309792438, 309.97551382314634, 367.63958072908065, 778.3055135474909, 1479.9924441921494, 3240.179011117108, 11017.11695450007, 59903.35459799553, 207078.88137497593]
+Trace/d: 279.6884614604475 effective dimension 1.7600102189311706
+Dev baseline: {'acc': 0.550000011920929, 'gain': 0.0, 'se': 0.0, 'brier': 0.057349756360054016}
+ridge (0.01, 0.01) norm 10.739 fit acc 0.633 dev {'acc': 0.60625, 'gain': 0.05625, 'se': 0.01463, 'brier': 0.04146}
+ridge (0.01, 0.03) norm 6.686 fit acc 0.607 dev {'acc': 0.5875, 'gain': 0.0375, 'se': 0.01194, 'brier': 0.04299}
+ridge (0.01, 0.1) norm 3.59 fit acc 0.584 dev {'acc': 0.56607, 'gain': 0.01607, 'se': 0.0087, 'brier': 0.04527}
+ridge (0.01, 0.3) norm 1.807 fit acc 0.573 dev {'acc': 0.55268, 'gain': 0.00268, 'se': 0.00663, 'brier': 0.04731}
+ridge (0.01, 1) norm 0.791 fit acc 0.569 dev {'acc': 0.55089, 'gain': 0.00089, 'se': 0.00482, 'brier': 0.04879}
+ridge (0.01, 3) norm 0.391 fit acc 0.566 dev {'acc': 0.55268, 'gain': 0.00268, 'se': 0.00296, 'brier': 0.0494}
+ridge (0.01, 10) norm 0.223 fit acc 0.565 dev {'acc': 0.55179, 'gain': 0.00179, 'se': 0.00126, 'brier': 0.04963}
+ridge (0.01, 30) norm 0.15 fit acc 0.563 dev {'acc': 0.55179, 'gain': 0.00179, 'se': 0.00126, 'brier': 0.04972}
+ridge (0.03, 0.01) norm 9.046 fit acc 0.634 dev {'acc': 0.61339, 'gain': 0.06339, 'se': 0.0145, 'brier': 0.04092}
+ridge (0.03, 0.03) norm 5.569 fit acc 0.607 dev {'acc': 0.59375, 'gain': 0.04375, 'se': 0.01241, 'brier': 0.04257}
+ridge (0.03, 0.1) norm 2.977 fit acc 0.589 dev {'acc': 0.56964, 'gain': 0.01964, 'se': 0.00885, 'brier': 0.0448}
+ridge (0.03, 0.3) norm 1.517 fit acc 0.576 dev {'acc': 0.55089, 'gain': 0.00089, 'se': 0.00664, 'brier': 0.04661}
+ridge (0.03, 1) norm 0.695 fit acc 0.568 dev {'acc': 0.55268, 'gain': 0.00268, 'se': 0.00447, 'brier': 0.04781}
+ridge (0.03, 3) norm 0.373 fit acc 0.564 dev {'acc': 0.55446, 'gain': 0.00446, 'se': 0.00267, 'brier': 0.04827}
+ridge (0.03, 10) norm 0.234 fit acc 0.565 dev {'acc': 0.55357, 'gain': 0.00357, 'se': 0.00177, 'brier': 0.04844}
+ridge (0.03, 30) norm 0.167 fit acc 0.563 dev {'acc': 0.55268, 'gain': 0.00268, 'se': 0.00154, 'brier': 0.04853}
+```
+[forward passes used: 5 of 25; Python runs used: 7 of 300]

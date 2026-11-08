@@ -1,0 +1,19 @@
+OUTPUT of Python run 41 of at most 300:
+```
+Half-strength logit midpoint max error: 1.1555850505828857e-05
+violations/0: P(true) 0.804->0.572->0.306
+violations/1: P(true) 0.779->0.696->0.598
+violations/3: P(true) 0.784->0.684->0.564
+topic/account: target P 0.229->0.277->0.322; top counts [0, 1, 4]/4
+topic/billing: target P 0.369->0.513->0.642; top counts [4, 4, 4]/4
+topic/delivery: target P 0.282->0.494->0.698; top counts [2, 4, 4]/4
+topic/refund: target P 0.184->0.285->0.400; top counts [0, 4, 4]/4
+topic/technical: target P 0.155->0.273->0.426; top counts [0, 1, 4]/4
+cancellation_intent/satisfied: expected level 1.615->1.592->1.562
+cancellation_intent/frustrated: expected level 1.614->1.611->1.595
+cancellation_intent/leaving: expected level 1.647->1.751->1.801
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 151.6871
+Restored final scalar SHA256: 63b78a773a55a4725883275abfaf66b322dc96549d4b96953449e4d14116695d
+Only edited tensor: ['scalar.weight']
+```
+[forward passes used: 24 of 25; Python runs used: 41 of 300]

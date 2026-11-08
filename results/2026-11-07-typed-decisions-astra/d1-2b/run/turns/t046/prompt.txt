@@ -1,0 +1,16 @@
+OUTPUT of Python run 27 of at most 300:
+```
+recompute_head (d, A, alpha=1.0) source unavailable
+contrast_targets (d, floor=0.015) source unavailable
+metrics_array (d, p) source unavailable
+install_w2 (alpha, delta=None) source unavailable
+read_arrays (k) source unavailable
+Output sample: {'action': "confidence=0.31950882469084885 value='human_review' probabilities={'continue': 0.12558564503675676, 'human_review': 0.48963161851813664, 'observe': 0.3301517265912398, 'stop': 0.054631009853866756}", 'needs_review': 'confidence=0.20166610081716585 value=True probability=0.6008330504085829', 'outcome': "confidence=0.2465172283724916 value='partial' probabilities={'failure': 0.15143212478307916, 'harmful': 0.04276211749021764, 'partial': 0.4348879212793687, 'success': 0.37091783644733445}", 'risk': 'confidence=0.3137188838773176 value=1.392778311340898 probabilities={0: 0.13768881541498987, 1: 0.3713737715609125, 2: 0.4514076992923077, 3: 0.0395297137317901} level=1', 'urgency': 'confidence=0.5204232291509983 value=1.0621327420897742 probabilities={0: 0.20872201437961385, 1: 0.5564207814959, 2: 0.19885965177958423, 3: 0.035997552344901824} level=1'}
+Gold sample: {'action': {'confidence': 0.377778, 'label': 'human_review', 'probabilities': {'continue': 0.083333, 'human_review': 0.533333, 'observe': 0.316667, 'stop': 0.066667}, 'type': 'choice'}, 'needs_review': {'confidence': 0.233333, 'label': 'true', 'noul': 0.616667, 'probabilities': {'false': 0.383333, 'true': 0.616667}, 'type': 'noul'}, 'outcome': {'confidence': 0.288889, 'label': 'partial', 'probabilities': {'failure': 0.126667, 'harmful': 0.056667, 'partial': 0.466667, 'success': 0.35}, 'type': 'choice'}, 'risk': {'confidence': 0.526667, 'label': '2', 'probabilities': {'0': 0.066667, '1': 0.253333, '2': 0.593333, '3': 0.086667}, 'score': 1.7, 'type': 'score'}, 'urgency': {'confidence': 0.556667, 'label': '1', 'probabilities': {'0': 0.1, '1': 0.6, '2': 0.256667, '3': 0.043333}, 'score': 1.243333, 'type': 'score'}}
+Meta row sample: {'request': 0, 'question': 'action', 'type': 'choice', 'options': ['continue', 'human_review', 'observe', 'stop']}
+B orthogonality error: 3.0797783380497597e-07
+Coefficient differences vs saved selected: 0.0
+Recompute signature: (d, A, alpha=1.0)
+Target signature: (d, floor=0.015)
+```
+[forward passes used: 18 of 25; Python runs used: 27 of 300]

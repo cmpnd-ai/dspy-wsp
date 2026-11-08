@@ -1,0 +1,5 @@
+OUTPUT of Python run 13 of at most 300:
+```
+Validation candidate: ['scalar.weight']
+```
+[forward passes used: 7 of 25; Python runs used: 13 of 300]

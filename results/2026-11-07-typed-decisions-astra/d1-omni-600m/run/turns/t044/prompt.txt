@@ -1,0 +1,233 @@
+OUTPUT of Python run 26 of at most 300:
+```
+              0 MAKE_CELL               14 (sel)
+
+ 26           2 RESUME                   0
+
+ 27           4 LOAD_GLOBAL              0 (D)
+             14 LOAD_FAST                1 (split)
+             16 BINARY_SUBSCR
+             20 STORE_DEREF             14 (sel)
+
+ 28          22 LOAD_FAST                0 (logits)
+             24 LOAD_ATTR                3 (NULL|self + masked_fill)
+             44 LOAD_GLOBAL              0 (D)
+             54 LOAD_CONST               1 ('mask')
+             56 BINARY_SUBSCR
+             60 UNARY_INVERT
+             62 LOAD_CONST               2 (-1000000.0)
+             64 CALL                     2
+             72 LOAD_ATTR                5 (NULL|self + argmax)
+             92 LOAD_CONST               3 (1)
+             94 CALL                     1
+            102 LOAD_GLOBAL              0 (D)
+            112 LOAD_CONST               4 ('gold')
+            114 BINARY_SUBSCR
+            118 LOAD_ATTR                5 (NULL|self + argmax)
+            138 LOAD_CONST               3 (1)
+            140 CALL                     1
+            148 COMPARE_OP              40 (==)
+            152 STORE_FAST               3 (correct)
+
+ 29         154 LOAD_GLOBAL              6 (torch)
+            164 LOAD_ATTR                9 (NULL|self + softmax)
+            184 LOAD_FAST                0 (logits)
+            186 LOAD_GLOBAL              0 (D)
+            196 LOAD_CONST               5 ('temp')
+            198 BINARY_SUBSCR
+            202 LOAD_CONST               0 (None)
+            204 LOAD_CONST               0 (None)
+            206 BUILD_SLICE              2
+            208 LOAD_CONST               0 (None)
+            210 BUILD_TUPLE              2
+            212 BINARY_SUBSCR
+            216 BINARY_OP               11 (/)
+            220 LOAD_ATTR                3 (NULL|self + masked_fill)
+            240 LOAD_GLOBAL              0 (D)
+            250 LOAD_CONST               1 ('mask')
+            252 BINARY_SUBSCR
+            256 UNARY_INVERT
+            258 LOAD_CONST               2 (-1000000.0)
+            260 CALL                     2
+            268 LOAD_CONST               3 (1)
+            270 KW_NAMES                 6 (('dim',))
+            272 CALL                     2
+            280 STORE_FAST               4 (probs)
+
+ 30         282 LOAD_FAST                4 (probs)
+            284 LOAD_GLOBAL              0 (D)
+            294 LOAD_CONST               4 ('gold')
+            296 BINARY_SUBSCR
+            300 BINARY_OP               10 (-)
+            304 LOAD_ATTR               11 (NULL|self + square)
+            324 CALL                     0
+            332 LOAD_GLOBAL              0 (D)
+            342 LOAD_CONST               1 ('mask')
+            344 BINARY_SUBSCR
+            348 BINARY_OP                5 (*)
+            352 LOAD_ATTR               13 (NULL|self + sum)
+            372 LOAD_CONST               3 (1)
+            374 CALL                     1
+            382 LOAD_GLOBAL              0 (D)
+            392 LOAD_CONST               7 ('n')
+            394 BINARY_SUBSCR
+            398 BINARY_OP               11 (/)
+            402 STORE_FAST               5 (brier)
+
+ 31         404 LOAD_GLOBAL             15 (NULL + list)
+            414 LOAD_GLOBAL             16 (dict)
+            424 LOAD_ATTR               19 (NULL|self + fromkeys)
+            444 LOAD_CLOSURE            14 (sel)
+            446 BUILD_TUPLE              1
+            448 LOAD_CONST               8 (<code object <genexpr> at 0x11cbb9730, file "<cell>", line 31>)
+            450 MAKE_FUNCTION            8 (closure)
+            452 LOAD_GLOBAL             21 (NULL + enumerate)
+            462 LOAD_GLOBAL              0 (D)
+            472 LOAD_CONST               9 ('rows')
+            474 BINARY_SUBSCR
+            478 CALL                     1
+            486 GET_ITER
+            488 CALL                     0
+            496 CALL                     1
+            504 CALL                     1
+            512 STORE_FAST               6 (ids)
+
+ 32         514 LOAD_GLOBAL             22 (collections)
+            524 LOAD_ATTR               25 (NULL|self + defaultdict)
+            544 LOAD_GLOBAL             14 (list)
+            554 CALL                     1
+            562 STORE_FAST               7 (idpos)
+
+ 33         564 LOAD_GLOBAL             21 (NULL + enumerate)
+            574 LOAD_GLOBAL              0 (D)
+            584 LOAD_CONST               9 ('rows')
+            586 BINARY_SUBSCR
+            590 CALL                     1
+            598 GET_ITER
+        >>  600 FOR_ITER                34 (to 672)
+            604 UNPACK_SEQUENCE          2
+            608 STORE_FAST               8 (j)
+            610 STORE_FAST               9 (r)
+
+ 34         612 LOAD_DEREF              14 (sel)
+            614 LOAD_FAST                8 (j)
+            616 BINARY_SUBSCR
+            620 POP_JUMP_IF_TRUE         1 (to 624)
+            622 JUMP_BACKWARD           12 (to 600)
+        >>  624 LOAD_FAST                7 (idpos)
+            626 LOAD_FAST                9 (r)
+            628 LOAD_CONST              10 ('id')
+            630 BINARY_SUBSCR
+            634 BINARY_SUBSCR
+            638 LOAD_ATTR               27 (NULL|self + append)
+            658 LOAD_FAST                8 (j)
+            660 CALL                     1
+            668 POP_TOP
+            670 JUMP_BACKWARD           36 (to 600)
+
+ 33     >>  672 END_FOR
+
+ 35         674 LOAD_GLOBAL              6 (torch)
+            684 LOAD_ATTR               29 (NULL|self + tensor)
+            704 LOAD_FAST                7 (idpos)
+            706 LOAD_ATTR               31 (NULL|self + values)
+            726 CALL                     0
+            734 GET_ITER
+            736 LOAD_FAST_AND_CLEAR     10 (ix)
+            738 SWAP                     2
+            740 BUILD_LIST               0
+            742 SWAP                     2
+        >>  744 FOR_ITER                71 (to 890)
+            748 STORE_FAST              10 (ix)
+            750 LOAD_GLOBAL             33 (NULL + float)
+            760 LOAD_FAST                3 (correct)
+            762 LOAD_FAST               10 (ix)
+            764 BINARY_SUBSCR
+            768 LOAD_ATTR               33 (NULL|self + float)
+            788 CALL                     0
+            796 LOAD_GLOBAL              0 (D)
+            806 LOAD_CONST              11 ('correct0')
+            808 BINARY_SUBSCR
+            812 LOAD_FAST               10 (ix)
+            814 BINARY_SUBSCR
+            818 LOAD_ATTR               33 (NULL|self + float)
+            838 CALL                     0
+            846 BINARY_OP               10 (-)
+            850 LOAD_ATTR               35 (NULL|self + mean)
+            870 CALL                     0
+            878 CALL                     1
+            886 LIST_APPEND              2
+            888 JUMP_BACKWARD           73 (to 744)
+        >>  890 END_FOR
+            892 SWAP                     2
+            894 STORE_FAST              10 (ix)
+            896 CALL                     1
+            904 STORE_FAST              11 (diff)
+
+ 36         906 LOAD_GLOBAL             33 (NULL + float)
+            916 LOAD_FAST                3 (correct)
+            918 LOAD_DEREF              14 (sel)
+            920 BINARY_SUBSCR
+            924 LOAD_ATTR               33 (NULL|self + float)
+            944 CALL                     0
+            952 LOAD_ATTR               35 (NULL|self + mean)
+            972 CALL                     0
+            980 CALL                     1
+            988 LOAD_GLOBAL             33 (NULL + float)
+            998 LOAD_FAST               11 (diff)
+           1000 LOAD_ATTR               35 (NULL|self + mean)
+           1020 CALL                     0
+           1028 CALL                     1
+           1036 LOAD_GLOBAL             33 (NULL + float)
+           1046 LOAD_FAST               11 (diff)
+           1048 LOAD_ATTR               37 (NULL|self + std)
+           1068 CALL                     0
+           1076 LOAD_GLOBAL             39 (NULL + len)
+           1086 LOAD_FAST               11 (diff)
+           1088 CALL                     1
+           1096 LOAD_CONST              12 (0.5)
+           1098 BINARY_OP                8 (**)
+           1102 BINARY_OP               11 (/)
+           1106 CALL                     1
+
+ 37        1114 LOAD_GLOBAL             33 (NULL + float)
+           1124 LOAD_FAST                5 (brier)
+           1126 LOAD_DEREF              14 (sel)
+           1128 BINARY_SUBSCR
+           1132 LOAD_ATTR               35 (NULL|self + mean)
+           1152 CALL                     0
+           1160 CALL                     1
+
+ 36        1168 LOAD_CONST              13 (('acc', 'gain', 'se', 'brier'))
+           1170 BUILD_CONST_KEY_MAP      4
+           1172 STORE_FAST              12 (result)
+
+ 38        1174 LOAD_FAST                2 (details)
+           1176 POP_JUMP_IF_FALSE      223 (to 1624)
+
+ 39        1178 BUILD_MAP                0
+           1180 LOAD_FAST               12 (result)
+           1182 LOAD_CONST              14 ('by_question')
+           1184 STORE_SUBSCR
+
+ 40        1188 LOAD_GLOBAL             41 (NULL + sorted)
+           1198 LOAD_GLOBAL             21 (NULL + enumerate)
+           1208 LOAD_GLOBAL              0 (D)
+           1218 LOAD_CONST               9 ('rows')
+           1220 BINARY_SUBSCR
+           1224 CALL                     1
+           1232 GET_ITER
+           1234 LOAD_FAST_AND_CLEAR      8 (j)
+           1236 LOAD_FAST_AND_CLEAR      9 (r)
+           1238 SWAP                     3
+           1240 BUILD_SET                0
+           1242 SWAP                     2
+        >> 1244 FOR_ITER                21 (to 1290)
+           1248 UNPACK_SEQUENCE          2
+           1252 STORE_FAST               8 (j)
+           1254 STORE_FAST               9 (r)
+           1256 LOAD_DEREF              14 (sel)
+
+[output cut at 10,000 characters]
+```
+[forward passes used: 14 of 25; Python runs used: 26 of 300]

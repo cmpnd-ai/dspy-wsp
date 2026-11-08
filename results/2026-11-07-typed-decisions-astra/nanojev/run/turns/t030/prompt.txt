@@ -1,0 +1,18 @@
+OUTPUT of Python run 18 of at most 300:
+```
+Multinomial candidates: dev accuracy, Brier, fit accuracy, target, ridge, strength, norm
+(0.5853, 0.1923, 0.7036, 'Kmix', 0.01, 0.75, np.float64(96.0414))
+(0.584, 0.1953, 0.7147, 'Kmix', 0.003, 0.75, np.float64(130.5175))
+(0.5827, 0.2021, 0.7276, 'Kmix', 0.01, 1.0, np.float64(96.0414))
+(0.58, 0.2078, 0.7373, 'Kmix', 0.003, 1.0, np.float64(130.5175))
+(0.5733, 0.1987, 0.6996, 'Kmix', 0.03, 1.0, np.float64(64.2797))
+(0.5707, 0.1918, 0.6787, 'Kmix', 0.03, 0.75, np.float64(64.2797))
+(0.5707, 0.1915, 0.7062, 'Ksoft', 0.003, 1.0, np.float64(102.2752))
+(0.5627, 0.187, 0.6453, 'Ksoft', 0.03, 0.75, np.float64(51.9344))
+(0.5613, 0.1867, 0.672, 'Ksoft', 0.003, 0.75, np.float64(102.2752))
+(0.5613, 0.1866, 0.6804, 'Ksoft', 0.03, 1.0, np.float64(51.9344))
+(0.5613, 0.1857, 0.6649, 'Ksoft', 0.01, 0.75, np.float64(76.4972))
+(0.5573, 0.1881, 0.7031, 'Ksoft', 0.01, 1.0, np.float64(76.4972))
+Comparator selected earlier: mix3 ridge.003 strength.75, dev (0.6, 0.19253838661479702)
+```
+[forward passes used: 11 of 25; Python runs used: 18 of 300]

@@ -1,0 +1,25 @@
+RESULT of forward pass 25:
+```
+{
+ "type": "decide",
+ "model": "edited",
+ "generations": 900,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b/work/gen_25.jsonl"
+ ],
+ "graded": 900,
+ "score": 0.6864444444444444,
+ "score_se_over_items": 0.007608208576819503,
+ "mean_output_tokens": 0.0,
+ "cut_share": 0.0,
+ "failures": {
+  "cut_at_max_tokens": 0,
+  "program_error": 0,
+  "metric_error": 0,
+  "scored_below_1": 720
+ },
+ "seconds": 313.6
+}
+```
+That was your last forward pass. Make your final choice: leave the edit you submit in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b/work/edited, then reply without a code block.
+[forward passes used: 25 of 25; Python runs used: 33 of 300]

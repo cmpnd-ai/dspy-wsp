@@ -1,0 +1,260 @@
+HANDOFF. The conversation was restarted to keep it short; the kernel and its variables are unchanged. Your task follows, unchanged.
+
+TASK. You are given the weights of a decision model: LiquidAI/d1-2B (d1 decision model on LFM3, text path): a language model with 24 blocks, width 2048. Blocks [2, 6, 10, 14, 18, 22] use full attention, blocks [4, 8, 12, 16, 20] sliding-window attention over 256 tokens, and the others a gated causal short convolution; each block has pre- and post-norms and a SwiGLU MLP (`feed_forward.w1`, `w3`, `w2`). A request is one ChatML user turn: the state, then up to 16 questions, each ending at the assistant header and an empty <think></think> block (its answer position). In the full-attention blocks, state tokens read every token and each question reads the state and itself; the convolution and sliding-window blocks read only earlier tokens. Options are coded A, B, C (choice), 0, 1, 2 (score) or yes/no (noul). The answer is a softmax, at the calibration temperature (default 1.3374, per question type where one is set), of the scores at the answer position for the option tokens: the final normed hidden state (after `embedding_norm`) times each option token's row of `embed_tokens` (the output layer is tied to the embedding); an option scores its best form. There is no separate head: the embedding and the final norm are protected, so edits land in the blocks. The last write into the residual stream is `layers.23.feed_forward.w2.weight`; its output passes through `layers.23.post_ffn_norm` (an RMS norm with a gain per dimension) before it joins the residual, and the sum passes through `embedding_norm` before the readout scores it. 1,728,801,536 parameters in float32. It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program answers five typed questions about a business record (an agent trace, a customer message, an invoice or a security alert). Each question's answer is scored against a gold probability distribution.
+
+THE PROGRAM.
+TypedDecisions, with 4 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'agent_trace_observability': state -> action, needs_review, outcome, risk, urgency
+  instructions: Answer each question about this agent trace observability record.
+  state: The record to judge.
+  action: What should the observability system do with this trace?
+  needs_review: This trace requires human review.
+  outcome: How did this agent run turn out?
+  risk: How risky was the agent's behaviour in this trace?
+  urgency: How quickly does this trace need attention?
+- step 'customer_service': state -> action, category, churn_risk, needs_human, urgency
+  instructions: Answer each question about this customer service record.
+  state: The record to judge.
+  action: What should the assistant do next with this conversation?
+  category: What is this customer conversation primarily about?
+  churn_risk: How likely is this customer to stop doing business with us because of this interaction?
+  needs_human: This conversation requires a human agent rather than automated handling.
+  urgency: How time-sensitive is this conversation?
+- step 'invoice_processing': state -> discrepancy_severity, disposition, duplicate, matches_order, urgency
+  instructions: Answer each question about this invoice processing record.
+  state: The record to judge.
+  discrepancy_severity: How material is any discrepancy between the invoice, the order and the delivery?
+  disposition: How should this vendor invoice be dispositioned?
+  duplicate: This invoice appears to duplicate an invoice already submitted.
+  matches_order: The invoice reconciles with the purchase order and the recorded delivery.
+  urgency: How time-sensitive is processing this invoice?
+- step 'security_incidents': state -> credential_compromise, disposition, severity, true_positive, urgency
+  instructions: Answer each question about this security incidents record.
+  state: The record to judge.
+  credential_compromise: The evidence indicates a credential or account has been compromised.
+  disposition: How should this security alert be dispositioned?
+  severity: How severe is the potential impact if this alert is real?
+  true_positive: This alert reflects genuinely malicious or unauthorised activity.
+  urgency: How quickly must a responder act on this alert?
+Program source:
+class TypedDecisions(dspy.Module):
+    """One Predict per workflow; each case goes to its workflow's questions."""
+
+    def __init__(self, examples: list[dspy.Example]):
+        super().__init__()
+        schemas = {}
+        for ex in examples:
+            schemas.setdefault(ex.workflow, ex.questions)
+        self.workflows = sorted(schemas)
+        for wf in self.workflows:
+            setattr(self, wf, dspy.Predict(make_signature(wf, schemas[wf])))
+
+    def forward(self, workflow: str, state: dict):
+        return getattr(self, workflow)(state=state)
+
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    results, notes = [], []
+    for qid, gold in example.gold.items():
+        probs = predicted_probabilities(pred[qid])
+        ok, _, brier, _ = score_one(probs, gold)
+        results.append((ok, brier))
+        best = max(probs, key=probs.get)
+        target = max(gold["probabilities"], key=gold["probabilities"].get)
+        notes.append(f"{qid}: {'right' if ok else 'WRONG'} (predicted {best} {probs[best]:.2f}, gold {target} {gold['probabilities'][target]:.2f})")
+    accuracy = sum(ok for ok, _ in results) / len(results)
+    brier = sum(b for _, b in results) / len(results)
+    return dspy.Prediction(score=accuracy, feedback="; ".join(notes) + f". Mean Brier {brier:.3f}.")
+
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the token embedding, which is also the output layer, and the final norm), and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no GPU): variables survive between your code blocks, like a notebook. The model's files are in /Users/dbreunig/.cache/huggingface/hub/models--LiquidAI--d1-2B/snapshots/652f920e544ea37f81e4b0ce89b81d4ed0da90b1 (read only), practice examples are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/practice, and /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  model.language_model.embed_tokens.weight [128000, 2048] (out of scope)
+  model.language_model.embedding_norm.weight [2048] (out of scope)
+  model.language_model.layers.0.conv.conv.weight [2048, 1, 7]
+  model.language_model.layers.0.conv.in_proj.weight [6144, 2048]
+  model.language_model.layers.0.conv.out_proj.weight [2048, 2048]
+  model.language_model.layers.0.feed_forward.w1.weight [7680, 2048]
+  model.language_model.layers.0.feed_forward.w2.weight [2048, 7680]
+  model.language_model.layers.0.feed_forward.w3.weight [7680, 2048]
+  model.language_model.layers.0.ffn_norm.weight [2048]
+  model.language_model.layers.0.operator_norm.weight [2048]
+  model.language_model.layers.0.post_ffn_norm.weight [2048]
+  model.language_model.layers.0.post_operator_norm.weight [2048]
+  ... the same names for blocks 0..23; 286 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/practice/trainset.jsonl (900 examples). Input fields: state, workflow. Label fields: case_id, gold, questions. Choose whichever serve your experiments. A separate validation set of 300 examples is held out from you; you can only score edits on it, as described below.
+
+3. A forward-pass tool with a budget of 25 forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to 900 practice items (with "both", up to 450 per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set (300 examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..24] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most 1,024 questions per pass. The results are .npy files in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to 1,024 questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/edited to /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 25 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/edited when you finish are submitted, so leave there the edit with the best paired gain confirmed on the validation set, or no edit if none was confirmed. Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help.
+
+YOUR NOTEBOOK (notes.md):
+# Weight-edit experiment
+
+Goal: diagnose typed-decision failures and make a targeted, closed-form block-weight repair. No backbone execution outside the forward tool; no gradient fitting.
+
+Initial edit: none.
+
+Planned forward pass 1: DECIDE original, all 900 practice IDs from trainset.jsonl. Current edit: none. Purpose: baseline diagnosis; no examples used for fitting yet.
+
+Pass 1 baseline: 900 records, mean accuracy 0.613333, item SE 0.008248; 798/900 items imperfect. Output: gen_1.jsonl. No edits.
+
+Baseline breakdown:
+- agent_trace_observability/action: acc 0.364; gold->pred [(('human_review', 'stop'), 62), (('observe', 'human_review'), 41), (('observe', 'stop'), 12)]
+- agent_trace_observability/needs_review: acc 0.618; gold->pred [(('false', 'true'), 86)]
+- agent_trace_observability/outcome: acc 0.680; gold->pred [(('partial', 'success'), 24), (('success', 'partial'), 12), (('partial', 'harmful'), 10)]
+- agent_trace_observability/risk: acc 0.653; gold->pred [(('0', '1'), 41), (('1', '2'), 10), (('3', '2'), 10)]
+- agent_trace_observability/urgency: acc 0.498; gold->pred [(('0', '1'), 45), (('1', '2'), 23), (('3', '2'), 15)]
+- customer_service/action: acc 0.333; gold->pred [(('escalate_to_human', 'request_information'), 100), (('answer_directly', 'request_information'), 30), (('escalate_to_human', 'answer_directly'), 13)]
+- customer_service/category: acc 0.898; gold->pred [(('account', 'billing'), 9), (('account', 'technical'), 6), (('refund', 'billing'), 4)]
+- customer_service/churn_risk: acc 0.520; gold->pred [(('1', '0'), 37), (('2', '1'), 24), (('2', '0'), 20)]
+- customer_service/needs_human: acc 0.724; gold->pred [(('false', 'true'), 43), (('true', 'false'), 19)]
+- customer_service/urgency: acc 0.538; gold->pred [(('2', '0'), 33), (('1', '0'), 31), (('3', '2'), 29)]
+- invoice_processing/discrepancy_severity: acc 0.533; gold->pred [(('3', '2'), 45), (('2', '0'), 26), (('3', '0'), 19)]
+- invoice_processing/disposition: acc 0.484; gold->pred [(('hold', 'approve'), 30), (('manual_review', 'hold'), 23), (('manual_review', 'reject'), 21)]
+- invoice_processing/duplicate: acc 0.942; gold->pred [(('false', 'true'), 11), (('true', 'false'), 2)]
+- invoice_processing/matches_order: acc 0.809; gold->pred [(('false', 'true'), 34), (('true', 'false'), 9)]
+- invoice_processing/urgency: acc 0.578; gold->pred [(('2', '3'), 42), (('2', '1'), 22), (('1', '0'), 11)]
+- security_incidents/credential_compromise: acc 0.560; gold->pred [(('false', 'true'), 88), (('true', 'false'), 11)]
+- security_incidents/disposition: acc 0.604; gold->pred [(('investigate', 'contain'), 39), (('close_benign', 'investigate'), 16), (('monitor', 'investigate'), 14)]
+- security_incidents/severity: acc 0.684; gold->pred [(('2', '3'), 23), (('3', '2'), 8), (('1', '2'), 8)]
+- security_incidents/true_positive: acc 0.733; gold->pred [(('false', 'true'), 60)]
+- security_incidents/urgency: acc 0.511; gold->pred [(('3', '2'), 46), (('1', '2'), 33), (('2', '3'), 16)]
+
+Practice split fixed with RNG 71031, stratified: fit=360, dev=180, test=360. Split saved to practice_split.json. Diagnostic tables use all baseline records, but weight fitting will use fit only; dev for strength selection; test for independent paired evaluation.
+
+Mechanism hypothesis: final-block state/question features are available but their option-token contrasts are misaligned. Largest error: customer-service action, 100/225 gold escalation -> request_information. Errors also include agent review over-triggering, security credential over-triggering, and question-specific score shifts. Will test a low-rank last-MLP output correction, not temperature or protected tensors.
+
+Planned pass 2: READ original, 180 balanced fit_a records (900 questions), IDs in read_fit_a.json, layers 23 and 24. Current edit: none. Will inspect actual head-input arrays before deriving any intervention.
+
+Head conventions: head_inputs is final normed answer-position state; hidden_mean is state-token average, NOT MLP activations. Plan: isolate last residual write via two complementary coordinate gain interventions at layers.23.post_ffn_norm. Untouched dimensions determine final-RMS scale ratio; perturbed dimensions then reveal their normalized last-write contribution. This avoids any backbone simulation.
+
+Planned pass 3: READ original fit_b (180 balanced records, 900 questions), read_fit_b.json, layers 23/24. Current edit: none.
+
+Pass 3 completed: original fit_b read, 900 questions in fwd_3.
+
+Planned pass 4: READ original dev (180 records, 900 questions), read_dev.json. Current edit: none. Fit remains 360 records; dev is for closed-form regularization/strength selection, not coefficient estimation; test=360 reserved for paired confirmation.
+
+Planned pass 5: READ edited fit_a (same 180 IDs as original pass 2). Exact edit: layers.23.post_ffn_norm.weight even coordinates multiplied by 1.5, odd coordinates original; all other tensors original. Diagnostic only, not a proposed final edit. Untouched odd coordinates anchor the final-RMS ratio; even-coordinate differences isolate the corresponding last-write contributions.
+
+Pass 5 causal check: untouched-coordinate RMS error 5e-08; final-scale ratio median 0.98626. Probe changes option logits (mean |delta|=0.4082).
+
+Planned pass 6: READ edited fit_b (180 IDs in probe_even_fit_b.json). Exact edit unchanged: post_ffn_norm.23 even gains x1.5; odd original. No w2 edit.
+
+Pass 6 completed: even-gain probe fit_b, fwd_6.
+
+Planned pass 7: READ edited dev, 180 IDs in probe_even_dev.json. Exact edit remains only layers.23.post_ffn_norm even coordinates x1.5. Development data will evaluate, not fit, the repair.
+
+Pass 7 completed: even-gain dev probe, fwd_7.
+
+Planned pass 8: READ edited fit_a. Exact edit replaced, not compounded: layers.23.post_ffn_norm odd coordinates x1.5; even coordinates original. IDs in probe_odd_fit_a.json. Together with pass 5 this identifies all final-write coordinates.
+
+Pass 8 odd anchor RMS error 4.37e-08. Complementary probes recover final-write C=b/RMS(final residual), and U=C/post_ffn_gain. Any left-factor edit W2'=(I+B A)W2 changes the captured last-MLP write to U'=U+B A U, allowing head-only RMS/readout recomputation. B will be confined to option contrast directions, not arbitrary backbone directions.
+
+Planned pass 9: READ edited fit_b (probe_odd_fit_b.json). Exact edit only post_ffn_norm.23 odd coordinates x1.5, even original.
+
+Pass 9 completed: odd-gain fit_b probe, fwd_9.
+
+Planned pass 10: READ edited dev, 180 IDs in probe_odd_dev.json. Exact edit remains post_ffn_norm.23 odd coordinates x1.5; even original. After this diagnostic pass the norm edit will be dropped. Proposed repair location remains layers.23.feed_forward.w2.weight only.
+
+Diagnostic norm edits removed. Current edit: none. Final-write features recovered for all fit and dev records (anchor errors ~5e-8). Option-aware pre-gain contrast subspace has rank 9. Targets: gold log-probability contrasts at observed calibration temperatures (probability floor .015), minus baseline contrasts; inverted through analytic final-write/final-RMS/readout Jacobian. Coefficients will be solved once per ridge value, in closed form, on fit=360 records only. No autograd, optimization, or backbone simulation.
+
+Head-only development grid (not actual model passes):
+ridge=0.1, best=(0.75, {'acc': 0.7622222222222222, 'brier': 0.06575577315582468, 'gain': 0.1433333333333333, 'se': 0.015054216111070285})
+ridge=1.0, best=(1.0, {'acc': 0.7833333333333333, 'brier': 0.05678224698566702, 'gain': 0.16444444444444445, 'se': 0.01790765716435891})
+ridge=10.0, best=(1.0, {'acc': 0.78, 'brier': 0.05633860832844284, 'gain': 0.16111111111111112, 'se': 0.017411457105612645})
+ridge=30.0, best=(1.0, {'acc': 0.7711111111111111, 'brier': 0.05887240892104883, 'gain': 0.15222222222222223, 'se': 0.016703043273513622})
+ridge=100.0, best=(1.0, {'acc': 0.7566666666666667, 'brier': 0.06313575083959877, 'gain': 0.1377777777777778, 'se': 0.01699226748513872})
+ridge=300.0, best=(0.75, {'acc': 0.7533333333333333, 'brier': 0.07489180677531972, 'gain': 0.13444444444444445, 'se': 0.01407883766183379})
+ridge=1000.0, best=(1.0, {'acc': 0.75, 'brier': 0.07431270707914404, 'gain': 0.13111111111111112, 'se': 0.01639989267517396})
+ridge=3000.0, best=(1.0, {'acc': 0.7433333333333333, 'brier': 0.08078181619196237, 'gain': 0.12444444444444445, 'se': 0.015611321518117465})
+ridge=10000.0, best=(1.0, {'acc': 0.7377777777777778, 'brier': 0.08966817187371456, 'gain': 0.1188888888888889, 'se': 0.015252659787565364})
+Preliminary setting ridge=1.0, alpha=1.0. Saved factors to rank9_closed_form.npz. Current edit: none.
+
+Proposed edit: W2' = W2 + alpha * B A W2, B is 2048x9 orthonormal option-contrast basis; A ridge=1 closed-form fit on 360 fit records. Rank <=9. Unit delta Frobenius / original = 2.639012. All other tensors original. Targets depend on state/question features, not a global temperature.
+
+Planned pass 11: READ edited dev=180 records, candidate_dev.json, alpha=0.5. Exact installed tensor W2_original + 0.5*delta_w2. Expected head-only dev metrics: {'acc': 0.74, 'brier': 0.07841502223018788, 'gain': 0.1211111111111111, 'se': 0.012849433391341262}. This begins actual-model dose-response verification.
+
+Pass 11 actual half-strength READ dev: {'acc': 0.74, 'brier': 0.07841350883245468, 'gain': 0.1211111111111111, 'se': 0.012849433391341262}; predicted-vs-actual logit MAE 0.000163743, argmax agreement 1.000000.
+
+Planned pass 12: READ edited dev, same candidate_dev.json and same 180 records. Exact edit W2_original + 1.0*delta_w2 (ridge=1, rank<=9); norms and all other tensors original. Unit-strength predicted metrics: {'acc': 0.7833333333333333, 'brier': 0.05678224698566702, 'gain': 0.16444444444444445, 'se': 0.01790765716435891}.
+
+Pass 12 actual unit-strength dev metrics: {'acc': 0.7833333333333333, 'brier': 0.05678229033946991, 'gain': 0.16444444444444445, 'se': 0.01790765716435891}. Actual/predicted probabilities agree to <0.0001. Contrasts differ by workflow/question: not a temperature or global option bias.
+
+Planned pass 13: READ edited same 180 dev records, candidate_dev.json. Exact edit W2_original + 1.5*delta_w2 (ridge=1, rank<=9). Expected development accuracy 0.710, below unit strength due to overshoot. All other weights original.
+
+Pass 13 actual 1.5-strength dev: {'acc': 0.71, 'brier': 0.0981292724609375, 'gain': 0.09111111111111113, 'se': 0.023809831217902585}. Actual dose-response accuracies: original .618889, alpha=.5 .740000, alpha=1 .783333, alpha=1.5 .710000. Causal optimum is bounded; excessive correction reverses gains.
+
+Candidate snapshot: candidate_rank9_ridge1/ (not yet validation-confirmed).
+
+Planned pass 14: DECIDE both on all 360 reserved practice-test IDs, test_pair.json. Exact current edit: W2_original + B A_ridge1 W2_original, alpha=1, rank<=9; all other tensors original. Test records were excluded from fit and strength/regularization selection.
+
+Pass 14 independent practice-test result, n=360: original .607778, edited .764444; paired gain +.156667, SE .013341; 208 improved, 49 worsened. This is ~11.7 paired SE above zero. Candidate: rank9 ridge1 alpha1 W2 repair.
+
+Planned pass 15: DECIDE both on hidden validation, n=300. Exact current edit: layers.23.feed_forward.w2.weight = W2_original + B A_ridge1 W2_original, alpha1; only this tensor changed. Validation has not yet been queried.
+
+Pass 15 VALIDATION CONFIRMED, n=300: original .606667 -> edited .757333; paired gain +.150667 SE .014504; 171 improved, 43 worsened. First hidden validation query. Confirmed best copied to best_1/. Exact edit: rank9 ridge1 alpha1 W2 only. Independent practice gain +.156667 SE .013341.
+
+Next analysis (no forward yet): compare closed-form penalties on actual ||delta W2|| rather than ||A||, using only fit coefficients and dev selection; also decompose state-dependent versus question-centroid components. Best_1 remains safe.
+
+Planned pass 16: READ edited dev (candidate_dev.json), diagnostic state ablation. Exact edit W2_original+B A_question W2_original; A_question=A_ridge1 P, P orthogonal projector onto 20 fit question-mean write vectors. Thus within-question state-dependent complement is removed. Predicted accuracy .711111 versus .783333 with full edit. All norm/embedding tensors original. Confirmed full edit preserved in best_1/.
+
+Independent closed-form target variants (fit only) considered beta=0,.2,.5 winner emphasis, coefficient or actual-weight norm ridge=1,3,10; dev scores:
+(0.0, 'weight', 1.0, {'acc': 0.7877777777777778, 'brier': 0.055134244588467156, 'gain': 0.1688888888888889, 'se': 0.01802283000932246})
+(0.0, 'coefficient', 1.0, {'acc': 0.7833333333333333, 'brier': 0.05678224698566702, 'gain': 0.16444444444444445, 'se': 0.01790765716435891})
+(0.2, 'weight', 1.0, {'acc': 0.7822222222222223, 'brier': 0.06085824131399264, 'gain': 0.16333333333333336, 'se': 0.01786041470425089})
+(0.5, 'weight', 1.0, {'acc': 0.7822222222222223, 'brier': 0.08123646201441041, 'gain': 0.16333333333333333, 'se': 0.017580179008727274})
+(0.0, 'coefficient', 3.0, {'acc': 0.7811111111111111, 'brier': 0.05533194167708228, 'gain': 0.1622222222222222, 'se': 0.017742827220807666})
+(0.2, 'weight', 3.0, {'acc': 0.7811111111111111, 'brier': 0.06039607620366311, 'gain': 0.16222222222222224, 'se': 0.01746070440613744})
+
+Pass 16 actual question-centroid-only ablation: {'acc': 0.7111111111111111, 'brier': 0.10934744775295258, 'gain': 0.09222222222222223, 'se': 0.015707118337010734}. Full minus ablated gain 0.072222, paired SE 0.016433. This causally demonstrates value from the within-question state-sensitive directions, beyond question biases.
+
+Planned pass 17: DECIDE both on reserved practice test n=360, test_pair.json. Exact current edit: W2_original+B A_weightnorm_ridge1 W2_original, alpha1, fit=360. This candidate was selected on dev (.787778) using actual-weight Frobenius regularization; relative update norm 1.8534 versus 2.641 prior. All other weights original. Confirmed best_1 untouched.
+
+
+
+YOUR CURRENT EDIT:
+model.language_model.layers.23.feed_forward.w2.weight: 15,728,640 of 15,728,640 entries changed, relative change 1.8534
+
+[forward passes used: 16 of 25; Python runs used: 24 of 300]
+
+OUTPUT of Python run 24 of at most 300:
+```
+Question-centroid-only actual metrics: {'acc': 0.7111111111111111, 'brier': 0.10934744775295258, 'gain': 0.09222222222222223, 'se': 0.015707118337010734}
+Full minus state-ablated: 0.07222222222222222 paired SE 0.016433292643619393
+('agent_trace_observability', 'needs_review') ablated 0.689 full 0.822
+('agent_trace_observability', 'urgency') ablated 0.511 full 0.756
+('customer_service', 'category') ablated 0.756 full 0.889
+('customer_service', 'churn_risk') ablated 0.711 full 0.889
+('invoice_processing', 'discrepancy_severity') ablated 0.667 full 0.778
+('invoice_processing', 'disposition') ablated 0.756 full 0.867
+('invoice_processing', 'urgency') ablated 0.556 full 0.733
+('security_incidents', 'disposition') ablated 0.711 full 0.822
+saved edit model.language_model.layers.23.feed_forward.w2.weight: 15,728,640 of 15,728,640 entries changed, relative change 1.8534
+```
+[forward passes used: 16 of 25; Python runs used: 24 of 300]

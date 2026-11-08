@@ -1,0 +1,12 @@
+OUTPUT of Python run 9 of at most 300:
+```
+probe 3 logit reconstruction rms 0.00043724181366468126
+probe 4 logit reconstruction rms 7.213287445264966e-05
+state reconstruction error 4.673552674078252e-08 scale ranges [0.6842 0.7172 0.811 ]
+ridge 1.0 fit acc 0.414 gain fractional norm 13.940384039829398 max 2.6688270515441794
+ridge 10.0 fit acc 0.409 gain fractional norm 5.824917375568946 max 2.5278569839510783
+ridge 100.0 fit acc 0.4 gain fractional norm 2.4539343780949645 max 2.2865700401889164
+ridge 1000.0 fit acc 0.397 gain fractional norm 1.2751604317170664 max 1.2708886498156169
+dropped edit model.language_model.layers.23.post_ffn_norm.weight
+```
+[forward passes used: 4 of 25; Python runs used: 9 of 300]

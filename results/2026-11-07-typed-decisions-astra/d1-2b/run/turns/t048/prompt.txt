@@ -1,0 +1,13 @@
+OUTPUT of Python run 29 of at most 300:
+```
+Traceback (most recent call last):
+  File "<cell>", line 2, in <module>
+  File "/Users/dbreunig/Development/cmpnd/dspy-wsp/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py", line 3161, in max
+    return _wrapreduction(a, np.maximum, 'max', axis, None, out,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dbreunig/Development/cmpnd/dspy-wsp/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py", line 81, in _wrapreduction
+    return reduction(axis=axis, out=out, **passkwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: max(): argument 'dim' must be int, not NoneType
+```
+[forward passes used: 18 of 25; Python runs used: 29 of 300]

@@ -1,0 +1,237 @@
+OUTPUT of Python run 24 of at most 300:
+```
+Relevant files: ['analysis_splits.json', 'baseline_request.json', 'best_1', 'best_1_manifest.json', 'best_2', 'best_2_manifest.json', 'candidate_full_definition.pt', 'candidate_overstrong_definition.pt', 'candidate_quarter_definition.pt', 'conditional_candidate.pt', 'counterfactual_conditional.json', 'counterfactual_edited.json', 'counterfactual_original.json', 'counterfactual_tags.json', 'dose_dev.json', 'notes.md', 'read_dev2.json', 'read_fit1.json', 'read_fit2.json', 'read_fitdev.json']
+Kernel variables:
+load function
+load_original function
+save_edit function
+drop_edit function
+edited function
+tok function
+practice list 900
+by_id dict 900
+split_ids dict 4
+ids list 8
+splits dict 3
+baseline list 900
+cfg dict 15
+base_by_id dict 900
+pbase dict 900
+diagnostic_ids list 672
+conf defaultdict 20
+errs defaultdict 20
+ex Tensor (1024,)
+g dict 5
+p dict 5
+pred dict 5
+target Tensor (3360, 5)
+c Counter 8
+misses Counter 8
+key tuple 2
+candidates list 96
+read_fit list 448
+read_dev list 224
+read_groups list 4
+meta2 dict 5
+arr2 dict 5
+W0 Tensor (1, 1024)
+scorer_params dict 6
+z2 Tensor (1000, 5, 1024)
+x2 Tensor (1000, 5, 1024)
+a2 Tensor (1000, 5, 1024)
+lp2 ndarray (1000, 5)
+mask2 ndarray (1000, 5)
+k tuple 2
+ds_parts list 4
+D dict 12
+Zc Tensor (3360, 5, 1024)
+unit0 Tensor (1024,)
+Zorth Tensor (3360, 5, 1024)
+fitmask Tensor (3360, 5)
+X Tensor (7952, 1024)
+C Tensor (1024, 1024)
+eigs Tensor (1024,)
+V Tensor (1024, 1024)
+base_eval dict 4
+solutions dict 23
+residual Tensor (3360, 5)
+y Tensor (7952,)
+vb Tensor (1024,)
+delta Tensor (1024,)
+new_logits Tensor (3360, 5)
+ev dict 4
+target_soft Tensor (3360, 5)
+residual_soft Tensor (3360, 5)
+ysoft Tensor (7952,)
+vbsoft Tensor (1024,)
+l Tensor (3360, 5)
+sv Tensor (1024,)
+Xc Tensor (3360, 5, 1024)
+XX Tensor (7952, 1024)
+CX Tensor (1024, 1024)
+Vx Tensor (1024, 1024)
+vbx Tensor (1024,)
+xsolutions dict 10
+dx Tensor (1024,)
+best_z_key tuple 2
+delta_z Tensor (1024,)
+evx dict 5
+contrib_rms Tensor (1024,)
+neuron_order Tensor (1024,)
+alt_solutions dict 12
+pcenter Tensor (3360, 5)
+bprob Tensor (1024,)
+blogit Tensor (1024,)
+bpvec Tensor (1024,)
+blvec Tensor (1024,)
+dprob Tensor (1024,)
+dlogit Tensor (1024,)
+d Tensor (1024,)
+onehot Tensor (3360, 5)
+bone Tensor (1024,)
+bovec Tensor (1024,)
+mode_solutions dict 12
+best_mode_key tuple 2
+cf_requests list 144
+cf_tags list 144
+candidate_dx Tensor (1024,)
+pair_units list 2
+mu_x Tensor (1024,)
+pair_removed Tensor (3360, 5)
+cfmeta list 720
+cfa dict 5
+cfz Tensor (720, 5, 1024)
+cfx Tensor (720, 5, 1024)
+cfmask Tensor (720, 5)
+cfbase Tensor (720, 5)
+cflogits Tensor (720, 5)
+cfvb dict 624
+cfve dict 624
+cfcontrasts list 8
+e ndarray (8,)
+w1edit Tensor (1024, 1024)
+b1edit Tensor (1024,)
+w3edit Tensor (1, 1024)
+probe Tensor (3360, 5)
+predicted Tensor (3360, 5)
+best1_manifest dict 7
+ed8 list 224
+ed8_by_id dict 224
+current_conf defaultdict 20
+r dict 10
+cfactual Tensor (720, 5)
+cfvactual dict 624
+workflows list 4
+wfidx Tensor (3360,)
+base_linear Tensor (3360, 5)
+target_mode Tensor (3360, 5)
+local_directions dict 4
+fm Tensor (3360, 5)
+xw Tensor (1904, 1024)
+yw Tensor (1904,)
+cw Tensor (1024, 1024)
+ew Tensor (1024,)
+vw Tensor (1024, 1024)
+bw Tensor (1024,)
+dw Tensor (1024,)
+XA Tensor (3360, 5, 1024)
+A Tensor (7952, 1024)
+CA Tensor (1024, 1024)
+ea Tensor (1024,)
+Va Tensor (1024, 1024)
+gate_labels Tensor (3360, 4)
+gate_mean Tensor (4,)
+Ygate Tensor (7952, 4)
+gateW Tensor (1024, 4)
+gates Tensor (3360, 5, 4)
+valid Tensor (3360, 5)
+pos Tensor (3360, 5)
+neg Tensor (3360, 5)
+qkeys list 20
+qid Tensor (3360,)
+qrels list 6
+qsolutions dict 20
+qstats dict 20
+base_linear_ev dict 4
+qkey tuple 2
+xq Tensor (448, 1024)
+yq Tensor (448,)
+cq Tensor (1024, 1024)
+eq Tensor (1024,)
+vq Tensor (1024, 1024)
+bq Tensor (1024,)
+ds dict 6
+sel Tensor (3360,)
+fitq Tensor (3360,)
+z0 Tensor (56, 5)
+scores list 6
+dq Tensor (1024,)
+add Tensor (3360, 5)
+qlab Tensor (3360, 20)
+qmean Tensor (20,)
+Yqgate Tensor (7952, 20)
+qgateW Tensor (1024, 20)
+qgates Tensor (3360, 5, 20)
+conditional_solutions dict 20
+conditional_logits dict 0
+condrels list 6
+allcond dict 6
+cond_stats list 0
+fq Tensor (3360,)
+aq Tensor (3360,)
+xf Tensor (112, 1024)
+xmean Tensor (1024,)
+xc Tensor (112, 1024)
+yf Tensor (112,)
+ym Tensor ()
+yc Tensor (112,)
+K Tensor (112, 112)
+eo Tensor (112,)
+Vo Tensor (112, 112)
+projected Tensor (112,)
+sol dict 6
+dd Tensor (1024,)
+bias Tensor ()
+fit_ev dict 4
+evc dict 5
+qopt_keys list 71
+qopt_index dict 71
+ident Tensor (3360, 5, 71)
+idmean Tensor (71,)
+Yid Tensor (7952, 71)
+idgateW Tensor (1024, 71)
+idgates Tensor (3360, 5, 71)
+vld Tensor (3360, 5)
+gate_actual Tensor (3360, 5)
+predgate Tensor (3360, 5)
+truegate Tensor (3360, 5)
+falsegate Tensor (3360, 5, 71)
+target_qs list 14
+selected_add Tensor (3360, 5)
+cfcond Tensor (720, 5)
+row dict 4
+tag dict 3
+cfvc dict 624
+selected_gate_keys list 54
+gate_thresholds Tensor (71,)
+centered_idgates Tensor (3360, 5, 71)
+sgidx list 54
+valid_selected Tensor (3360, 5)
+vg Tensor (3360, 5, 54)
+truth Tensor (3360, 5, 54)
+cond_units list 108
+cond_params tuple 3
+cond_logits Tensor (3360, 5)
+oracle Tensor (3360, 5)
+ed12 list 224
+ed12_by_id dict 224
+inc ndarray (224,)
+prior_add Tensor (3360, 5)
+state_add Tensor (3360, 5)
+cf14 Tensor (720, 5)
+cf14v dict 624
+invoice_bad list 28
+Scorer edits: ['head.scorer.1.bias', 'head.scorer.1.weight', 'head.scorer.3.weight']
+Read metadata keys: dict_keys(['rows', 'layers', 'conventions', 'model', 'files'])
+```
+[forward passes used: 14 of 25; Python runs used: 24 of 300]

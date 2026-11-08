@@ -1,0 +1,14 @@
+OUTPUT of Python run 11 of at most 300:
+```
+Counterfactuals: 144 720 questions
+Chosen direction: rel ridge .01, .25 mode + .75 soft target, norm 14.8355131149292
+Chosen units [33, 746] max removed option-contrast logit 4.146571654928266e-07
+Predicted dose 0 {'acc': 0.55, 'gain': 0.0, 'se': 0.0, 'brier': 0.05735}
+Predicted dose 0.25 {'acc': 0.59821, 'gain': 0.04821, 'se': 0.01055, 'brier': 0.0473}
+Predicted dose 0.5 {'acc': 0.64196, 'gain': 0.09196, 'se': 0.0135, 'brier': 0.04142}
+Predicted dose 0.75 {'acc': 0.65982, 'gain': 0.10982, 'se': 0.01554, 'brier': 0.03987}
+Predicted dose 1 {'acc': 0.67054, 'gain': 0.12054, 'se': 0.01678, 'brier': 0.04183}
+Predicted dose 1.25 {'acc': 0.65625, 'gain': 0.10625, 'se': 0.01725, 'brier': 0.04657}
+Predicted dose 1.5 {'acc': 0.62679, 'gain': 0.07679, 'se': 0.01866, 'brier': 0.05437}
+```
+[forward passes used: 5 of 25; Python runs used: 11 of 300]

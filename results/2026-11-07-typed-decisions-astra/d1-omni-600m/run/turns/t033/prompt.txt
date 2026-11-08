@@ -1,0 +1,22 @@
+OUTPUT of Python run 19 of at most 300:
+```
+Conditional gates dev min true -0.33141231536865234 max false -0.28673404455184937
+Weak neuron contrast RMS at ranks [(2, 5.898234078927089e-08), (20, 1.708538320599473e-06), (40, 4.085918590135407e-06), (80, 7.2885759436758235e-06), (120, 1.156175130745396e-05), (160, 1.7248992662644014e-05)]
+Baseline-error-targeted questions [('agent_trace_observability', 'action'), ('agent_trace_observability', 'needs_review'), ('agent_trace_observability', 'outcome'), ('agent_trace_observability', 'risk'), ('agent_trace_observability', 'urgency'), ('customer_service', 'action'), ('customer_service', 'churn_risk'), ('customer_service', 'urgency'), ('invoice_processing', 'discrepancy_severity'), ('invoice_processing', 'disposition'), ('invoice_processing', 'matches_order'), ('invoice_processing', 'urgency'), ('security_incidents', 'severity'), ('security_incidents', 'urgency')]
+Conditional extension dose 0.25 {'acc': 0.68214, 'gain': 0.13214, 'se': 0.01641, 'brier': 0.04032}
+Conditional extension dose 0.5 {'acc': 0.69375, 'gain': 0.14375, 'se': 0.01696, 'brier': 0.03992}
+Conditional extension dose 0.75 {'acc': 0.69821, 'gain': 0.14821, 'se': 0.01691, 'brier': 0.04039}
+Conditional extension dose 1 {'acc': 0.70089, 'gain': 0.15089, 'se': 0.01706, 'brier': 0.04148}
+Conditional predicted constraint_violations outcome 0.4163 -> 0.5368
+Conditional predicted constraint_violations risk 1.0435 -> 1.2197
+Conditional predicted constraint_violations needs_review 0.4374 -> 0.5482
+Conditional predicted days_until_due urgency 0.3792 -> 0.6032
+Conditional predicted discount urgency 0.0064 -> 0.3046
+Conditional predicted freight_terms discrepancy_severity 0.0507 -> 0.1887
+Conditional predicted privileges severity 0.1958 -> 0.4563
+Conditional predicted asset_criticality severity 0.4909 -> 0.6956
+saved edit head.scorer.1.weight: 2,048 of 1,048,576 entries changed, relative change 0.0839
+saved edit head.scorer.1.bias: 2 of 1,024 entries changed, relative change 0.3260
+saved edit head.scorer.3.weight: 2 of 1,024 entries changed, relative change 89.2042
+```
+[forward passes used: 10 of 25; Python runs used: 19 of 300]

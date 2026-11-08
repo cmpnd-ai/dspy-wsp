@@ -1,0 +1,11 @@
+OUTPUT of Python run 32 of at most 300:
+```
+Half changes input rows? 0.0
+Conditional strength 0.5 {'acc': 0.6937500238418579, 'gain': 0.14374999701976776, 'se': 0.016961755231022835, 'brier': 0.03991265967488289} vsbest2 {'gain': -0.007142857249294009, 'se': 0.0067982201429986466, 'improved': 22, 'worsened': 27, 'n': 224}
+Conditional strength 1.0 {'acc': 0.7008928656578064, 'gain': 0.15089285373687744, 'se': 0.01706094667315483, 'brier': 0.04147079959511757} vsbest2 {'gain': 0.0, 'se': 0.0, 'improved': 0, 'worsened': 0, 'n': 224}
+Conditional strength 2.0 {'acc': 0.6919642686843872, 'gain': 0.14196428656578064, 'se': 0.018559131771326065, 'brier': 0.048655249178409576} vsbest2 {'gain': -0.008928571561617511, 'se': 0.008179675417843495, 'improved': 26, 'worsened': 37, 'n': 224}
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5761
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1476
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 300.5212
+```
+[forward passes used: 15 of 25; Python runs used: 32 of 300]

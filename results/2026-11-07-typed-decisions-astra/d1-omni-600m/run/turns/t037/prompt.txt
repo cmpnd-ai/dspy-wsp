@@ -1,0 +1,5 @@
+OUTPUT of Python run 21 of at most 300:
+```
+Conditional vs shared on dev: gain 0.030357142857142857 SE 0.00967270631048533 improved 58 worsened 27
+```
+[forward passes used: 12 of 25; Python runs used: 21 of 300]

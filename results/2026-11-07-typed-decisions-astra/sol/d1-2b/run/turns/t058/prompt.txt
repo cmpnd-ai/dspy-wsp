@@ -1,0 +1,10 @@
+OUTPUT of Python run 33 of at most 300:
+```
+Holdout top-option changes: 700 / 2250
+Confidence increased/decreased: 503 1747
+Brier original/edited, paired change SE: 0.1615777777777778 0.11016888888888889 (450, -0.0514, 0.005)
+Changed entries: 384 Finite: True
+Largest absolute gain changes: [1067, 1224, 1901, 1000, 1847, 275, 617, 129, 20, 960, 1793, 1649]
+Only edited tensor: ['model.language_model.layers.23.post_ffn_norm.weight']
+```
+[forward passes used: 24 of 25; Python runs used: 33 of 300]

@@ -1,0 +1,5 @@
+OUTPUT of Python run 8 of at most 300:
+```
+Next: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/read_dev.json edit: []
+```
+[forward passes used: 3 of 25; Python runs used: 8 of 300]

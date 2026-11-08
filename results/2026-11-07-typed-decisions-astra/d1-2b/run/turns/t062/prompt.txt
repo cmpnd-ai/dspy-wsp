@@ -1,0 +1,11 @@
+OUTPUT of Python run 37 of at most 300:
+```
+dropped edit model.language_model.layers.23.post_ffn_norm.weight
+saved edit model.language_model.layers.23.feed_forward.w2.weight: 15,728,640 of 15,728,640 entries changed, relative change 2.9829
+Odd probe anchor RMS error: 4.3795370135772686e-08
+Fit dimensions: (3600, 2048) (3600, 9)
+Coefficient rank: 9
+Relative W2 update norm: 2.981569290161133
+Current edits: ['model.language_model.layers.23.feed_forward.w2.weight']
+```
+[forward passes used: 23 of 25; Python runs used: 37 of 300]

@@ -1,0 +1,9 @@
+OUTPUT of Python run 35 of at most 300:
+```
+dropped edit model.language_model.layers.23.feed_forward.w2.weight
+saved edit model.language_model.layers.23.post_ffn_norm.weight: 1,024 of 2,048 entries changed, relative change 0.3540
+Extra original questions: 900
+Probe delta: 0.5
+infer_subset return instructions: [('LOAD_GLOBAL', 'probe_delta'), ('BINARY_OP', '/'), ('LOAD_GLOBAL', 'gn'), ('LOAD_ATTR', 'NULL|self + numpy'), ('CALL', ''), ('LOAD_FAST', 'changed'), ('BINARY_SUBSCR', ''), ('BINARY_OP', '/'), ('STORE_FAST', 'c'), ('LOAD_FAST', 'c'), ('LOAD_ATTR', 'NULL|self + astype'), ('LOAD_GLOBAL', 'np'), ('LOAD_ATTR', 'float32'), ('CALL', ''), ('LOAD_FAST', 'scale'), ('LOAD_FAST', 'anchor_error'), ('BUILD_TUPLE', ''), ('RETURN_VALUE', '')]
+```
+[forward passes used: 21 of 25; Python runs used: 35 of 300]

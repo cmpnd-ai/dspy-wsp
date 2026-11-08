@@ -1,0 +1,9 @@
+OUTPUT of Python run 34 of at most 300:
+```
+Conditional state ablation {'acc': 0.6669642925262451, 'gain': 0.11696428805589676, 'se': 0.017034942284226418, 'brier': 0.041881389915943146}
+Compared with full repair {'gain': -0.03392857193414654, 'se': 0.010026932664332208, 'improved': 29, 'worsened': 60, 'n': 224}
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5760
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1213
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 592.1420
+```
+[forward passes used: 17 of 25; Python runs used: 34 of 300]

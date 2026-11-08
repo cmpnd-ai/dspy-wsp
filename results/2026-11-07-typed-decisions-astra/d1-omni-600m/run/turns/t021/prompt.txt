@@ -1,0 +1,49 @@
+RESULT of forward pass 7:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 224,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra/work/gen_7_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra/work/gen_7_edited.jsonl"
+ ],
+ "original": {
+  "graded": 224,
+  "score": 0.55,
+  "score_se_over_items": 0.01409221937883243,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 216
+  }
+ },
+ "edited": {
+  "graded": 224,
+  "score": 0.5982142857142857,
+  "score_se_over_items": 0.014034771466020156,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 208
+  }
+ },
+ "paired": {
+  "items": 224,
+  "original": 0.55,
+  "edited": 0.5982142857142857,
+  "gain": 0.048214285714285716,
+  "se": 0.010549528669028176,
+  "improved": 58,
+  "worsened": 21
+ },
+ "seconds": 96.4
+}
+```
+[forward passes used: 7 of 25; Python runs used: 12 of 300]

@@ -1,0 +1,22 @@
+OUTPUT of Python run 32 of at most 300:
+```
+Fold 0 template rank 51 norm prior/evidence 8.898 106.698
+Fold 1 template rank 51 norm prior/evidence 8.492 108.119
+Fold 2 template rank 51 norm prior/evidence 10.502 105.725
+Top component-strength combinations:
+{'prior_strength': 0.875, 'evidence_strength': 0.5, 'accuracy': 0.57467, 'gain': 0.21044, 'paired_se': 0.009, 'brier_sum': 0.18592, 'items': 900}
+{'prior_strength': 0.875, 'evidence_strength': 0.75, 'accuracy': 0.57356, 'gain': 0.20933, 'paired_se': 0.00933, 'brier_sum': 0.18734, 'items': 900}
+{'prior_strength': 1, 'evidence_strength': 0.75, 'accuracy': 0.57333, 'gain': 0.20911, 'paired_se': 0.00947, 'brier_sum': 0.18583, 'items': 900}
+{'prior_strength': 1, 'evidence_strength': 0.875, 'accuracy': 0.57311, 'gain': 0.20889, 'paired_se': 0.00962, 'brier_sum': 0.18922, 'items': 900}
+{'prior_strength': 1, 'evidence_strength': 0.5, 'accuracy': 0.57222, 'gain': 0.208, 'paired_se': 0.00932, 'brier_sum': 0.18492, 'items': 900}
+{'prior_strength': 0.875, 'evidence_strength': 0.875, 'accuracy': 0.57156, 'gain': 0.20733, 'paired_se': 0.00934, 'brier_sum': 0.19097, 'items': 900}
+{'prior_strength': 1, 'evidence_strength': 1, 'accuracy': 0.57156, 'gain': 0.20733, 'paired_se': 0.00968, 'brier_sum': 0.19425, 'items': 900}
+{'prior_strength': 0.75, 'evidence_strength': 0.5, 'accuracy': 0.57, 'gain': 0.20578, 'paired_se': 0.00846, 'brier_sum': 0.19117, 'items': 900}
+{'prior_strength': 0.75, 'evidence_strength': 0.75, 'accuracy': 0.568, 'gain': 0.20378, 'paired_se': 0.00893, 'brier_sum': 0.1929, 'items': 900}
+{'prior_strength': 1.25, 'evidence_strength': 1, 'accuracy': 0.56644, 'gain': 0.20222, 'paired_se': 0.00974, 'brier_sum': 0.20008, 'items': 900}
+Ablation strengths 0 0 {'accuracy': 0.3642222222222222, 'gain': 0.0, 'paired_se': 0.0, 'brier_sum': 0.328453004360199, 'items': 900}
+Ablation strengths 0.875 0 {'accuracy': 0.5006666666666666, 'gain': 0.13644444444444445, 'paired_se': 0.008896931227694626, 'brier_sum': 0.21036450564861298, 'items': 900}
+Ablation strengths 0 0.875 {'accuracy': 0.42800000000000005, 'gain': 0.06377777777777778, 'paired_se': 0.006661024267380989, 'brier_sum': 0.3065715432167053, 'items': 900}
+Ablation strengths 0.875 0.875 {'accuracy': 0.5715555555555555, 'gain': 0.20733333333333337, 'paired_se': 0.009343259724876065, 'brier_sum': 0.19097299873828888, 'items': 900}
+```
+[forward passes used: 17 of 25; Python runs used: 32 of 300]

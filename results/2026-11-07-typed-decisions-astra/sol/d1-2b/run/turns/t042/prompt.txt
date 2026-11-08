@@ -1,0 +1,26 @@
+OUTPUT of Python run 24 of at most 300:
+```
+# Weight repair session
+No edits. Stratified random split seed 718; fit=448, holdout=452.
+Next pass: original DECIDE on all 900 practice examples.
+Baseline 900 practice accuracy .61333 SE .00825. Inspecting question confusions. Next READ original: 200 fit cases (1000 questions), last layer inputs; no edits.
+Pass 3 READ: causal probe 1, last post_ffn_norm = g0 + random-sign*g0 (seed 851), same 200 fit requests as pass 2. No other edits.
+Pass 4 READ: causal probe 2, last post_ffn_norm = g0 + second independent random-sign*g0, same 200 fit cases. No other edits.
+Two causal probes reconstructed branch B; gain solutions use 384 largest causally sensitive dimensions, closed-form ridge vs gold log probabilities. Probes removed.
+Alignment fixed by exact state matching: READ from ids follows baseline order. Next pass 5: half-strength ridge=1 correction on 384 last-post-FFN gain dimensions; DECIDE both on 448 fit cases only. Direction stored gain_direction.npy.
+Pass 5 half-strength: fit gain +.039286 SE .005523 (103 improved,28 worsened). Next pass 6: strength 1.0, same ridge=1 384-dim direction, same 448 fit cases; dose-response.
+Pass 6 strength1 fit +.052232 SE .007295. Next pass7 strength2 same direction and same 448 fit cases. Inspect question-specific gains to verify non-global effect.
+Pass7 strength2 fit gain +.067411 SE .009955. Next pass8 original READ on 200 additional fit-only cases, no edits. Holdout untouched.
+Pass9 READ additional 200 fit cases with causal probe1 g0+d1; no other edits.
+Pass10 READ additional 200 fit cases with probe2 g0+d2; no other edits.
+Pass11: candidate B, ridge1 closed-form solve on 400 fit cases, 384 causally sensitive dimensions, strength1; DECIDE both all448 fit. No holdout used.
+Pass11 candidate B strength1 fit +.054464 SE .007568. Pass12 candidate B strength2 on same448 fit.
+Pass12 B strength2 fit +.069643 SE .010344. Next pass13 candidate C ridge.1, same400 fit causal measurements, same384dims, strength1; DECIDE both448 fit.
+Pass13 C strength1 fit +.072321 SE .008402. Pass14 C strength2 same448 fit.
+Pass14 C strength2 fit +.080357 SE .011409. Pass15 C strength.5 same448 fit, lower-dose bracket.
+Pass15 C strength.5 fit +.05625 SE .006039. Pass16 C strength3 same448 fit, upper-dose bracket; predicted below strength2.
+Pass16 C strength3 fit +.00625 SE .014045, saturation confirmed. LOCK selected candidate C strength2 (ridge.1,384dims,400 fit cases). Pass17 independent practice holdout450 of452; no further fitting or strength selection on holdout.
+
+Current edits: ['model.language_model.layers.23.post_ffn_norm.weight']
+```
+[forward passes used: 17 of 25; Python runs used: 24 of 300]

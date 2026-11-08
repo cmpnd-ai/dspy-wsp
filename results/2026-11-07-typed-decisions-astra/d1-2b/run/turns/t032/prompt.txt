@@ -1,0 +1,21 @@
+OUTPUT of Python run 19 of at most 300:
+```
+Actual unit-strength metrics: {'acc': 0.7833333333333333, 'brier': 0.05678229033946991, 'gain': 0.16444444444444445, 'se': 0.01790765716435891}
+Unit prediction probability max error: 0.00010197966816682946
+('agent_trace_observability', 'action') mean centered logit shifts {'continue': np.float64(0.363), 'human_review': np.float64(0.44), 'observe': np.float64(0.903), 'stop': np.float64(-1.706)}
+ fixed/broken: 18 2
+('agent_trace_observability', 'outcome') mean centered logit shifts {'failure': np.float64(0.053), 'harmful': np.float64(-0.85), 'partial': np.float64(0.828), 'success': np.float64(-0.031)}
+ fixed/broken: 12 3
+('customer_service', 'action') mean centered logit shifts {'answer_directly': np.float64(-0.01), 'close_no_action': np.float64(-0.272), 'escalate_to_human': np.float64(1.051), 'execute_refund': np.float64(1.012), 'request_information': np.float64(-1.781)}
+ fixed/broken: 18 6
+('customer_service', 'category') mean centered logit shifts {'account': np.float64(0.646), 'billing': np.float64(-0.991), 'delivery': np.float64(0.542), 'refund': np.float64(0.413), 'technical': np.float64(-0.61)}
+ fixed/broken: 4 2
+('security_incidents', 'credential_compromise') mean centered logit shifts {'false': np.float64(1.059), 'true': np.float64(-1.059)}
+ fixed/broken: 14 5
+Corrected train_300 state {"account": {"lifetime_value_usd": 4642, "prior_tickets_90d": 2, "seats": 3, "tenure_months": 60, "tier": "enterprise"}, "thread": [{"role": "customer", "text": "Hello, after five years on the Enterprise plan I\u2019ve decided it\u2019s time to close my account. Could you please start the cancellation process?"}, {"role": "agent", "text": "I\u2019m sorry to hear you want to leave. May I have the account number or the email associated with the subscription so I can locate it?"}, {"role": "customer", "text": "Sure, the account is registered to alice.smith@example.com, and the reference number is 987654. I\u2019d appreciate a confirmation once the cancellation is underway."}, {"role": "agent", "text": "Thank you for that information. I\u2019ve flagged the request; could you let me know if there\u2019s any specific reason you\u2019re closing, or any final data you need from us?"}, {"role": "customer", "text": "No particular issue, just moving to a different provider. I\u2019ll wait for your follow\u2011up confirming the account is scheduled for termination."}]}
+Original [0.157 0.802 0.011 0.005 0.026] edited [0.477 0.276 0.178 0.025 0.044] gold [0.7433 0.03   0.2    0.0033 0.0233]
+Corrected train_318 state {"account": {"lifetime_value_usd": 60, "prior_tickets_90d": 1, "seats": 1, "tenure_months": 1, "tier": "premium"}, "thread": [{"role": "customer", "text": "Last week you promised a refund for my premium subscription, but nothing\u2019s shown up yet. I\u2019m just waiting for an update."}, {"role": "agent", "text": "I\u2019m sorry you haven\u2019t seen the refund yet. Could you provide the ticket number you were given for that request?"}, {"role": "customer", "text": "The ticket number is #4529. I just need to know if the refund is on its way."}, {"role": "agent", "text": "Thanks for the reference. I\u2019ll check with our finance team. Do you still have the original payment method details handy?"}, {"role": "customer", "text": "Yes, it was the Visa ending in 1234. I\u2019ll wait for your next update."}]}
+Original [0.344 0.172 0.176 0.035 0.272] edited [0.182 0.046 0.463 0.233 0.076] gold [0.1333 0.     0.4333 0.3667 0.0667]
+saved edit model.language_model.layers.23.feed_forward.w2.weight: 15,728,640 of 15,728,640 entries changed, relative change 3.9597
+```
+[forward passes used: 12 of 25; Python runs used: 19 of 300]

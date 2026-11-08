@@ -1,0 +1,6 @@
+OUTPUT of Python run 38 of at most 300:
+```
+Matched diagnostic requests/questions: 124 268
+Kinds: {'violations': 12, 'topic': 20, 'days_due': 16, 'asset_criticality': 16, 'duplicate_id': 12, 'invoice_amount_ratio': 18, 'authorization_evidence': 12, 'cancellation_intent': 18}
+```
+[forward passes used: 21 of 25; Python runs used: 38 of 300]

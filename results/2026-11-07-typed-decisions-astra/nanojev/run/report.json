@@ -1,0 +1,281 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev-astra",
+ "final_answer": "**Submitted:** only `scalar.weight` was changed. The backbone, normalization layers, scalar bias, and set-attention head remain untouched.\n\n### Repair and evidence\nThe original readout strongly favored fixed answers\u2014every boolean was \u201ctrue,\u201d agent actions were usually \u201cstop,\u201d and customer categories were usually \u201cbilling.\u201d I derived a **closed-form, regularized correction to the scalar readout** from centered option-feature contrasts. This is a directional edit, not global rescaling.\n\nEvidence that it recovers usable state information:\n- Backbone features and set-attention corrections remained exactly unchanged.\n- Restricting the repair to mean question/option directions lost **7.09 \u00b1 0.83 percentage points** in practice cross-fitting.\n- On matched customer-topic probes, correct classifications increased from **6/20 \u2192 14/20 \u2192 20/20** at zero, half, and full edit strength.\n\n### Measured results\nGains below include paired standard errors.\n\n| Evaluation | Original | Edited | Gain |\n|---|---:|---:|---:|\n| Practice cross-fit, 900 records | 36.42% | 57.16% | **+20.73 \u00b1 0.93 pp** |\n| Hidden validation, 300 records | 34.80% | 58.07% | **+23.27 \u00b1 1.52 pp** |\n\nCross-fitting informed strength selection, so it is not an untouched final test. Before the full-data refit, the earlier 600-record candidate also gained **21.07 \u00b1 1.42 pp** on 300 independent practice records.\n\nThe final validation run reproduced the frozen edit\u2019s result exactly: **207 records improved and 30 worsened**. That repeat confirms restoration, not additional independent evidence.\n\nThe repair should help because it reads existing semantic evidence more effectively while correcting strong answer biases. It is incomplete: deadline reasoning, exact duplicate-ID matching, and some numeric comparisons remain weak.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 41
+ },
+ "turns": 68,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 8,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.56,
+    "score_se_over_items": 0.014071009595504842,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 278
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.56,
+    "gain": 0.212,
+    "se": 0.01578732681135041,
+    "improved": 199,
+    "worsened": 42
+   }
+  },
+  {
+   "pass": 13,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5740000000000001,
+    "score_se_over_items": 0.015343411936563278,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 269
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.5740000000000001,
+    "gain": 0.22599999999999998,
+    "se": 0.014990595342345439,
+    "improved": 207,
+    "worsened": 32
+   }
+  },
+  {
+   "pass": 17,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5793333333333334,
+    "score_se_over_items": 0.014535493278378352,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 275
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.5793333333333334,
+    "gain": 0.23133333333333336,
+    "se": 0.0147159908423942,
+    "improved": 205,
+    "worsened": 25
+   }
+  },
+  {
+   "pass": 18,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5706666666666668,
+    "score_se_over_items": 0.01450093860286902,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 275
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.5706666666666668,
+    "gain": 0.22266666666666665,
+    "se": 0.01475397143090703,
+    "improved": 206,
+    "worsened": 31
+   }
+  },
+  {
+   "pass": 19,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5806666666666668,
+    "score_se_over_items": 0.014010613378928454,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 273
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.5806666666666668,
+    "gain": 0.23266666666666666,
+    "se": 0.015183701093363403,
+    "improved": 207,
+    "worsened": 30
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "scalar.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.34800000000000003,
+    "score_se_over_items": 0.012665317067103232,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 300
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.5806666666666668,
+    "score_se_over_items": 0.014010613378928454,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 273
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.34800000000000003,
+    "edited": 0.5806666666666668,
+    "gain": 0.23266666666666666,
+    "se": 0.015183701093363403,
+    "improved": 207,
+    "worsened": 30
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.38550000000000006,
+   "score_se_over_items": 0.010606867544084086,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 399
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.5730000000000001,
+   "score_se_over_items": 0.010884561737181995,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 377
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.38550000000000006,
+   "edited": 0.5730000000000001,
+   "gain": 0.1875,
+   "se": 0.012952946462297213,
+   "improved": 252,
+   "worsened": 54
+  }
+ },
+ "patch": "1 tensors, 1,024 entries changed\n  scalar.weight float32[1, 1024]: 1,024 entries (dense), relative change 151.6871"
+}

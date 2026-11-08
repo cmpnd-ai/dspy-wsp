@@ -1,0 +1,24 @@
+RESULT of forward pass 20:
+```
+{
+ "type": "decide",
+ "model": "edited",
+ "generations": 900,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev-astra/work/gen_20.jsonl"
+ ],
+ "graded": 900,
+ "score": 0.6697777777777778,
+ "score_se_over_items": 0.007639281065426465,
+ "mean_output_tokens": 0.0,
+ "cut_share": 0.0,
+ "failures": {
+  "cut_at_max_tokens": 0,
+  "program_error": 0,
+  "metric_error": 0,
+  "scored_below_1": 758
+ },
+ "seconds": 660.2
+}
+```
+[forward passes used: 20 of 25; Python runs used: 35 of 300]

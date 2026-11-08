@@ -1,0 +1,205 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra",
+ "final_answer": "Kept the **720-record, rank-nine repair** already installed in `edited`. Only `layers.23.feed_forward.w2.weight` is changed; embeddings, norms, and all other weights remain original.\n\n### What changed\nI applied a closed-form, state-dependent correction to the last MLP\u2019s output, restricted to nine option-token contrast directions. It addresses systematic decision errors\u2014such as choosing \u201crequest information\u201d instead of escalation\u2014rather than globally sharpening probabilities.\n\n### Causal evidence\n- Complementary norm probes isolated the last MLP\u2019s residual contribution.\n- Actual development accuracy showed a dose-response: **61.89% original \u2192 74.00% half-strength \u2192 78.33% full-strength**, then **71.00%** when over-applied.\n- Removing the within-question, state-sensitive component reduced accuracy from **78.33% to 71.11%**. Thus, the repair does more than adjust question-specific biases.\n\n### Final candidate results\n\n| Evaluation | Original | Edited | Paired gain \u00b1 SE |\n|---|---:|---:|---:|\n| Practice records excluded from coefficient fitting, n=180 | 62.11% | 76.67% | **+14.56 \u00b1 1.93 pp** |\n| Hidden validation, n=300 | 60.67% | 76.33% | **+15.67 \u00b1 1.42 pp** |\n\nOn validation, **172 records improved and 38 worsened**. This candidate has the highest measured validation score among those tested. The large gains outside coefficient fitting, together with the causal ablation and dose-response, support expecting the targeted repair to help on unseen records.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 38
+ },
+ "turns": 65,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 15,
+   "model": "both",
+   "edited_tensors": [
+    "model.language_model.layers.23.feed_forward.w2.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.6066666666666667,
+    "score_se_over_items": 0.014379265802681115,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 264
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7573333333333334,
+    "score_se_over_items": 0.012391723541841185,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 213
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.6066666666666667,
+    "edited": 0.7573333333333334,
+    "gain": 0.15066666666666667,
+    "se": 0.014504013463187339,
+    "improved": 171,
+    "worsened": 43
+   }
+  },
+  {
+   "pass": 18,
+   "model": "both",
+   "edited_tensors": [
+    "model.language_model.layers.23.feed_forward.w2.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.6066666666666667,
+    "score_se_over_items": 0.014379265802681115,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 264
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.754,
+    "score_se_over_items": 0.012760201506046696,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 211
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.6066666666666667,
+    "edited": 0.754,
+    "gain": 0.14733333333333334,
+    "se": 0.014387481655624543,
+    "improved": 165,
+    "worsened": 41
+   }
+  },
+  {
+   "pass": 20,
+   "model": "both",
+   "edited_tensors": [
+    "model.language_model.layers.23.feed_forward.w2.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.6066666666666667,
+    "score_se_over_items": 0.014379265802681115,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 264
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.758,
+    "score_se_over_items": 0.012875702836072832,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 205
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.6066666666666667,
+    "edited": 0.758,
+    "gain": 0.15133333333333332,
+    "se": 0.014526900686401854,
+    "improved": 170,
+    "worsened": 42
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "model.language_model.layers.23.feed_forward.w2.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.6066666666666667,
+    "score_se_over_items": 0.014379265802681115,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 264
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7633333333333333,
+    "score_se_over_items": 0.01265116695287105,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 206
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.6066666666666667,
+    "edited": 0.7633333333333333,
+    "gain": 0.15666666666666668,
+    "se": 0.014211598363888722,
+    "improved": 172,
+    "worsened": 38
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.622,
+   "score_se_over_items": 0.012130865374607126,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 350
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.774,
+   "score_se_over_items": 0.010492150067196974,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 274
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.622,
+   "edited": 0.774,
+   "gain": 0.15200000000000002,
+   "se": 0.01175096647227714,
+   "improved": 238,
+   "worsened": 56
+  }
+ },
+ "patch": "1 tensors, 15,714,372 entries changed\n  model.language_model.layers.23.feed_forward.w2.weight bfloat16[2048, 7680]: 15,714,372 entries (dense), relative change 2.9816"
+}

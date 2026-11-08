@@ -1,0 +1,9 @@
+OUTPUT of Python run 38 of at most 300:
+```
+720 minus 540 on remaining 180: -0.003333333333333332 paired SE 0.007953152715305629
+agent_trace_observability n 45 gain 0.2000 SE 0.0402
+customer_service n 45 gain 0.1422 SE 0.0390
+invoice_processing n 45 gain 0.1378 SE 0.0323
+security_incidents n 45 gain 0.1022 SE 0.0420
+```
+[forward passes used: 24 of 25; Python runs used: 38 of 300]

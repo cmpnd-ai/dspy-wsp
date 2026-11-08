@@ -1,0 +1,35 @@
+OUTPUT of Python run 31 of at most 300:
+```
+Cross-fit strength 0 {'accuracy': 0.36422, 'gain': 0.0, 'paired_se': 0.0, 'brier_sum': 0.32845, 'items': 900}
+Cross-fit strength 0.25 {'accuracy': 0.43467, 'gain': 0.07044, 'paired_se': 0.00489, 'brier_sum': 0.26376, 'items': 900}
+Cross-fit strength 0.5 {'accuracy': 0.52978, 'gain': 0.16556, 'paired_se': 0.00734, 'brier_sum': 0.21544, 'items': 900}
+Cross-fit strength 0.625 {'accuracy': 0.55889, 'gain': 0.19467, 'paired_se': 0.00826, 'brier_sum': 0.20089, 'items': 900}
+Cross-fit strength 0.75 {'accuracy': 0.568, 'gain': 0.20378, 'paired_se': 0.00893, 'brier_sum': 0.1929, 'items': 900}
+Cross-fit strength 0.875 {'accuracy': 0.57156, 'gain': 0.20733, 'paired_se': 0.00934, 'brier_sum': 0.19097, 'items': 900}
+Cross-fit strength 1 {'accuracy': 0.57156, 'gain': 0.20733, 'paired_se': 0.00968, 'brier_sum': 0.19425, 'items': 900}
+Cross-fit strength 1.25 {'accuracy': 0.55422, 'gain': 0.19, 'paired_se': 0.00996, 'brier_sum': 0.21223, 'items': 900}
+Per-question cross-fit original -> repaired:
+agent_trace_observability action 0.013 -> 0.511 gain 0.498
+agent_trace_observability needs_review 0.462 -> 0.707 gain 0.244
+agent_trace_observability outcome 0.218 -> 0.596 gain 0.378
+agent_trace_observability risk 0.253 -> 0.56 gain 0.307
+agent_trace_observability urgency 0.107 -> 0.458 gain 0.351
+customer_service action 0.471 -> 0.516 gain 0.044
+customer_service category 0.244 -> 0.636 gain 0.391
+customer_service churn_risk 0.262 -> 0.476 gain 0.213
+customer_service needs_human 0.676 -> 0.667 gain -0.009
+customer_service urgency 0.409 -> 0.369 gain -0.04
+invoice_processing discrepancy_severity 0.244 -> 0.333 gain 0.089
+invoice_processing disposition 0.347 -> 0.431 gain 0.084
+invoice_processing duplicate 0.093 -> 0.884 gain 0.791
+invoice_processing matches_order 0.48 -> 0.667 gain 0.187
+invoice_processing urgency 0.449 -> 0.444 gain -0.004
+security_incidents credential_compromise 0.533 -> 0.596 gain 0.062
+security_incidents disposition 0.72 -> 0.702 gain -0.018
+security_incidents severity 0.32 -> 0.6 gain 0.28
+security_incidents true_positive 0.684 -> 0.684 gain 0.0
+security_incidents urgency 0.298 -> 0.524 gain 0.227
+Accuracy by gold top-two gap: [(0, 0.1, 0.435, 584), (0.1, 0.3, 0.474, 1193), (0.3, 0.6, 0.62, 1404), (0.6, 1.01, 0.657, 1319)]
+Existing target families: ['log01', 'prob3', 'prob5', 'mix3', 'hard2'] ['Ksoft', 'Kmix']
+```
+[forward passes used: 17 of 25; Python runs used: 31 of 300]

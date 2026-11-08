@@ -1,0 +1,9 @@
+OUTPUT of Python run 37 of at most 300:
+```
+Read metadata first rows [{'request': 0, 'question': 'action', 'type': 'choice', 'options': ['continue', 'human_review', 'observe', 'stop']}, {'request': 0, 'question': 'needs_review', 'type': 'noul', 'options': ['false', 'true']}]
+Test record order ['train_163', 'train_46', 'train_39', 'train_239']
+Gate detection true positive rate 0.9996461272239685 false positive rate 4.2103489249711856e-05 positive p05 0.5407456159591675 negative p99 -0.31175196170806885
+Displaced original-neuron logit-contrast RMS 0.0004962316597811878
+Actual best2 vs local scorer max probability error 0.0004275556766311084
+```
+[forward passes used: 20 of 25; Python runs used: 37 of 300]

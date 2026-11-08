@@ -1,0 +1,12 @@
+OUTPUT of Python run 21 of at most 300:
+```
+scalar feature ones RMSE 0.00012417355901561677 max 0.0004627704620361328
+scalar feature logcount RMSE 5.904173860926676e-08 max 1.4901161193847656e-07
+scalar feature count RMSE 0.0009249039576388896 max 0.0034263134002685547
+scalar feature mean_logit RMSE 7.553496834589168e-05 max 0.0002243518829345703
+scalar feature scaled_raw RMSE 0.00026871671434491873 max 0.000766456127166748
+set_project last column 0.22725896537303925 other col avg norm 0.2301679104566574
+Set output residual candidates will use original-vs-edited READ to verify formulas.
+Choice questions 900
+```
+[forward passes used: 13 of 25; Python runs used: 21 of 300]

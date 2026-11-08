@@ -1,0 +1,16 @@
+OUTPUT of Python run 5 of at most 300:
+```
+keys dict_keys(['rows', 'layers', 'conventions', 'model', 'files'])
+layers [23, 24]
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "each option's score at the answer position before the temperature: head_inputs . option_rows", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens", 'head_inputs': "the final normed hidden state at the question's answer position, one copy per option", 'option_rows': "each option's best-form row of embed_tokens, which the readout multiplies by head_inputs"}
+model original
+files {'option_mask.npy': [1000, 5], 'option_logits.npy': [1000, 5], 'head_inputs.npy': [1000, 5, 2048], 'option_rows.npy': [1000, 5, 2048], 'hidden_mean.npy': [1000, 2, 2048], 'probabilities.npy': [1000, 5]}
+files ['option_rows.npy', 'hidden_mean.npy', 'option_mask.npy', 'requests.json', 'head_inputs.npy', 'probabilities.npy', 'option_logits.npy', 'meta.json']
+option_rows.npy (1000, 5, 2048)
+hidden_mean.npy (1000, 2, 2048)
+option_mask.npy (1000, 5)
+head_inputs.npy (1000, 5, 2048)
+probabilities.npy (1000, 5)
+option_logits.npy (1000, 5)
+```
+[forward passes used: 2 of 25; Python runs used: 5 of 300]

@@ -1,0 +1,42 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-05T21:26:22+00:00",
+  "base_model": "LiquidAI/d1-2B",
+  "revision": "652f920e544ea37f81e4b0ce89b81d4ed0da90b1",
+  "writer": "openai/gpt-6.1-sol",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 33
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b",
+  "validation": {
+   "items": 400,
+   "original": 0.622,
+   "edited": 0.665,
+   "gain": 0.043,
+   "se": 0.011585034854563608,
+   "improved": 157,
+   "worsened": 111
+  }
+ },
+ "changed_tensors": 1,
+ "changed_entries_total": 384,
+ "tensors": [
+  {
+   "name": "model.language_model.layers.23.post_ffn_norm.weight",
+   "shape": [
+    2048
+   ],
+   "dtype": "bfloat16",
+   "form": "sparse",
+   "changed_entries": 384,
+   "relative_change": 3.8082220554351807,
+   "base_sha256": "c95b09e20435e377c02df0d286b241ed5d6646f931180d8145f524e24df28975",
+   "edited_sha256": "d8293aa44a47a6abf2e372c48a90e27a682ae7f94061bb21f2b3e3872b9b7c6a"
+  }
+ ]
+}

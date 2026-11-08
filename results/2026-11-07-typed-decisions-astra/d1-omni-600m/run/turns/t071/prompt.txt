@@ -1,0 +1,6 @@
+OUTPUT of Python run 42 of at most 300:
+```
+Original robustness: {'original_state_accuracy': 0.593999981880188, 'metadata_added_accuracy': 0.5759999752044678, 'answer_flip_rate': 0.13600000739097595, 'mean_probability_total_variation': 0.07536449283361435}
+Frozen repair predicted robustness: {'original_state_accuracy': 0.7279999852180481, 'metadata_added_accuracy': 0.6859999895095825, 'answer_flip_rate': 0.18799999356269836, 'mean_probability_total_variation': 0.13291752338409424}
+```
+[forward passes used: 23 of 25; Python runs used: 42 of 300]

@@ -1,0 +1,31 @@
+OUTPUT of Python run 17 of at most 300:
+```
+agent_tr action base 0.643 q-specific [0.661, 0.661, 0.679, 0.643, 0.643, 0.625]
+agent_tr needs_review base 0.839 q-specific [0.821, 0.839, 0.839, 0.839, 0.839, 0.839]
+agent_tr outcome base 0.786 q-specific [0.804, 0.786, 0.821, 0.821, 0.804, 0.804]
+agent_tr risk base 0.696 q-specific [0.714, 0.75, 0.732, 0.75, 0.732, 0.696]
+agent_tr urgency base 0.571 q-specific [0.589, 0.625, 0.625, 0.607, 0.571, 0.571]
+customer action base 0.536 q-specific [0.536, 0.518, 0.554, 0.554, 0.554, 0.554]
+customer category base 0.911 q-specific [0.875, 0.875, 0.893, 0.893, 0.893, 0.893]
+customer churn_risk base 0.536 q-specific [0.625, 0.607, 0.607, 0.571, 0.571, 0.571]
+customer needs_human base 0.75 q-specific [0.571, 0.589, 0.661, 0.696, 0.714, 0.732]
+customer urgency base 0.75 q-specific [0.661, 0.696, 0.714, 0.714, 0.75, 0.75]
+invoice_ discrepancy_severity base 0.429 q-specific [0.554, 0.571, 0.536, 0.5, 0.464, 0.446]
+invoice_ disposition base 0.411 q-specific [0.554, 0.446, 0.464, 0.429, 0.393, 0.411]
+invoice_ duplicate base 0.929 q-specific [0.929, 0.911, 0.911, 0.911, 0.911, 0.929]
+invoice_ matches_order base 0.732 q-specific [0.75, 0.768, 0.804, 0.839, 0.821, 0.786]
+invoice_ urgency base 0.607 q-specific [0.625, 0.607, 0.607, 0.554, 0.607, 0.607]
+security credential_compromise base 0.821 q-specific [0.75, 0.786, 0.786, 0.786, 0.786, 0.804]
+security disposition base 0.661 q-specific [0.679, 0.679, 0.696, 0.661, 0.661, 0.661]
+security severity base 0.554 q-specific [0.536, 0.571, 0.625, 0.589, 0.589, 0.554]
+security true_positive base 0.75 q-specific [0.714, 0.714, 0.714, 0.768, 0.75, 0.75]
+security urgency base 0.5 q-specific [0.464, 0.518, 0.464, 0.482, 0.5, 0.5]
+All question directions rel 0.01 {'acc': 0.67054, 'gain': 0.12054, 'se': 0.01956, 'brier': 0.05299}
+All question directions rel 0.03 {'acc': 0.67589, 'gain': 0.12589, 'se': 0.01903, 'brier': 0.04908}
+All question directions rel 0.1 {'acc': 0.68661, 'gain': 0.13661, 'se': 0.01759, 'brier': 0.04518}
+All question directions rel 0.3 {'acc': 0.68036, 'gain': 0.13036, 'se': 0.01733, 'brier': 0.04271}
+All question directions rel 1 {'acc': 0.67768, 'gain': 0.12768, 'se': 0.01748, 'brier': 0.0417}
+All question directions rel 3 {'acc': 0.67411, 'gain': 0.12411, 'se': 0.0169, 'brier': 0.04179}
+Question identity gates dev sign errors 0 min positive 0.016941308975219727 max negative -0.3754240870475769
+```
+[forward passes used: 10 of 25; Python runs used: 17 of 300]

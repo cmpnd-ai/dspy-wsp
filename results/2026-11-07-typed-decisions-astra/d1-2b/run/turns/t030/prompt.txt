@@ -1,0 +1,13 @@
+OUTPUT of Python run 18 of at most 300:
+```
+Actual half-strength metrics: {'acc': 0.74, 'brier': 0.07841350883245468, 'gain': 0.1211111111111111, 'se': 0.012849433391341262}
+Prediction error mean/max logits: 0.00016374310175835608 0.00048331590051375883
+Prediction error mean/max probabilities: 2.050590388917784e-06 4.463905798596235e-05
+Argmax agreement 1.0
+ridge 1.0 relative delta norm 2.640994915432873
+ridge 10.0 relative delta norm 0.9750086892185291
+ridge 30.0 relative delta norm 0.5974696808276886
+ridge 100.0 relative delta norm 0.3463780673270157
+saved edit model.language_model.layers.23.feed_forward.w2.weight: 15,728,640 of 15,728,640 entries changed, relative change 2.6398
+```
+[forward passes used: 11 of 25; Python runs used: 18 of 300]

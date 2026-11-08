@@ -1,0 +1,24 @@
+OUTPUT of Python run 34 of at most 300:
+```
+agent_trace_observability/action original 0.378 -> repair 0.756
+agent_trace_observability/needs_review original 0.600 -> repair 0.844
+agent_trace_observability/outcome original 0.667 -> repair 0.767
+agent_trace_observability/risk original 0.544 -> repair 0.789
+agent_trace_observability/urgency original 0.533 -> repair 0.689
+customer_service/action original 0.344 -> repair 0.611
+customer_service/category original 0.878 -> repair 0.956
+customer_service/churn_risk original 0.600 -> repair 0.867
+customer_service/needs_human original 0.667 -> repair 0.722
+customer_service/urgency original 0.478 -> repair 0.767
+invoice_processing/discrepancy_severity original 0.500 -> repair 0.689
+invoice_processing/disposition original 0.467 -> repair 0.656
+invoice_processing/duplicate original 0.933 -> repair 0.956
+invoice_processing/matches_order original 0.756 -> repair 0.822
+invoice_processing/urgency original 0.589 -> repair 0.789
+security_incidents/credential_compromise original 0.533 -> repair 0.689
+security_incidents/disposition original 0.678 -> repair 0.767
+security_incidents/severity original 0.700 -> repair 0.811
+security_incidents/true_positive original 0.778 -> repair 0.822
+security_incidents/urgency original 0.533 -> repair 0.667
+```
+[forward passes used: 20 of 25; Python runs used: 34 of 300]

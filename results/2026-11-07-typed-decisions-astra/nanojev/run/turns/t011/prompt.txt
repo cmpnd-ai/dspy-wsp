@@ -1,0 +1,11 @@
+OUTPUT of Python run 6 of at most 300:
+```
+Read 2 alignment max errors {'source': np.float32(0.0), 'requested': np.float32(0.31913075)}
+Read 3 alignment max errors {'source': np.float32(0.0), 'requested': np.float32(0.2968408)}
+Traceback (most recent call last):
+  File "<cell>", line 25, in <module>
+  File "<cell>", line 16, in load_read_dataset
+  File "<cell>", line 13, in err
+KeyError: 'action'
+```
+[forward passes used: 4 of 25; Python runs used: 6 of 300]

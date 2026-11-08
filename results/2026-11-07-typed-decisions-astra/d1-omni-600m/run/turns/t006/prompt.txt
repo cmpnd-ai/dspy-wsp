@@ -1,0 +1,88 @@
+OUTPUT of Python run 3 of at most 300:
+```
+Encoder classes: ['class RMSNorm(nn.Module):', 'class Attention(nn.Module):', 'class ShortConv(nn.Module):', 'class MLP(nn.Module):', 'class Layer(nn.Module):', 'class Trunk(nn.Module):', 'class DecisionHead(nn.Module):']
+HEAD SOURCE: ength, device=h.device, dtype=h.dtype)
+        mask = mask + ((~pad).float() * neg).to(h.dtype)[:, None, None, :]
+        mask = mask.masked_fill((media_query[:, :, None] & text_key[:, None, :])[:, None], neg)
+        keep_right = (t != prefix[:, None] - 1).to(h.dtype)
+        padf = pad.to(h.dtype)
+        cos, sin = self.rope(length, h)
+        for layer in self.layers:
+            x = layer.operator_norm(h)
+            if layer.is_attention_layer:
+                x = layer.self_attn(x, cos, sin, mask)
+            else:
+                x = layer.conv(x, padf, keep_right)
+            h = h + x
+            h = h + layer.feed_forward(layer.ffn_norm(h))
+        return self.embedding_norm(h)
+
+
+class DecisionHead(nn.Module):
+    def __init__(self, d: int, layers: int):
+        super().__init__()
+        self.type_emb = nn.Embedding(3, d)
+        layer = nn.TransformerEncoderLayer(d, d // 64, 4 * d, 0.0, batch_first=True, norm_first=True)
+        self.head = nn.TransformerEncoder(layer, layers, enable_nested_tensor=False)
+        self.scorer = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, 1))
+
+    def forward(self, h, pad, marker_pos, marker_mask, qtype):
+        h = h + self.type_emb(qtype)[:, None, :]
+        for layer in self.head.layers:
+            h = layer(h, src_key_padding_mask=~pad)
+        g = torch.gather(h, 1, marker_pos[:, :, None].expand(-1, -1, h.size(-1)))
+        return self.scorer(g).squeeze(-1).float().masked_fill(~marker_mask, -1e4)
+
+
+def _rotate_half(x: torch.Tensor) -> torch.Tensor:
+    x1, x2 = x.chunk(2, dim=-1)
+    return torch.cat((-x2, x1), dim=-1)
+
+agent_tr action 79/168=0.470 misses [(('observe', 'human_review'), 64), (('continue', 'human_review'), 17), (('continue', 'observe'), 4), (('human_review', 'observe'), 3)]
+agent_tr needs_review 100/168=0.595 misses [(('false', 'true'), 55), (('true', 'false'), 13)]
+agent_tr outcome 72/168=0.429 misses [(('success', 'partial'), 40), (('harmful', 'partial'), 33), (('partial', 'success'), 15), (('failure', 'partial'), 6)]
+agent_tr risk 67/168=0.399 misses [(('1', '0'), 51), (('2', '0'), 24), (('2', '1'), 9), (('3', '1'), 6)]
+agent_tr urgency 82/168=0.488 misses [(('0', '1'), 30), (('1', '2'), 13), (('1', '0'), 13), (('2', '1'), 9)]
+customer action 72/168=0.429 misses [(('escalate_to_human', 'answer_directly'), 51), (('request_information', 'answer_directly'), 16), (('request_information', 'escalate_to_human'), 13), (('answer_directly', 'escalate_to_human'), 8)]
+customer category 154/168=0.917 misses [(('billing', 'account'), 5), (('technical', 'account'), 3), (('delivery', 'account'), 2), (('technical', 'delivery'), 2)]
+customer churn_risk 84/168=0.500 misses [(('1', '0'), 38), (('2', '0'), 27), (('3', '2'), 7), (('3', '0'), 4)]
+customer needs_human 113/168=0.673 misses [(('false', 'true'), 55)]
+customer urgency 93/168=0.554 misses [(('2', '1'), 38), (('3', '1'), 15), (('2', '3'), 15), (('1', '0'), 4)]
+invoice_ discrepancy_severity 68/168=0.405 misses [(('3', '0'), 48), (('2', '0'), 41), (('0', '2'), 5), (('3', '1'), 3)]
+invoice_ disposition 68/168=0.405 misses [(('manual_review', 'approve'), 31), (('approve', 'manual_review'), 25), (('hold', 'approve'), 23), (('hold', 'manual_review'), 12)]
+invoice_ duplicate 154/168=0.917 misses [(('true', 'false'), 14)]
+invoice_ matches_order 98/168=0.583 misses [(('true', 'false'), 52), (('false', 'true'), 18)]
+invoice_ urgency 71/168=0.423 misses [(('2', '1'), 77), (('3', '1'), 20)]
+security credential_compromise 120/168=0.714 misses [(('false', 'true'), 25), (('true', 'false'), 23)]
+security disposition 120/168=0.714 misses [(('contain', 'investigate'), 16), (('close_benign', 'investigate'), 14), (('monitor', 'investigate'), 9), (('investigate', 'contain'), 5)]
+security severity 55/168=0.327 misses [(('3', '2'), 61), (('1', '2'), 19), (('4', '2'), 14), (('2', '3'), 5)]
+security true_positive 122/168=0.726 misses [(('true', 'false'), 28), (('false', 'true'), 18)]
+security urgency 87/168=0.518 misses [(('2', '3'), 30), (('3', '2'), 13), (('2', '1'), 12), (('1', '3'), 9)]
+
+Representative high-confidence errors:
+('security_incidents', 'severity') train_1084 pred 2 0.672 gold 3
+STATE {"alert": {"description": "audit logging was turned off on a host", "evidence": "On host DB-SERVER-04, a privileged admin account executed a command to disable the system audit log at 22:45 local time. The activity originated from an allowlisted management workstation, and system logs indicate the account's credentials have not been rotated in 700 days. No authorized change window was active during this event, which occurred without multi-factor authentication.", "rule": "disabled_logging"}, "context": {"asset_criticality": "medium", "change_window_active": false, "source_on_allowlist": true}, "history": {"credential_rotation_days_ago": 700, "distinct_countries_30d": 1, "logins_30d": 353, "prior_alerts_90d": 0}, "principal": {"mfa_enrolled": false, "name": "usr-infra-482", "privileges": ["deploy:production", "secrets:read"], "type": "admin"}}
+GOLD {'confidence': 0.569444, 'label': '3', 'probabilities': {'0': 0.0, '1': 0.066667, '2': 0.3, '3': 0.55, '4': 0.083333}, 'score': 2.65, 'type': 'score'}
+PRED {'0': 0.05726582677610111, '1': 0.08756501978481125, '2': 0.6718269067371349, '3': 0.1741913837471653, '4': 0.009150862954787358}
+('agent_trace_observability', 'risk') train_95 pred 0 0.906 gold 1
+STATE {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not exceed a $50 spend on cloud resources"], "task": "Backfill missing analytics events for the last seven days.", "trace_summary": {"constraint_violations": 0, "duration_s": 826.3, "irreversible_actions": 0, "steps": 8, "tool_errors": 0}}
+GOLD {'confidence': 0.53, 'label': '1', 'probabilities': {'0': 0.393333, '1': 0.54, '2': 0.056667, '3': 0.01}, 'score': 0.683333, 'type': 'score'}
+PRED {'0': 0.9056007098156132, '1': 0.07315562657165676, '2': 0.011507434934637378, '3': 0.009736228678092585}
+('invoice_processing', 'discrepancy_severity') train_723 pred 0 0.643 gold 2
+STATE {"delivery": {"condition": "accepted with exceptions", "date": "2026-03-08", "received_qty": 50}, "invoice": {"currency": "USD", "id": "INV-2026-5267", "lines": [{"qty": 50, "sku": "SKU-916", "total_usd": 22219.0, "unit_usd": 444.38}, {"qty": 1, "sku": "FREIGHT", "total_usd": 1147.63, "unit_usd": 1147.63}], "total_usd": 23366.63, "vendor": "Acme Fabrication"}, "payment": {"days_until_due": 18, "discount_expires_in_days": 2, "early_payment_discount_pct": 2.0, "status": "scheduled", "terms": "net 30"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-2802", "lines": [{"qty": 50, "unit_usd": 444.38}], "total_usd": 22219.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 22, "prior_invoice_ids": ["INV-2026-3885", "INV-2026-7284"]}}
+GOLD {'confidence': 0.71, 'label': '2', 'probabilities': {'0': 0.006667, '1': 0.026667, '2': 0.716667, '3': 0.25}, 'score': 2.21, 'type': 'score'}
+PRED {'0': 0.6428889882502079, '1': 0.17947793677865675, '2': 0.09589004114992182, '3': 0.0817430338212135}
+('invoice_processing', 'disposition') train_869 pred approve 0.643 gold hold
+STATE {"delivery": {"condition": "accepted with exceptions", "date": "2026-03-04", "received_qty": 250}, "invoice": {"currency": "USD", "id": "INV-2026-5045", "lines": [{"qty": 250, "sku": "SKU-657", "total_usd": 71242.5, "unit_usd": 284.97}], "total_usd": 71242.5, "vendor": "Vantage Materials"}, "payment": {"days_until_due": 44, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 15"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-7733", "lines": [{"qty": 250, "unit_usd": 284.97}], "total_usd": 71242.5}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 42, "prior_invoice_ids": ["INV-2026-5045"]}}
+GOLD {'confidence': 0.2, 'label': 'hold', 'probabilities': {'approve': 0.383333, 'hold': 0.4, 'manual_review': 0.196667, 'reject': 0.02}, 'type': 'choice'}
+PRED {'approve': 0.6434496141207583, 'hold': 0.14773096999586982, 'manual_review': 0.20579230368041437, 'reject': 0.00302711220295758}
+('invoice_processing', 'urgency') train_809 pred 1 0.86 gold 2
+STATE {"delivery": {"condition": "accepted", "date": "2026-03-16", "received_qty": 80}, "invoice": {"currency": "USD", "id": "INV-2026-4623", "lines": [{"qty": 80, "sku": "SKU-665", "total_usd": 22786.4, "unit_usd": 284.83}], "total_usd": 22786.4, "vendor": "Pallas Industrial"}, "payment": {"days_until_due": -3, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "overdue", "terms": "net 60"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-7949", "lines": [{"qty": 100, "unit_usd": 284.83}], "total_usd": 28483.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 31, "prior_invoice_ids": ["INV-2026-3629"]}}
+GOLD {'confidence': 0.51, 'label': '2', 'probabilities': {'0': 0.023333, '1': 0.243333, '2': 0.533333, '3': 0.2}, 'score': 1.91, 'type': 'score'}
+PRED {'0': 0.021620706288911332, '1': 0.8597640924228782, '2': 0.0828471750560938, '3': 0.035768026232116515}
+('agent_trace_observability', 'outcome') train_257 pred partial 0.643 gold harmful
+STATE {"agent": {"autonomy": "unsupervised", "model": "internal-agent-v3"}, "constraints": ["Do not exceed a $50 spend on cloud resources", "Do not touch customer data outside the named accounts", "Never delete anything matching release/*"], "task": "Reconcile the billing ledger against the payment provider.", "trace_summary": {"constraint_violations": 1, "duration_s": 711.4, "irreversible_actions": 1, "steps": 8, "tool_errors": 1}}
+GOLD {'confid
+[output cut at 10,000 characters]
+```
+[forward passes used: 1 of 25; Python runs used: 3 of 300]

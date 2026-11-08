@@ -1,0 +1,9 @@
+OUTPUT of Python run 36 of at most 300:
+```
+Record keys ['id', 'sample', 'model', 'inputs', 'outputs', 'score', 'feedback', 'calls', 'cut', 'output_tokens']
+agent_trace_observability 57 original 0.5018 edited 0.7439 gain 0.2421 SE 0.0364
+customer_service 57 original 0.6105 edited 0.7053 gain 0.0947 SE 0.0321
+invoice_processing 57 original 0.5789 edited 0.7333 gain 0.1544 SE 0.0317
+security_incidents 57 original 0.6456 edited 0.7158 gain 0.0702 SE 0.0276
+```
+[forward passes used: 19 of 25; Python runs used: 36 of 300]

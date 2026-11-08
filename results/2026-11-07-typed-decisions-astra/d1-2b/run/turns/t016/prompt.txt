@@ -1,0 +1,9 @@
+OUTPUT of Python run 10 of at most 300:
+```
+Request match/order: ['train_1', 'train_5', 'train_7'] same in probe: True
+Anchor RMS error: 5.0049380022394726e-08 scale quantiles [0.9808 0.9863 0.9917]
+Mean baseline accuracy: 0.62
+Even-gain probe accuracy: 0.6188888888888889
+Mean absolute option-logit change: 0.40824616
+```
+[forward passes used: 5 of 25; Python runs used: 10 of 300]

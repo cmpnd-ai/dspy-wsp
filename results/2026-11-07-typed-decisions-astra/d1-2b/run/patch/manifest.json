@@ -1,0 +1,43 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-07T22:54:16+00:00",
+  "base_model": "LiquidAI/d1-2B",
+  "revision": "652f920e544ea37f81e4b0ce89b81d4ed0da90b1",
+  "writer": "openai/gpt-6-astra",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 38
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra",
+  "validation": {
+   "items": 400,
+   "original": 0.622,
+   "edited": 0.774,
+   "gain": 0.15200000000000002,
+   "se": 0.01175096647227714,
+   "improved": 238,
+   "worsened": 56
+  }
+ },
+ "changed_tensors": 1,
+ "changed_entries_total": 15714372,
+ "tensors": [
+  {
+   "name": "model.language_model.layers.23.feed_forward.w2.weight",
+   "shape": [
+    2048,
+    7680
+   ],
+   "dtype": "bfloat16",
+   "form": "dense",
+   "changed_entries": 15714372,
+   "relative_change": 2.981574058532715,
+   "base_sha256": "b5a49c806057b3edaca76a84966c93dd07ca01dd00ae899afd72f8b64497a31e",
+   "edited_sha256": "5333794ada177cd5db1c2696a2f30632afc5c5cafba1f1c40e26a4070f14b008"
+  }
+ ]
+}

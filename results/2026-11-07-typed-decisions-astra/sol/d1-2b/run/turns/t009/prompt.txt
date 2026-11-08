@@ -1,0 +1,9 @@
+OUTPUT of Python run 6 of at most 300:
+```
+post FFN gain quantiles [-0.003   0.1318  0.1374  0.1455  0.1927  0.25    0.3926]
+embedding gain quantiles [0.3145 1.9255 2.2297 2.375  2.5    3.5175 5.2812]
+norm tensors last [('model.language_model.layers.23.conv.conv.weight', (2048, 1, 7)), ('model.language_model.layers.23.conv.in_proj.weight', (6144, 2048)), ('model.language_model.layers.23.conv.out_proj.weight', (2048, 2048)), ('model.language_model.layers.23.feed_forward.w1.weight', (7680, 2048)), ('model.language_model.layers.23.feed_forward.w2.weight', (2048, 7680)), ('model.language_model.layers.23.feed_forward.w3.weight', (7680, 2048)), ('model.language_model.layers.23.ffn_norm.weight', (2048,)), ('model.language_model.layers.23.operator_norm.weight', (2048,)), ('model.language_model.layers.23.post_ffn_norm.weight', (2048,)), ('model.language_model.layers.23.post_operator_norm.weight', (2048,))]
+H rms [0.8908 1.0287 1.2835]
+state norm [0.1051 0.1231 0.1672]
+```
+[forward passes used: 2 of 25; Python runs used: 6 of 300]

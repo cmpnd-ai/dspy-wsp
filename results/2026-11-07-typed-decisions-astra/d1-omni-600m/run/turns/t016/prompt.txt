@@ -1,0 +1,49 @@
+OUTPUT of Python run 9 of at most 300:
+```
+Direct-input per-question effects:
+agent_tr action 0.482 -> 0.661 delta 0.179
+agent_tr needs_review 0.589 -> 0.839 delta 0.25
+agent_tr outcome 0.446 -> 0.75 delta 0.304
+agent_tr risk 0.393 -> 0.643 delta 0.25
+agent_tr urgency 0.429 -> 0.518 delta 0.089
+customer action 0.411 -> 0.5 delta 0.089
+customer category 0.946 -> 0.929 delta -0.018
+customer churn_risk 0.518 -> 0.643 delta 0.125
+customer needs_human 0.643 -> 0.643 delta 0.0
+customer urgency 0.571 -> 0.696 delta 0.125
+invoice_ discrepancy_severity 0.357 -> 0.446 delta 0.089
+invoice_ disposition 0.411 -> 0.375 delta -0.036
+invoice_ duplicate 0.929 -> 0.929 delta 0.0
+invoice_ matches_order 0.607 -> 0.696 delta 0.089
+invoice_ urgency 0.393 -> 0.607 delta 0.214
+security credential_compromise 0.75 -> 0.804 delta 0.054
+security disposition 0.625 -> 0.661 delta 0.036
+security severity 0.304 -> 0.5 delta 0.196
+security true_positive 0.714 -> 0.714 delta 0.0
+security urgency 0.482 -> 0.411 delta -0.071
+Least option-ranking-contributing GELU units:
+33 weight -6.776246209483361e-06 contrast_rms 4.4032695711848646e-08 activation_mean -0.1550932377576828
+746 weight 3.7548920772678684e-06 contrast_rms 5.898234078927089e-08 activation_mean -0.01120265293866396
+594 weight -3.4123756904591573e-06 contrast_rms 8.561751485558489e-08 activation_mean -0.05752822384238243
+624 weight 7.421092595905066e-05 contrast_rms 2.416625477508205e-07 activation_mean -0.167265385389328
+924 weight 3.766740337596275e-05 contrast_rms 3.6207529774401337e-07 activation_mean -0.004564107861369848
+993 weight 1.8947190255858004e-05 contrast_rms 5.911589937568351e-07 activation_mean -0.15457092225551605
+231 weight -0.008922822773456573 contrast_rms 7.701764843659475e-07 activation_mean -7.921642463770695e-06
+365 weight 7.266476313816383e-05 contrast_rms 9.369007898385462e-07 activation_mean -0.00912412442266941
+166 weight 4.573316255118698e-05 contrast_rms 9.836559229370323e-07 activation_mean -0.11788985133171082
+538 weight 0.0002699393662624061 contrast_rms 1.116346084018005e-06 activation_mean -0.0007384439231827855
+Strongest normalized-input correction coordinates: [(150, -1.0898), (6, 1.0147), (73, 0.9706), (809, -0.9298), (713, -0.9224), (916, -0.9037), (689, -0.8782), (671, -0.8635), (720, -0.8466), (773, -0.8338), (256, -0.8234), (234, -0.8192)]
+prob target 0.003 3 norm 11.18 fit 0.7469 dev {'acc': 0.65, 'gain': 0.1, 'se': 0.01707, 'brier': 0.03758}
+prob target 0.003 5 norm 18.42 fit 0.746 dev {'acc': 0.65536, 'gain': 0.10536, 'se': 0.01693, 'brier': 0.04134}
+prob target 0.003 8 norm 29.35 fit 0.7455 dev {'acc': 0.65982, 'gain': 0.10982, 'se': 0.01682, 'brier': 0.05491}
+prob target 0.01 3 norm 7.81 fit 0.7277 dev {'acc': 0.65625, 'gain': 0.10625, 'se': 0.01669, 'brier': 0.0367}
+prob target 0.01 5 norm 12.81 fit 0.7308 dev {'acc': 0.66071, 'gain': 0.11071, 'se': 0.01682, 'brier': 0.03875}
+prob target 0.01 8 norm 20.38 fit 0.7335 dev {'acc': 0.66607, 'gain': 0.11607, 'se': 0.0168, 'brier': 0.05073}
+prob target 0.03 3 norm 5.09 fit 0.7125 dev {'acc': 0.65893, 'gain': 0.10893, 'se': 0.0162, 'brier': 0.03693}
+prob target 0.03 5 norm 8.29 fit 0.7147 dev {'acc': 0.65893, 'gain': 0.10893, 'se': 0.01629, 'brier': 0.03744}
+prob target 0.03 8 norm 13.14 fit 0.7152 dev {'acc': 0.66518, 'gain': 0.11518, 'se': 0.01632, 'brier': 0.04758}
+prob target 0.1 3 norm 2.99 fit 0.6862 dev {'acc': 0.65625, 'gain': 0.10625, 'se': 0.01555, 'brier': 0.03861}
+prob target 0.1 5 norm 4.79 fit 0.6862 dev {'acc': 0.65357, 'gain': 0.10357, 'se': 0.01518, 'brier': 0.03794}
+prob target 0.1 8 norm 7.55 fit 0.6835 dev {'acc': 0.65089, 'gain': 0.10089, 'se': 0.01519, 'brier': 0.04624}
+```
+[forward passes used: 5 of 25; Python runs used: 9 of 300]

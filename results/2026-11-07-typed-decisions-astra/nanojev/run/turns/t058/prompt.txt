@@ -1,0 +1,12 @@
+OUTPUT of Python run 36 of at most 300:
+```
+Record keys: ['id', 'sample', 'model', 'inputs', 'outputs', 'score', 'feedback', 'calls', 'cut', 'output_tokens']
+Completion-probability sample: {'action': {'continue': 0.20452013228718013, 'human_review': 0.369438773000747, 'observe': 0.23815925656625636, 'stop': 0.18788183814581658}, 'needs_review': {'false': 0.6732499458517094, 'true': 0.3267500541482906}, 'outcome': {'failure': 0.18753104202009988, 'harmful': 0.19586002154701684, 'partial': 0.39583852264613034, 'success': 0.22077041378675302}, 'risk': {'0': 0.26850280413732636, '1': 0.25057400397483126, '2': 0.323480471927764, '3': 0.15744271996007841}, 'urgency': {'0': 0.26450540488305047, '1': 0.39822647214159773, '2': 0.15071210997891213, '3': 0.1865560129964397}}
+Cached final fitted score: {'accuracy': 0.6697777777777777, 'gain': 0.3055555555555556, 'paired_se': 0.00881652350231889, 'brier_sum': 0.14811000227928162, 'items': 900}
+Program score sample: {'score': 0.6, 'feedback': 'action: right (predicted human_review 0.37, gold human_review 0.43); needs_review: WRONG (predicted false 0.67, gold true 0.55); outcome: right (predicted partial 0.40, gold partial 0.49); risk: WRONG (predicted 2 0.32, gold 0 0.47); urgency: right (predicted 1 0.40, gold 1 0.48). Mean Brier 0.081.'}
+Actual all900 fitted comparison: {'gain': 0.3055555555555556, 'se': 0.00881652350231889, 'improved': 699, 'worsened': 47}
+Prior-only expected on450: {'accuracy': 0.49688888888888894, 'gain': 0.13377777777777777, 'paired_se': 0.012327819907279196, 'brier_sum': 0.20309877395629883, 'items': 450}
+Full expected on450: {'accuracy': 0.6502222222222223, 'gain': 0.28711111111111115, 'paired_se': 0.01262115146149623, 'brier_sum': 0.14667999744415283, 'items': 450}
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 14.5089
+```
+[forward passes used: 20 of 25; Python runs used: 36 of 300]

@@ -1,0 +1,7 @@
+OUTPUT of Python run 28 of at most 300:
+```
+Probe sources: ['train_726', 'train_605', 'train_654', 'train_881', 'train_674', 'train_788', 'train_666', 'train_854']
+Request format: <class 'dict'> ['action', 'needs_review', 'outcome', 'risk', 'urgency']
+Prepared 88 requests.
+```
+[forward passes used: 14 of 25; Python runs used: 28 of 300]

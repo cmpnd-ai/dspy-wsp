@@ -1,0 +1,8 @@
+OUTPUT of Python run 20 of at most 300:
+```
+Actual 1.5-strength metrics: {'acc': 0.71, 'brier': 0.0981292724609375, 'gain': 0.09111111111111113, 'se': 0.023809831217902585}
+Dose response: [(0, 0.6188888888888889), (0.5, 0.74), (1, 0.7833333333333333), (1.5, 0.71)]
+saved edit model.language_model.layers.23.feed_forward.w2.weight: 15,728,640 of 15,728,640 entries changed, relative change 2.6398
+Next: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/test_pair.json backup: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-2b-astra/work/candidate_rank9_ridge1
+```
+[forward passes used: 13 of 25; Python runs used: 20 of 300]

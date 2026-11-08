@@ -1,0 +1,24 @@
+OUTPUT of Python run 8 of at most 300:
+```
+GELU ridge 3e-06 norm 181.98 fit 0.6884 dev {'acc': 0.61518, 'gain': 0.06518, 'se': 0.01815, 'brier': 0.04293}
+GELU ridge 1e-05 norm 126.07 fit 0.6848 dev {'acc': 0.61518, 'gain': 0.06518, 'se': 0.01788, 'brier': 0.04217}
+GELU ridge 3e-05 norm 86.58 fit 0.6821 dev {'acc': 0.61518, 'gain': 0.06518, 'se': 0.01756, 'brier': 0.04157}
+GELU ridge 0.0001 norm 53.96 fit 0.6786 dev {'acc': 0.61786, 'gain': 0.06786, 'se': 0.01726, 'brier': 0.04111}
+GELU ridge 0.0003 norm 34.37 fit 0.6714 dev {'acc': 0.61339, 'gain': 0.06339, 'se': 0.01708, 'brier': 0.0407}
+GELU ridge 0.001 norm 21.81 fit 0.658 dev {'acc': 0.62143, 'gain': 0.07143, 'se': 0.01673, 'brier': 0.04016}
+GELU ridge 0.003 norm 14.57 fit 0.6491 dev {'acc': 0.62143, 'gain': 0.07143, 'se': 0.01569, 'brier': 0.04004}
+scorer.1 singular values top: [4.001284599304199, 2.849724531173706, 2.138418674468994, 1.7980173826217651, 1.3465478420257568, 1.3289698362350464, 1.276124358177185, 1.2343872785568237, 1.2017496824264526, 1.1962875127792358] median 0.46494412422180176 min 0.0010984225664287806
+Normalized input effective dimension: 1.4649674943235664 trace/d 223.25643940957852
+INPUT ridge 0.0001 norm 19.189 fit 0.7295 dev {'acc': 0.62054, 'gain': 0.07054, 'se': 0.01849, 'brier': 0.04001}
+INPUT ridge 0.0003 norm 18.516 fit 0.7286 dev {'acc': 0.62411, 'gain': 0.07411, 'se': 0.01812, 'brier': 0.03959}
+INPUT ridge 0.001 norm 16.693 fit 0.7281 dev {'acc': 0.63036, 'gain': 0.08036, 'se': 0.01744, 'brier': 0.0385}
+INPUT ridge 0.003 norm 13.672 fit 0.7232 dev {'acc': 0.64018, 'gain': 0.09018, 'se': 0.01715, 'brier': 0.03693}
+INPUT ridge 0.01 norm 9.607 fit 0.7036 dev {'acc': 0.64821, 'gain': 0.09821, 'se': 0.01664, 'brier': 0.03554}
+INPUT ridge 0.03 norm 6.332 fit 0.6893 dev {'acc': 0.64375, 'gain': 0.09375, 'se': 0.0161, 'brier': 0.03551}
+INPUT ridge 0.1 norm 3.794 fit 0.6679 dev {'acc': 0.6375, 'gain': 0.0875, 'se': 0.01583, 'brier': 0.03709}
+INPUT ridge 0.3 norm 2.344 fit 0.6429 dev {'acc': 0.62411, 'gain': 0.07411, 'se': 0.01525, 'brier': 0.03947}
+INPUT ridge 1 norm 1.357 fit 0.6049 dev {'acc': 0.59464, 'gain': 0.04464, 'se': 0.0119, 'brier': 0.04217}
+INPUT ridge 3 norm 0.755 fit 0.5938 dev {'acc': 0.56875, 'gain': 0.01875, 'se': 0.00908, 'brier': 0.04447}
+Best readout (0.03, 0.001) best input 0.01
+```
+[forward passes used: 5 of 25; Python runs used: 8 of 300]

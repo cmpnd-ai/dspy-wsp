@@ -1,0 +1,49 @@
+RESULT of forward pass 6:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 150,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev-astra/work/gen_6_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev-astra/work/gen_6_edited.jsonl"
+ ],
+ "original": {
+  "graded": 150,
+  "score": 0.37333333333333335,
+  "score_se_over_items": 0.01869732222310699,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 150
+  }
+ },
+ "edited": {
+  "graded": 150,
+  "score": 0.5853333333333333,
+  "score_se_over_items": 0.020472859027226634,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 137
+  }
+ },
+ "paired": {
+  "items": 150,
+  "original": 0.37333333333333335,
+  "edited": 0.5853333333333333,
+  "gain": 0.212,
+  "se": 0.025328623134472653,
+  "improved": 96,
+  "worsened": 24
+ },
+ "seconds": 222.9
+}
+```
+[forward passes used: 6 of 25; Python runs used: 11 of 300]

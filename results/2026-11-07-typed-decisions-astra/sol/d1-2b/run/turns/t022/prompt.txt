@@ -1,0 +1,6 @@
+OUTPUT of Python run 14 of at most 300:
+```
+dropped edit model.language_model.layers.23.post_ffn_norm.weight
+additional workflows Counter({'agent_trace_observability': 62, 'customer_service': 62, 'invoice_processing': 62, 'security_incidents': 14})
+```
+[forward passes used: 7 of 25; Python runs used: 14 of 300]

@@ -1,0 +1,11 @@
+OUTPUT of Python run 5 of at most 300:
+```
+Metadata keys: dict_keys(['rows', 'layers', 'conventions', 'model', 'files'])
+layers []
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "the head's raw score per option, before calibration", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the row's tokens", 'head_inputs': "the scorer's input at each option's <mask> (after the head's transformer layers)", 'trunk_markers': "the trunk's normed output at each option's <mask> (the head's input there)"}
+model original
+files {'option_mask.npy': [1000, 5], 'option_logits.npy': [1000, 5], 'head_inputs.npy': [1000, 5, 1024], 'trunk_markers.npy': [1000, 5, 1024], 'probabilities.npy': [1000, 5]}
+Last metadata rows: [{'request': 199, 'question': 'severity', 'type': 'score', 'options': ['0', '1', '2', '3', '4']}, {'request': 199, 'question': 'true_positive', 'type': 'noul', 'options': ['false', 'true']}, {'request': 199, 'question': 'urgency', 'type': 'score', 'options': ['0', '1', '2', '3']}]
+Fit groups sizes: [200, 200, 200, 72]
+```
+[forward passes used: 3 of 25; Python runs used: 5 of 300]

@@ -1,0 +1,449 @@
+{
+  "train_score_before": 0.6084,
+  "train_score": 0.6882,
+  "fitted": [
+    {
+      "predictor": "agent_trace_observability",
+      "field": "action",
+      "parameter": "weights",
+      "value": {
+        "continue": 1.0,
+        "human_review": 0.76,
+        "observe": 1.0,
+        "stop": 1.0
+      },
+      "train_score": 0.6107,
+      "train_score_at_start": 0.6084,
+      "observed": {
+        "calls": 225,
+        "candidates": 157
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 2
+      },
+      "train_score_original": 0.6084
+    },
+    {
+      "predictor": "agent_trace_observability",
+      "field": "needs_review",
+      "parameter": "threshold",
+      "train_score": 0.6107,
+      "train_score_at_start": 0.6107,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.1353,
+        "max": 0.938,
+        "candidates": 40
+      },
+      "fold_check": {
+        "passed": 0,
+        "failed": 1
+      },
+      "train_score_original": 0.6107,
+      "skipped": "fitted behavior did not beat the original"
+    },
+    {
+      "predictor": "agent_trace_observability",
+      "field": "outcome",
+      "parameter": "weights",
+      "value": {
+        "failure": 1.0,
+        "harmful": 1.8,
+        "partial": 1.0,
+        "success": 1.0
+      },
+      "train_score": 0.612,
+      "train_score_at_start": 0.6107,
+      "observed": {
+        "calls": 225,
+        "candidates": 159
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 1
+      },
+      "train_score_original": 0.6107
+    },
+    {
+      "predictor": "agent_trace_observability",
+      "field": "risk",
+      "parameter": "cuts",
+      "value": [
+        0.84,
+        1.5,
+        1.9
+      ],
+      "train_score": 0.6247,
+      "train_score_at_start": 0.612,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.2824,
+        "max": 2.5047,
+        "candidates": 118
+      },
+      "fold_check": {
+        "passed": 2,
+        "failed": 1
+      },
+      "train_score_original": 0.612
+    },
+    {
+      "predictor": "agent_trace_observability",
+      "field": "urgency",
+      "parameter": "cuts",
+      "value": [
+        0.5,
+        1.5,
+        1.765
+      ],
+      "train_score": 0.6313,
+      "train_score_at_start": 0.6247,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.5178,
+        "max": 2.5436,
+        "candidates": 118
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 2
+      },
+      "train_score_original": 0.6247
+    },
+    {
+      "predictor": "customer_service",
+      "field": "action",
+      "parameter": "weights",
+      "train_score": 0.6313,
+      "train_score_at_start": 0.6313,
+      "observed": {
+        "calls": 225,
+        "candidates": 198
+      },
+      "fold_check": {
+        "passed": 0,
+        "failed": 3
+      },
+      "train_score_original": 0.6313,
+      "skipped": "fitted behavior did not beat the original"
+    },
+    {
+      "predictor": "customer_service",
+      "field": "category",
+      "parameter": "weights",
+      "value": {
+        "account": 1.0,
+        "billing": 1.0,
+        "delivery": 1.0,
+        "refund": 1.0,
+        "technical": 0.8
+      },
+      "train_score": 0.632,
+      "train_score_at_start": 0.6313,
+      "observed": {
+        "calls": 225,
+        "candidates": 199
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 1
+      },
+      "train_score_original": 0.6313
+    },
+    {
+      "predictor": "customer_service",
+      "field": "churn_risk",
+      "parameter": "cuts",
+      "value": [
+        1.06,
+        1.5,
+        2.5
+      ],
+      "train_score": 0.6329,
+      "train_score_at_start": 0.632,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.7744,
+        "max": 2.8825,
+        "candidates": 118
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 1
+      },
+      "train_score_original": 0.632
+    },
+    {
+      "predictor": "customer_service",
+      "field": "needs_human",
+      "parameter": "threshold",
+      "train_score": 0.6329,
+      "train_score_at_start": 0.6329,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.2543,
+        "max": 0.9271,
+        "candidates": 40
+      },
+      "fold_check": {
+        "passed": 0,
+        "failed": 1
+      },
+      "train_score_original": 0.6329,
+      "skipped": "fitted behavior did not beat the original"
+    },
+    {
+      "predictor": "customer_service",
+      "field": "urgency",
+      "parameter": "cuts",
+      "value": [
+        0.5,
+        1.62,
+        2.27
+      ],
+      "train_score": 0.6376,
+      "train_score_at_start": 0.6329,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 1.1546,
+        "max": 2.9636,
+        "candidates": 105
+      },
+      "fold_check": {
+        "passed": 2,
+        "failed": 0
+      },
+      "train_score_original": 0.6329
+    },
+    {
+      "predictor": "invoice_processing",
+      "field": "discrepancy_severity",
+      "parameter": "cuts",
+      "value": [
+        1.496,
+        1.5,
+        1.534
+      ],
+      "train_score": 0.6567,
+      "train_score_at_start": 0.6376,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.8147,
+        "max": 2.0833,
+        "candidates": 118
+      },
+      "fold_check": {
+        "passed": 2,
+        "failed": 1
+      },
+      "train_score_original": 0.6376
+    },
+    {
+      "predictor": "invoice_processing",
+      "field": "disposition",
+      "parameter": "weights",
+      "value": {
+        "approve": 1.73,
+        "hold": 1.0,
+        "manual_review": 1.0,
+        "reject": 1.0
+      },
+      "train_score": 0.6602,
+      "train_score_at_start": 0.6567,
+      "observed": {
+        "calls": 225,
+        "candidates": 158
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 0
+      },
+      "train_score_original": 0.6567
+    },
+    {
+      "predictor": "invoice_processing",
+      "field": "duplicate",
+      "parameter": "threshold",
+      "value": 0.3,
+      "train_score": 0.662,
+      "train_score_at_start": 0.6602,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.0137,
+        "max": 0.6141,
+        "candidates": 40
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 0
+      },
+      "train_score_original": 0.6602
+    },
+    {
+      "predictor": "invoice_processing",
+      "field": "matches_order",
+      "parameter": "threshold",
+      "train_score": 0.662,
+      "train_score_at_start": 0.662,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.0284,
+        "max": 0.8817,
+        "candidates": 40
+      },
+      "fold_check": {
+        "passed": 0,
+        "failed": 0
+      },
+      "train_score_original": 0.662,
+      "skipped": "fitted behavior did not beat the original"
+    },
+    {
+      "predictor": "invoice_processing",
+      "field": "urgency",
+      "parameter": "cuts",
+      "value": [
+        0.5,
+        1.59,
+        2.5
+      ],
+      "train_score": 0.6687,
+      "train_score_at_start": 0.662,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 1.3511,
+        "max": 2.1424,
+        "candidates": 101
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 1
+      },
+      "train_score_original": 0.662
+    },
+    {
+      "predictor": "security_incidents",
+      "field": "credential_compromise",
+      "parameter": "threshold",
+      "train_score": 0.6687,
+      "train_score_at_start": 0.6687,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.0571,
+        "max": 0.787,
+        "candidates": 40
+      },
+      "fold_check": {
+        "passed": 0,
+        "failed": 1
+      },
+      "train_score_original": 0.6687,
+      "skipped": "fitted behavior did not beat the original"
+    },
+    {
+      "predictor": "security_incidents",
+      "field": "disposition",
+      "parameter": "weights",
+      "value": {
+        "close_benign": 1.7,
+        "contain": 1.0,
+        "investigate": 1.0,
+        "monitor": 1.0
+      },
+      "train_score": 0.6691,
+      "train_score_at_start": 0.6687,
+      "observed": {
+        "calls": 225,
+        "candidates": 159
+      },
+      "fold_check": {
+        "passed": 1,
+        "failed": 3
+      },
+      "train_score_original": 0.6687
+    },
+    {
+      "predictor": "security_incidents",
+      "field": "severity",
+      "parameter": "cuts",
+      "value": [
+        0.5,
+        1.9,
+        2.37,
+        3.5
+      ],
+      "train_score": 0.6716,
+      "train_score_at_start": 0.6691,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 1.4698,
+        "max": 3.0784,
+        "candidates": 120
+      },
+      "fold_check": {
+        "passed": 2,
+        "failed": 2
+      },
+      "train_score_original": 0.6691
+    },
+    {
+      "predictor": "security_incidents",
+      "field": "true_positive",
+      "parameter": "threshold",
+      "train_score": 0.6716,
+      "train_score_at_start": 0.6716,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 0.073,
+        "max": 0.9237,
+        "candidates": 40
+      },
+      "fold_check": {
+        "passed": 0,
+        "failed": 1
+      },
+      "train_score_original": 0.6716,
+      "skipped": "fitted behavior did not beat the original"
+    },
+    {
+      "predictor": "security_incidents",
+      "field": "urgency",
+      "parameter": "cuts",
+      "value": [
+        0.5,
+        1.74,
+        2.08
+      ],
+      "train_score": 0.6882,
+      "train_score_at_start": 0.6716,
+      "observed": {
+        "calls": 225,
+        "distinct": 225,
+        "min": 1.1986,
+        "max": 2.5977,
+        "candidates": 87
+      },
+      "fold_check": {
+        "passed": 2,
+        "failed": 0
+      },
+      "train_score_original": 0.6716
+    }
+  ],
+  "val_score_before": 0.5907,
+  "val_score": 0.6593
+}

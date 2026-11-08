@@ -1,0 +1,12 @@
+OUTPUT of Python run 33 of at most 300:
+```
+New split: 180 180
+call_probs output sample: {'action': {'continue': 0.09984600852402438, 'human_review': 0.49913263073001524, 'observe': 0.3545504999384172, 'stop': 0.046470860807543216}, 'needs_review': {'false': 0.39295432615403947, 'true': 0.6070456738459605}, 'outcome': {'failure': 0.13421563525084182, 'harmful': 0.04745932661559423, 'partial': 0.4409898978436386, 'success': 0.3773351402899253}, 'risk': {'0': 0.0811189861432413, '1': 0.3558739982694182, '2': 0.4840333507038933, '3': 0.07897366488344716}, 'urgency': {'0': 0.1870381727048953, '1': 0.5236937670937506, '2': 0.24685540329339636, '3': 0.042412656907957695}}
+read_arrays (k) variables ('k', 'folder', 'meta', 'reqs', 'sig', 'r', 'lookup', 'req', 'ids', 'h', 'mask', 'erows', 'logits', 'probs', 'gold', 'row_ids', 'keys', 'i', 'row', 'eid', 'gs', 'j', 'opt') globals ('WORK', 'json', 'loads', 'read_text', 'baseline', 'get', 'np', 'load', 'copy', 'nan_to_num', 'zeros_like', 'enumerate', 'append', 'by_id', 'dict')
+infer_subset (orig, pert, changed) variables ('orig', 'pert', 'changed', 'unchanged', 'h', 'hp', 'scale', 'anchor_error', 'c') globals ('np', 'setdiff1d', 'arange', 'astype', 'float64', 'sum', 'sqrt', 'mean', 'probe_delta', 'gn', 'numpy', 'float32')
+combine_data (a, b) variables ('a', 'b', 'out', 'k') globals ('np', 'concatenate')
+temp_for_data (d) variables ('d', 'temps', 'l', 'p', 'm', 'lc', 'lp') globals ('zip', 'mean', 'np', 'log', 'maximum', 'append', 'float', 'array')
+Existing read request: dict_keys(['type', 'model', 'from', 'layers'])
+Arrays metadata: {"option_mask.npy": [900, 5], "option_logits.npy": [900, 5], "head_inputs.npy": [900, 5, 2048], "option_rows.npy": [900, 5, 2048], "hidden_mean.npy": [900, 2, 2048], "probabilities.npy": [900, 5]}
+```
+[forward passes used: 20 of 25; Python runs used: 33 of 300]

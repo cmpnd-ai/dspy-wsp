@@ -1,0 +1,8 @@
+OUTPUT of Python run 7 of at most 300:
+```
+post_ffn_norm min/max -0.0030059814453125 0.392578125 abs quantiles [0.0025 0.1374 0.1455 0.1927 0.3926]
+embedding_norm min/max 0.314453125 5.28125 abs quantiles [0.3145 2.2297 2.375  2.5    5.2812]
+w2 frobenius norm 66.7966537475586 row norm quantiles [1.0509 1.4179 1.4805 1.5152 4.2755]
+Distinct best forms by type/code: [(('choice', 0), 1, [270]), (('choice', 1), 1, [270]), (('choice', 2), 1, [270]), (('choice', 3), 1, [270]), (('noul', 0), 1, [270]), (('noul', 1), 1, [270]), (('score', 0), 1, [360]), (('score', 1), 1, [360]), (('score', 2), 1, [360]), (('score', 3), 1, [360]), (('choice', 4), 1, [90]), (('score', 4), 1, [45])]
+```
+[forward passes used: 2 of 25; Python runs used: 7 of 300]

@@ -1,0 +1,7 @@
+OUTPUT of Python run 15 of at most 300:
+```
+Full minus prior-only: 0.10533333333333333 paired SE 0.021462972989432654
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 124.8180
+Counterfactual requests 64 questions 100
+```
+[forward passes used: 9 of 25; Python runs used: 15 of 300]

@@ -1,0 +1,35 @@
+OUTPUT of Python run 14 of at most 300:
+```
+Template-subspace rank 51 prior norm 8.308172601998757 evidence norm 68.21048466194058
+none fit (0.36533333333333334, 0.3310025084320081) dev (0.37333333333333335, 0.3247783930911475)
+prior-only fit (0.5084444444444445, 0.20757555118065552) dev (0.48, 0.21523749001479747)
+evidence-only fit (0.4782222222222222, 0.26802109854341877) dev (0.4573333333333333, 0.29271313744734034)
+full fit (0.6875555555555556, 0.13223796457416262) dev (0.5853333333333334, 0.18701702854011035)
+Soft vs mixed development accuracy by question:
+agent_trace_observability/action 0.0 0.703 0.595
+agent_trace_observability/needs_review 0.432 0.838 0.703
+agent_trace_observability/outcome 0.243 0.73 0.703
+agent_trace_observability/risk 0.324 0.568 0.622
+agent_trace_observability/urgency 0.027 0.459 0.514
+customer_service/action 0.514 0.459 0.486
+customer_service/category 0.216 0.703 0.73
+customer_service/churn_risk 0.297 0.378 0.432
+customer_service/needs_human 0.703 0.622 0.757
+customer_service/urgency 0.459 0.459 0.432
+invoice_processing/discrepancy_severity 0.184 0.421 0.395
+invoice_processing/disposition 0.289 0.342 0.395
+invoice_processing/duplicate 0.211 0.789 0.789
+invoice_processing/matches_order 0.447 0.553 0.605
+invoice_processing/urgency 0.447 0.5 0.447
+security_incidents/credential_compromise 0.684 0.658 0.711
+security_incidents/disposition 0.658 0.658 0.658
+security_incidents/severity 0.289 0.658 0.684
+security_incidents/true_positive 0.711 0.737 0.789
+security_incidents/urgency 0.316 0.474 0.553
+Inferred set scalar inputs vs raw for first three choices:
+raw [1.3715 1.4159 1.5137 2.5983] inferred [5.1087 5.4732 5.1404 4.9057]
+raw [0.8085 1.4424 1.4664 1.4465] inferred [1.404  1.3873 1.3882 1.3878]
+raw [1.2407 1.5322 1.5071 2.2779] inferred [1.1912 1.155  1.179  1.1856]
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 15.0915
+```
+[forward passes used: 8 of 25; Python runs used: 14 of 300]

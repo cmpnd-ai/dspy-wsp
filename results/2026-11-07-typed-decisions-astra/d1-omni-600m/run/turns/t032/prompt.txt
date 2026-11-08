@@ -1,0 +1,33 @@
+OUTPUT of Python run 18 of at most 300:
+```
+Option-conditional rel 0.01 fit acc 0.9987 dev {'acc': 0.68393, 'gain': 0.13393, 'se': 0.01902, 'brier': 0.04728}
+Option-conditional rel 0.03 fit acc 0.9839 dev {'acc': 0.69464, 'gain': 0.14464, 'se': 0.01823, 'brier': 0.04408}
+Option-conditional rel 0.1 fit acc 0.9366 dev {'acc': 0.69911, 'gain': 0.14911, 'se': 0.01746, 'brier': 0.04196}
+Option-conditional rel 0.3 fit acc 0.8665 dev {'acc': 0.68482, 'gain': 0.13482, 'se': 0.01729, 'brier': 0.04146}
+Option-conditional rel 1.0 fit acc 0.817 dev {'acc': 0.68482, 'gain': 0.13482, 'se': 0.01701, 'brier': 0.04177}
+Option-conditional rel 3.0 fit acc 0.7844 dev {'acc': 0.67411, 'gain': 0.12411, 'se': 0.01666, 'brier': 0.04218}
+Question effects for fixed rel .1:
+agent_tr action shared 0.643 conditional 0.661
+agent_tr needs_review shared 0.839 conditional 0.839
+agent_tr outcome shared 0.786 conditional 0.804
+agent_tr risk shared 0.696 conditional 0.732
+agent_tr urgency shared 0.571 conditional 0.625
+customer action shared 0.536 conditional 0.589
+customer category shared 0.911 conditional 0.893
+customer churn_risk shared 0.536 conditional 0.589
+customer needs_human shared 0.75 conditional 0.714
+customer urgency shared 0.75 conditional 0.768
+invoice_ discrepancy_severity shared 0.429 conditional 0.5
+invoice_ disposition shared 0.411 conditional 0.5
+invoice_ duplicate shared 0.929 conditional 0.929
+invoice_ matches_order shared 0.732 conditional 0.821
+invoice_ urgency shared 0.607 conditional 0.643
+security credential_compromise shared 0.821 conditional 0.768
+security disposition shared 0.661 conditional 0.696
+security severity shared 0.554 conditional 0.589
+security true_positive shared 0.75 conditional 0.786
+security urgency shared 0.5 conditional 0.536
+Q/option identity argmax accuracy on dev: 1.0
+Gate sign accuracy: 0.9998937249183655
+```
+[forward passes used: 10 of 25; Python runs used: 18 of 300]

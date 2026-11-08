@@ -1,0 +1,17 @@
+OUTPUT of Python run 20 of at most 300:
+```
+Selected conditional gates: 54 neurons needed 108
+Fit-derived thresholds range -0.5145961046218872 -0.04515337944030762
+Selected gates dev classification errors 2 positive min 0.0790083110332489 negative max 0.030587077140808105
+Conditional actual local dev: {'acc': 0.7008928656578064, 'gain': 0.15089285373687744, 'se': 0.01706094667315483, 'brier': 0.04147079959511757}
+Oracle deviation quantiles: [0.0002452731132507324, 0.0008132457733154297, 0.002023428911343217, 0.11590933799743652]
+Actual conditional dose 0 {'acc': 0.67054, 'gain': 0.12054, 'se': 0.01678, 'brier': 0.04183}
+Actual conditional dose 0.5 {'acc': 0.69375, 'gain': 0.14375, 'se': 0.01696, 'brier': 0.03991}
+Actual conditional dose 1 {'acc': 0.70089, 'gain': 0.15089, 'se': 0.01706, 'brier': 0.04147}
+Actual conditional dose 1.5 {'acc': 0.69911, 'gain': 0.14911, 'se': 0.01755, 'brier': 0.04473}
+Actual conditional dose 2 {'acc': 0.69196, 'gain': 0.14196, 'se': 0.01856, 'brier': 0.04866}
+saved edit head.scorer.1.weight: 112,640 of 1,048,576 entries changed, relative change 19.5761
+saved edit head.scorer.1.bias: 110 of 1,024 entries changed, relative change 434.1476
+saved edit head.scorer.3.weight: 110 of 1,024 entries changed, relative change 592.1420
+```
+[forward passes used: 11 of 25; Python runs used: 20 of 300]

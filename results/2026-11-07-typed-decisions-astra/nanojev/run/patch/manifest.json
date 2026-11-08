@@ -1,0 +1,43 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-08T08:04:07+00:00",
+  "base_model": "C-Tianyu/NanoJev",
+  "revision": "047b927b30882a1138fc504821b82ac145a4b81a",
+  "writer": "openai/gpt-6-astra",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 41
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/nanojev-astra",
+  "validation": {
+   "items": 400,
+   "original": 0.38550000000000006,
+   "edited": 0.5730000000000001,
+   "gain": 0.1875,
+   "se": 0.012952946462297213,
+   "improved": 252,
+   "worsened": 54
+  }
+ },
+ "changed_tensors": 1,
+ "changed_entries_total": 1024,
+ "tensors": [
+  {
+   "name": "scalar.weight",
+   "shape": [
+    1,
+    1024
+   ],
+   "dtype": "float32",
+   "form": "dense",
+   "changed_entries": 1024,
+   "relative_change": 151.6871337890625,
+   "base_sha256": "592948d82fdb9f5519c3a2e3b222519bb1fa887e4fdd8f5944737cef3ce45254",
+   "edited_sha256": "63b78a773a55a4725883275abfaf66b322dc96549d4b96953449e4d14116695d"
+  }
+ ]
+}

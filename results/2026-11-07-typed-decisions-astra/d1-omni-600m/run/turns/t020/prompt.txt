@@ -1,0 +1,16 @@
+OUTPUT of Python run 12 of at most 300:
+```
+constraint_violations outcome original 0.0945 proposed 0.4163 positive pairs 8 / 8
+constraint_violations risk original 0.4106 proposed 1.0435 positive pairs 8 / 8
+constraint_violations needs_review original 0.0184 proposed 0.4374 positive pairs 6 / 8
+days_until_due urgency original 0.0429 proposed 0.3792 positive pairs 6 / 8
+discount urgency original 0.0278 proposed 0.0064 positive pairs 6 / 4
+freight_terms discrepancy_severity original 0.1345 proposed 0.0507 positive pairs 8 / 3
+privileges severity original 0.1163 proposed 0.1958 positive pairs 7 / 7
+asset_criticality severity original 0.3755 proposed 0.4909 positive pairs 8 / 8
+saved edit head.scorer.1.weight: 2,048 of 1,048,576 entries changed, relative change 0.0839
+saved edit head.scorer.1.bias: 2 of 1,024 entries changed, relative change 0.3260
+saved edit head.scorer.3.weight: 2 of 1,024 entries changed, relative change 14.8674
+Edited scorer reconstruction error: 4.76837158203125e-06
+```
+[forward passes used: 6 of 25; Python runs used: 12 of 300]

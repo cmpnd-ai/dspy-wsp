@@ -1,0 +1,8 @@
+OUTPUT of Python run 33 of at most 300:
+```
+Cross-fit decomposed minus strength.75: {'gain': 0.006666666666666667, 'se': 0.004690389409395148, 'improved': 180, 'worsened': 154}
+Cross-fit strength.875 minus strength.75: {'gain': 0.003555555555555556, 'se': 0.0035555555555555557, 'improved': 109, 'worsened': 94}
+Decomposed edit norm: 48.16615723075696
+saved edit scalar.weight: 1,024 of 1,024 entries changed, relative change 87.4923
+```
+[forward passes used: 17 of 25; Python runs used: 33 of 300]

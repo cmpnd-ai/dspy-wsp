@@ -1,0 +1,431 @@
+OUTPUT of Python run 4 of at most 300:
+```
+META: {
+  "rows": [
+    {
+      "request": 0,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 0,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 0,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 0,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 0,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 1,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 1,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 1,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 1,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 1,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 2,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 2,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 2,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 2,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 2,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 3,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 3,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 3,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 3,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 3,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 4,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 4,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 4,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 4,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 4,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 5,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 5,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 5,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 5,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 5,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 6,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 6,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 6,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "request": 6,
+      "question": "risk",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 6,
+      "question": "urgency",
+      "type": "score",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "request": 7,
+      "question": "action",
+      "type": "choice",
+      "options": [
+        "continue",
+        "human_review",
+        "observe",
+        "stop"
+      ]
+    },
+    {
+      "request": 7,
+      "question": "needs_review",
+      "type": "noul",
+      "options": [
+        "false",
+        "true"
+      ]
+    },
+    {
+      "request": 7,
+      "question": "outcome",
+      "type": "choice",
+      "options": [
+        "failure",
+        "harmful",
+        "partial",
+        "success"
+      ]
+    },
+    {
+      "requ
+ARRAYS: {'option_mask': ((1000, 5), 'bool'), 'head_inputs': ((1000, 5, 1024), 'float32'), 'trunk_markers': ((1000, 5, 1024), 'float32'), 'probabilities': ((1000, 5), 'float32'), 'option_logits': ((1000, 5), 'float32')}
+HEAD WEIGHTS: [('head.head.layers.0.linear1.bias', (4096,)), ('head.head.layers.0.linear1.weight', (4096, 1024)), ('head.head.layers.0.linear2.bias', (1024,)), ('head.head.layers.0.linear2.weight', (1024, 4096)), ('head.head.layers.0.norm1.bias', (1024,)), ('head.head.layers.0.norm1.weight', (1024,)), ('head.head.layers.0.norm2.bias', (1024,)), ('head.head.layers.0.norm2.weight', (1024,)), ('head.head.layers.0.self_attn.in_proj_bias', (3072,)), ('head.head.layers.0.self_attn.in_proj_weight', (3072, 1024)), ('head.head.layers.0.self_attn.out_proj.bias', (1024,)), ('head.head.layers.0.self_attn.out_proj.weight', (1024, 1024)), ('head.head.layers.1.linear1.bias', (4096,)), ('head.head.layers.1.linear1.weight', (4096, 1024)), ('head.head.layers.1.linear2.bias', (1024,)), ('head.head.layers.1.linear2.weight', (1024, 4096)), ('head.head.layers.1.norm1.bias', (1024,)), ('head.head.layers.1.norm1.weight', (1024,)), ('head.head.layers.1.norm2.bias', (1024,)), ('head.head.layers.1.norm2.weight', (1024,)), ('head.head.layers.1.self_attn.in_proj_bias', (3072,)), ('head.head.layers.1.self_attn.in_proj_weight', (3072, 1024)), ('head.head.layers.1.self_attn.out_proj.bias', (1024,)), ('head.head.layers.1.self_attn.out_proj.weight', (1024, 1024)), ('head.scorer.0.bias', (1024,)), ('head.scorer.0.weight', (1024,)), ('head.scorer.1.bias', (1024,)), ('head.scorer.1.weight', (1024, 1024)), ('head.scorer.3.bias', (1,)), ('head.scorer.3.weight', (1, 1024)), ('head.type_emb.weight', (3, 1024))]
+Head code exact: class DecisionHead(nn.Module):
+    def __init__(self, d: int, layers: int):
+        super().__init__()
+        self.type_emb = nn.Embedding(3, d)
+        layer = nn.TransformerEncoderLayer(d, d // 64, 4 * d, 0.0, batch_first=True, norm_first=True)
+        self.head = nn.TransformerEncoder(layer, layers, enable_nested_tensor=False)
+        self.scorer = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, 1))
+
+    def forward(self, h, pad, marker_pos, marker_mask, qtype):
+        h = h + self.type_emb(qtype)[:, None, :]
+        for layer in self.head.layers:
+            h = layer(h, src_key_padding_mask=~pad)
+        g = torch.gather(h, 1, marker_pos[:, :, None].expand(-1, -1, h.size(-1)))
+        return self.scorer(g).squeeze(-1).float().masked_fill(~marker_mask, -1e4)
+
+
+
+Reconstruction max absolute error: 3.8146973e-06
+Original final scorer weight norm: 0.3527959883213043 range -0.03181774541735649 0.03414463624358177
+```
+[forward passes used: 2 of 25; Python runs used: 4 of 300]

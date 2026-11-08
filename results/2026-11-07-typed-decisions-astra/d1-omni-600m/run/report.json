@@ -1,0 +1,173 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/d1-astra",
+ "final_answer": "Left the **best validation-confirmed repair** in `work/edited`.\n\n### What changed\nOnly three scorer tensors:\n- `head.scorer.1.weight`\n- `head.scorer.1.bias`\n- `head.scorer.3.weight`\n\nI repurposed **110 low-contribution scorer neurons** to carry a shared residual direction and 54 question/option-gated residual channels. These were derived by closed-form regularized solves using 448 fit examples. The encoder, embeddings, normalization parameters, and temperatures remain unchanged.\n\n### Diagnosis and causal evidence\nThe scorer underused evidence already present in its inputs\u2014particularly constraint violations, payment deadlines, and security impact cues.\n\nTargeted interventions matched the predicted scorer-level effects. Dose-response tests showed that stronger edits eventually overcorrected. Removing state-dependent conditional directions while preserving average option preferences reduced accuracy by **3.39 points on development examples** and **2.11 points on reserved examples**, supporting an evidence-reading mechanism rather than merely changed answer priors.\n\n### Measured results\nAll gains below are percentage points; SE is paired over examples.\n\n| Set | Original | Edited | Gain \u00b1 SE |\n|---|---:|---:|---:|\n| Development, 224 examples | 55.00% | 70.09% | **+15.09 \u00b1 1.71** |\n| Reserved practice, 228 examples | 58.42% | 72.46% | **+14.04 \u00b1 1.65** |\n| Hidden validation, 300 examples | 57.53% | 71.73% | **+14.20 \u00b1 1.54** |\n\nFinal validation reproduced the earlier result exactly: **171 examples improved, 47 worsened**.\n\nThe independent gains, positive across all four workflows, support generalization. Remaining limitations include weak discrimination of numerical invoice discrepancy magnitude and sensitivity to irrelevant metadata; the repair does not solve those completely.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 43
+ },
+ "turns": 74,
+ "conversations": 2,
+ "validation_runs": [
+  {
+   "pass": 9,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.1.bias",
+    "head.scorer.1.weight",
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.6880000000000001,
+    "score_se_over_items": 0.013813860520322203,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 233
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.6880000000000001,
+    "gain": 0.11266666666666668,
+    "se": 0.01519544417242141,
+    "improved": 157,
+    "worsened": 59
+   }
+  },
+  {
+   "pass": 13,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.1.bias",
+    "head.scorer.1.weight",
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7173333333333334,
+    "score_se_over_items": 0.01336807069137734,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 226
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.7173333333333334,
+    "gain": 0.14200000000000002,
+    "se": 0.015428043498721386,
+    "improved": 171,
+    "worsened": 47
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "head.scorer.1.bias",
+    "head.scorer.1.weight",
+    "head.scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.5753333333333334,
+    "score_se_over_items": 0.012284924128068692,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 286
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7173333333333334,
+    "score_se_over_items": 0.01336807069137734,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 226
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.5753333333333334,
+    "edited": 0.7173333333333334,
+    "gain": 0.14200000000000002,
+    "se": 0.015428043498721386,
+    "improved": 171,
+    "worsened": 47
+   }
+  }
+ ],
+ "validation_size": 300,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.5335,
+   "score_se_over_items": 0.01069955963771887,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 384
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.6829999999999999,
+   "score_se_over_items": 0.011537342661515392,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 321
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.5335,
+   "edited": 0.6829999999999999,
+   "gain": 0.14950000000000002,
+   "se": 0.01231883758308779,
+   "improved": 243,
+   "worsened": 61
+  }
+ },
+ "patch": "3 tensors, 112,860 entries changed\n  head.scorer.1.bias float32[1024]: 110 entries (sparse), relative change 434.1476\n  head.scorer.1.weight float32[1024, 1024]: 112,640 entries (sparse), relative change 19.5763\n  head.scorer.3.weight float32[1, 1024]: 110 entries (sparse), relative change 592.1420"
+}
