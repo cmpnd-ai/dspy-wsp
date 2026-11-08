@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dspy-wsp"
-version = "0.1.0"
+version = "0.1.1"
 description = "Weight-space programming as a DSPy optimizer: a frontier LM reads and edits a small model's weights, with no gradients."
 readme = "README.md"
 requires-python = ">=3.10"
