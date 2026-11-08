@@ -6,7 +6,7 @@ Weight-space programming as a DSPy optimizer.
 
 The method comes from [*Sparks of Weight-Space Programming*](https://rikiyat.github.io/blog/weight-space-programming/) by Rikiya Takehi, Jayden Teoh, Alex Zhang and Omar Khattab (MIT CSAIL, 2026). In their Experiment 8, a frontier model edited 0.016% of Qwen3.5-0.8B's weights. The edit raised MATH-500 from 7.9% to 48.1% by removing a direction that drove the model's looping. This package rebuilds that harness around DSPy programs and metrics.
 
-This is an early release. We are releasing it outside the core DSPy library so that more people can try it and tell us what breaks. Please report problems and results in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
+This is an early release. We are releasing it outside the core DSPy library so that more people can try it and tell us what breaks. Please report problems and results, and tell us which models you would like us to support, in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
 
 ## Install
 
@@ -86,7 +86,7 @@ ReAnchor fits how the program turns probabilities into answers and changes no we
 - `NanoJevBackend` runs NanoJev models: a Qwen3 backbone with a decision head.
 - `D1LMBackend` runs Liquid AI's d1 models built on LFM3, e.g. d1-2B. It reads each answer from the language model's output at the question's answer position, so it has no separate head. Its output layer is the token embedding, which stays protected, so the writer's edits land in the backbone. It reads text states and answers Choice, Noul and Score questions. It refuses d1-2B's other question types (text, number, date, box and multiple choice).
 
-We have tested `WeightSpace` on three decision models so far: d1-omni-600M, NanoJev and d1-2B. If you run it on another open decision model, please tell us how it went in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
+We have tested `WeightSpace` on three decision models so far: d1-omni-600M, NanoJev and d1-2B. If you run it on another open decision model, please tell us how it went in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord. Please also tell us which models you would like us to support, especially decision models.
 
 `load_decision_backend` opens a model by alias, Hugging Face repo id or local folder. It reads the checkpoint's config to pick the family, and it refuses other architectures with a message that names the supported ones. The aliases `"d1"`, `"nanojev"` and `"d1-2b"` open the checkpoints we tested, at pinned revisions.
 
