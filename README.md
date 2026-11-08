@@ -74,13 +74,13 @@ We edited three decision models on the Typed Decisions benchmark with `gpt-6-ast
 | WeightSpace | 66.9% (+16.1 ± 1.2) | 52.4% (+13.3 ± 1.1) | 74.0% (+13.4 ± 1.2) |
 | WeightSpace + ReAnchor | 69.1% (+18.3 ± 1.3) | 56.4% (+17.3 ± 1.3) | 77.9% (+17.3 ± 1.3) |
 
-ReAnchor fits how the program turns probabilities into answers and changes no weights. Each run took between 78 and 167 minutes and cost between $5.42 and $7.63 in writer calls. With `gpt-6.1-sol` as the writer, the WeightSpace edits alone gained 5.8, 12.1 and −0.6 points on the same three models.
+`dspy.experimental.ReAnchor` fits how the program turns probabilities into answers, i.e., its Noul thresholds, Score cut points and Choice weights. It changes no weights. Each run took between 78 and 167 minutes and cost between $5.42 and $7.63 in writer calls. With `gpt-6.1-sol` as the writer, the WeightSpace edits alone gained 5.8, 12.1 and −0.6 points on the same three models.
 
-[The results folder](results/2026-11-07-typed-decisions-astra/) has every run, edit and comparison. [Decision models](#decision-models) covers the earlier runs and the Procedural Typed Decisions benchmark.
+[The results folder](https://github.com/cmpnd-ai/dspy-wsp/tree/main/results/2026-11-07-typed-decisions-astra/) has every run, edit and comparison. [Decision models](https://github.com/cmpnd-ai/dspy-wsp#decision-models) covers the supported models and the benchmark scripts.
 
 ## Decision models
 
-`WeightSpace` also edits System One decision models: models that read a state and typed questions (Choice, Noul and Score) and return a probability for every option, with no text generation. Three families are supported, each with our own loader in MLX and in PyTorch. Each family's code is in its own folder under `src/dspy_wsp/decision/families/`:
+A System One decision model reads a state and typed questions (Choice, Noul and Score) and returns a probability for every option, with no text generation. `WeightSpace` supports three families of decision models. Each family has our own loader in MLX and in PyTorch, in its own folder under `src/dspy_wsp/decision/families/`:
 
 - `D1Backend` runs Liquid AI's d1-omni models (text path), e.g. d1-omni-600M: an encoder with a decision head.
 - `NanoJevBackend` runs NanoJev models: a Qwen3 backbone with a decision head.
@@ -120,47 +120,7 @@ compiled.wsp_patch.write_checkpoint(backend.weights_dir, "edited-d1/")
 
 `write_checkpoint` copies the model's folder, including its subfolders and the model's own code files, with the edited tensors substituted and checked against their hashes. The result has the same layout as the base folder, so the model's own code and `load_decision_backend` both open it. The example scripts take `--model` with an alias, repo id or folder, and they save the edited checkpoint in the run folder's `checkpoint/`.
 
-For a decision model, the writer gets `decide` passes, which run the program and score it, and `read` passes, which return each option's logit and the decision head's inputs. It may recompute the head from those reads and derive edits in closed form. `holdout` moves training examples to a validation set that the writer can score edits on but never see. `examples/typed_decisions.py` runs the Typed Decisions benchmark. Two runs on a MacBook Pro with MLX, with `openai/gpt-6.1-sol` as the writer and 25 passes each, gave these results on the 400 held-out test cases:
-
-| Model | Tensor edited | Original | Edited | Paired gain | Improved / worse | Run |
-|---|---|---|---|---|---|---|
-| d1-omni-600M | `head.scorer.3.weight` (1,024 weights) | 53.4% | 60.6% | +7.25 ± 1.05 points | 150 / 63 | [results](results/2026-11-04-typed-decisions-d1/) |
-| NanoJev (Qwen3-0.6B) | `scalar.weight` (1,024 weights) | 38.6% | 55.7% | +17.10 ± 1.35 points | 243 / 63 | [results](results/2026-11-04-typed-decisions-nanojev/) |
-
-In both runs the writer derived the edit in closed form from the decision head's inputs, confirmed it on 300 held-out validation cases, and never saw the test cases. Each run took between 75 and 110 minutes.
-
-WeightSpace also combines with `dspy.experimental.ReAnchor`, which fits how a program turns probabilities into answers (Noul thresholds, Score cut points and Choice weights) without changing weights. Scored on the answers NanoJev's program returns, on the same 400 test cases:
-
-| NanoJev | Decided accuracy | Paired gain over plain |
-|---|---|---|
-| Plain | 39.2% | |
-| ReAnchor | 50.7% | +11.6 ± 1.3 points |
-| WeightSpace | 51.3% | +12.1 ± 1.2 points |
-| WeightSpace + ReAnchor | 55.7% | +16.6 ± 1.4 points |
-
-See [the comparison](results/2026-11-04-typed-decisions-nanojev/reanchor/) for how the two methods divide the gain.
-
-On three balanced, rule-based tasks from Procedural Typed Decisions, overnight on the same laptop, the same kind of edit gave larger gains on 400 test cases:
-
-| Model | Tensor edited | Original | Edited | Paired gain | Improved / worse | Run |
-|---|---|---|---|---|---|---|
-| d1-omni-600M | `head.scorer.3.weight` (1,024 weights) | 52.3% | 72.3% | +20.0 ± 2.3 points | 179 / 54 | [results](results/2026-11-04-procedural-decisions/) |
-| NanoJev (Qwen3-0.6B) | `scalar.weight` (1,024 weights) | 49.3% | 72.3% | +23.1 ± 2.3 points | 193 / 54 | [results](results/2026-11-04-procedural-decisions/) |
-
-These tasks have balanced labels. Edits that only shifted option preferences gained nothing, so the gains come from how the head reads each record.
-
-Scored on the answers each program returns, on the same 400 test cases:
-
-| Version | d1-omni-600M | NanoJev |
-|---|---|---|
-| Plain | 52.3% | 47.8% |
-| ReAnchor | 58.7% (+6.4 ± 2.2) | 52.8% (+5.0 ± 1.7) |
-| WeightSpace | 64.2% (+11.9 ± 2.3) | 68.4% (+20.6 ± 2.3) |
-| WeightSpace + ReAnchor | 69.9% (+17.7 ± 2.4) | 71.3% (+23.4 ± 2.3) |
-| WeightSpace (GEPA) | 66.9% (+14.7 ± 2.2) | 65.6% (+17.8 ± 2.4) |
-| WeightSpace (GEPA) + ReAnchor | 71.2% (+18.9 ± 2.3) | 67.9% (+20.1 ± 2.4) |
-
-The WeightSpace rows come from one 25-pass conversation. The GEPA rows come from a [population search](#population-search) with 51 passes and at least 10 rounds. The search beat the conversation on d1-omni-600M and trailed it on NanoJev. Every difference between the two is smaller than two standard errors.
+For a decision model, the writer gets `decide` passes, which run the program and score it, and `read` passes, which return each option's logit and the decision head's inputs. It may recompute the head from those reads and derive edits in closed form. The writer may edit any tensor except the token embedding and the final norm. In our runs, every writer chose to edit the decision head, or d1-2B's last block, which has no head. `holdout` moves training examples to a validation set that the writer can score edits on but never see. `examples/typed_decisions.py` runs the Typed Decisions benchmark, and `examples/procedural_decisions.py` runs three tasks from Procedural Typed Decisions.
 
 ## Generating LLMs
 
@@ -200,10 +160,10 @@ This path is a bigger step than the decision models, and we have tested it less.
 
 ## How a run works
 
-The writer works in turns. Each turn it explains its next step and sends exactly one block:
+The writer works in turns. Each turn it explains its next step and sends exactly one code block, marked `python` or `forward`:
 
-- **` ```python `** runs in a persistent kernel with no GPU and, under the sandbox, no network. The kernel predefines `NAMES`, `SHAPES`, `load(name)`, `load_original(name)`, `save_edit(name, tensor)`, `drop_edit(name)`, `edited()` and `tok`. Gradients are disabled.
-- **` ```forward `** sends a JSON request to the forward-pass tool, the only way to run the model:
+- A `python` block runs in a persistent kernel with no GPU and, under the sandbox, no network. The kernel predefines `NAMES`, `SHAPES`, `load(name)`, `load_original(name)`, `save_edit(name, tensor)`, `drop_edit(name)`, `edited()` and `tok`. Gradients are disabled.
+- A `forward` block sends a JSON request to the forward-pass tool, the only way to run the model:
   - `generate` runs your program on up to 512 practice items with the original weights, the edited weights, or `"both"`. Every answer is scored with your metric. `"both"` uses the same seed for each item and reports the paired gain with its standard error. The records keep every LM call's full prompt and completion. Pooled activations are optional.
   - `teacher_forced` reads up to 1,024 texts and returns log-probs, top-k predictions, hidden states, MLP activations or attention probabilities as `.npy` files.
 
@@ -212,7 +172,7 @@ Each forward pass costs one unit of budget, whatever its size. A refused request
 The harness follows the paper's rules:
 
 - **Guardrails:** `save_edit` refuses edits to the embeddings, the output layer and the final norm. It also refuses edits that only rescale a whole tensor. The host checks every edit again before each pass.
-- **Limits:** the writer gets 300 Python runs, 15 minutes per run, and 10,000 characters of output per run.
+- **Limits:** the writer may run Python up to 300 times, for up to 15 minutes and 10,000 characters of output each time. Our 25-pass runs used between 33 and 43 Python runs.
 - **Explanations:** a block sent without an explanation is returned unrun, at most twice in a row.
 - **Handoffs:** every 40 turns the conversation restarts with the task, the writer's `notes.md` and its current edit.
 
@@ -290,7 +250,6 @@ The writer's code runs on your machine. With `sandbox="auto"` (the default), the
 - `HFBackend` generates one sequence at a time in-process. That's fine for small models and short answers, but too slow at the paper's scale. There, one pass produced 512 answers of up to 32k tokens, and a pass took up to 30 minutes on a server. `MLXBackend` batches on a Mac, but a 64-problem paired pass at 32k tokens still takes one to two hours.
 - A run is long and costly. The paper's 50-pass run took 158 turns and 20 hours. Budget for the writer's tokens accordingly.
 - Editing removes obstacles; it doesn't add abilities. The paper's Gemma 3 270M follow-up barely moved. That model didn't loop, so the writer had no failure mechanism to repair.
-- Neither the paper nor this package compares against prompt optimization yet. Run GEPA on the same student and budget before you trust a gain.
 
 ## Credits and license
 
