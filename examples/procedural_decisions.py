@@ -20,6 +20,8 @@ task); the 400 test cases come from its test split. Steps:
     python examples/procedural_decisions.py --model d1 --step compare
     OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize --search gepa --rounds 10
     python examples/procedural_decisions.py --model d1 --step compare --search gepa
+    OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize --writer astra
+    python examples/procedural_decisions.py --model d1 --step compare --writer astra
 """
 
 from __future__ import annotations
@@ -31,7 +33,7 @@ from collections import Counter
 from pathlib import Path
 
 import dspy
-from typed_decisions import baseline, make_backend, make_search, optimize, run_name
+from typed_decisions import WRITERS, baseline, make_backend, make_search, optimize, run_name
 from typed_decisions_reanchor import compare
 
 DATASET = "tasksource/procedural-typed-decisions"
@@ -85,12 +87,13 @@ def main() -> None:
     parser.add_argument("--passes", type=int, help="the forward-pass budget (default: 25, or what --rounds needs with GEPA)")
     parser.add_argument("--search", choices=["conversation", "gepa"], default="conversation")
     parser.add_argument("--rounds", type=int, default=10, help="with --search gepa: the rounds the budget must pay for")
+    parser.add_argument("--writer", choices=sorted(WRITERS), default="sol")
     args = parser.parse_args()
 
     train, test = splits()
     name = run_name(args.model)
     search = make_search(args.search, args.rounds) if args.step == "optimize" else None
-    suffix = "-gepa" if args.search == "gepa" else ""
+    suffix = ("-gepa" if args.search == "gepa" else "") + ("" if args.writer == "sol" else f"-{args.writer}")
     run_dir = RUNS / f"{name}{suffix}"
     if args.step == "compare":
         compare(args.model, args.framework, run_dir, RUNS / f"reanchor_{name}{suffix}", train, test, revision=args.revision)
@@ -99,7 +102,7 @@ def main() -> None:
     try:
         if args.step == "optimize":
             passes = args.passes or (search.min_passes() if search else 25)
-            optimize(backend, train, test, run_dir=run_dir, passes=passes, holdout=300, task=TASK, search=search)
+            optimize(backend, train, test, run_dir=run_dir, passes=passes, holdout=300, task=TASK, search=search, writer=args.writer)
         else:
             kind = args.step.removeprefix("baseline-")
             baseline(backend, kind, train, test, RUNS / f"baseline_{name}_{kind}.json")
