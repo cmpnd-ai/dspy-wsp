@@ -18,7 +18,7 @@ The setup matches the d1 run, with these differences:
 The command, run from `examples/`:
 
 ```bash
-OPENAI_API_KEY=... python typed_decisions.py --model nanojev --framework mlx
+OPENAI_API_KEY=... python typed_decisions.py --model nanojev --framework mlx --writer sol
 ```
 
 ## Baselines
@@ -107,7 +107,7 @@ pip install -e ".[examples]"
 cd examples
 python typed_decisions.py --model nanojev --framework mlx --baseline protocol
 python typed_decisions.py --model nanojev --framework mlx --baseline program
-OPENAI_API_KEY=... python typed_decisions.py --model nanojev --framework mlx
+OPENAI_API_KEY=... python typed_decisions.py --model nanojev --framework mlx --writer sol
 ```
 
 The writer's answers are sampled, so a new run will make different choices. NanoJev's source code is MIT-licensed; its model card states no license.

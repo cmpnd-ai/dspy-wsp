@@ -20,8 +20,10 @@ task); the 400 test cases come from its test split. Steps:
     python examples/procedural_decisions.py --model d1 --step compare
     OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize --search gepa --rounds 10
     python examples/procedural_decisions.py --model d1 --step compare --search gepa
-    OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize --writer astra
-    python examples/procedural_decisions.py --model d1 --step compare --writer astra
+    OPENAI_API_KEY=... python examples/procedural_decisions.py --model d1 --step optimize --writer sol
+    python examples/procedural_decisions.py --model d1 --step compare --writer sol
+
+The writer is gpt-6-astra at maximum reasoning effort unless --writer says otherwise.
 """
 
 from __future__ import annotations
@@ -87,7 +89,7 @@ def main() -> None:
     parser.add_argument("--passes", type=int, help="the forward-pass budget (default: 25, or what --rounds needs with GEPA)")
     parser.add_argument("--search", choices=["conversation", "gepa"], default="conversation")
     parser.add_argument("--rounds", type=int, default=10, help="with --search gepa: the rounds the budget must pay for")
-    parser.add_argument("--writer", choices=sorted(WRITERS), default="sol")
+    parser.add_argument("--writer", choices=sorted(WRITERS), default="astra", help="the writer model: gpt-6-astra at maximum effort (default) or gpt-6.1-sol")
     args = parser.parse_args()
 
     train, test = splits()

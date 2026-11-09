@@ -103,7 +103,7 @@ To try a run without data of your own, clone this repository and run the benchma
 
 ```bash
 pip install -e ".[examples]"
-OPENAI_API_KEY=... python examples/typed_decisions.py --smoke --writer astra
+OPENAI_API_KEY=... python examples/typed_decisions.py --smoke
 ```
 
 How `compile` uses your data:
@@ -280,7 +280,7 @@ compiled = optimizer.compile(program, trainset=train, valset=test)
 compiled.wsp_patch.write_checkpoint(backend.weights_dir, "edited-d1/")
 ```
 
-**Benchmark scripts.** `examples/typed_decisions.py` runs the Typed Decisions benchmark, and `examples/procedural_decisions.py` runs three tasks from Procedural Typed Decisions. Both take `--model` with an alias, repo id or folder, and `--writer astra`. They save the edited checkpoint in the run folder's `checkpoint/`.
+**Benchmark scripts.** `examples/typed_decisions.py` runs the Typed Decisions benchmark, and `examples/procedural_decisions.py` runs three tasks from Procedural Typed Decisions. Both take `--model` with an alias, repo id or folder. Both use `gpt-6-astra` as the writer unless you pass `--writer sol`. They save the edited checkpoint in the run folder's `checkpoint/`.
 
 ## Generating LLMs
 

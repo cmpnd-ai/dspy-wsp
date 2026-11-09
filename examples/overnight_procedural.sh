@@ -26,7 +26,7 @@ watch_memory() {
 for model in "$@"; do
   for step in baseline-protocol baseline-program optimize compare; do
     echo "=== $(date) start $model $step" >> $logs/overnight.log
-    caffeinate -i ../.venv/bin/python procedural_decisions.py --model $model --step $step > $logs/${model:t:l}_${step}.log 2>&1 &
+    caffeinate -i ../.venv/bin/python procedural_decisions.py --model $model --step $step --writer sol > $logs/${model:t:l}_${step}.log 2>&1 &
     pid=$!
     watch_memory $pid "$model $step" &
     wait $pid

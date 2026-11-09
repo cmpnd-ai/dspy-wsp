@@ -134,8 +134,8 @@ Or one step at a time, from `examples/`:
 ```bash
 python procedural_decisions.py --model d1 --step baseline-protocol
 python procedural_decisions.py --model d1 --step baseline-program
-OPENAI_API_KEY=... python procedural_decisions.py --model d1 --step optimize
-python procedural_decisions.py --model d1 --step compare
+OPENAI_API_KEY=... python procedural_decisions.py --model d1 --step optimize --writer sol
+python procedural_decisions.py --model d1 --step compare --writer sol
 ```
 
 The writer's answers are sampled, so a new run will make different choices.
