@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pytest
 
@@ -139,9 +141,18 @@ def test_sandbox_reads_an_allowlist_and_has_no_network(weights_dir, tmp_path):
         assert (work / "edited" / f"{L0}.npy").exists()
         assert "tmp ok" in k.run("import tempfile; f = tempfile.NamedTemporaryFile(); f.write(b'x'); print('tmp ok')")
         assert "BLOCKED" in k.run(TRY.format("import socket; socket.create_connection(('1.1.1.1', 80), timeout=3)"))
-        for probe in (f"open({str(secret)!r}).read()", f"os.listdir({str(Path.home())!r})", f"open({str(Path.home() / '.profile')!r}).read()"):
+        for probe in (f"open({str(secret)!r}).read()", f"open({str(Path.home() / '.profile')!r}).read()"):
             out = k.run(TRY.format(probe))
             assert "BLOCKED" in out and "TOPSECRET" not in out, probe
+        # The home folder is unreadable (macOS) or holds only the folders that lead to allowlisted paths (Linux).
+        import sys
+
+        from dspy_wsp.kernel import runtime_paths
+
+        allowed = [str(Path(p).resolve()) for p in [*runtime_paths(), work, weights_dir, sys.modules["dspy_wsp"].__file__]]
+        hidden = [n for n in os.listdir(Path.home()) if not any(a.startswith(str((Path.home() / n).resolve())) for a in allowed)]
+        out = k.run(TRY.format(f"print(sorted(os.listdir({str(Path.home())!r})))"))
+        assert "BLOCKED" in out or not any(repr(n) in out for n in hidden), out
         k.run(TRY.format(f"open({str(outside)!r}, 'w').write('x')"))  # refused, or it lands in the sandbox's own /tmp
         assert not outside.exists()
         # A link made inside the sandbox cannot read the file for the kernel, and the host refuses to follow it.
