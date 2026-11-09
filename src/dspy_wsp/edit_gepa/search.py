@@ -20,6 +20,7 @@ from typing import Any
 
 import numpy as np
 
+from ..writer import ask_writer
 from . import language
 
 PROTOCOL = (
@@ -100,7 +101,7 @@ class EditGEPA:
     def _ask(self, messages: list[dict]) -> str:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            out = self.writer_lm(messages=messages)
+            reply = ask_writer(self.writer_lm, messages)
         entry = (getattr(self.writer_lm, "history", None) or [{}])[-1]
         usage = entry.get("usage") or {}
         get = lambda o, k: (o.get(k) if isinstance(o, Mapping) else getattr(o, k, None)) or 0  # noqa: E731
@@ -109,8 +110,7 @@ class EditGEPA:
                                        "reasoning": get(get(usage, "completion_tokens_details") or {},
                                                         "reasoning_tokens")})
         self.lm_cost += entry.get("cost") or 0.0
-        first = out[0] if out else ""
-        return str(first.get("text") or "") if isinstance(first, dict) else str(first)
+        return reply
 
     # --- the GEPA adapter --------------------------------------------------------------
     def evaluate(self, batch, candidate, capture_traces=False):

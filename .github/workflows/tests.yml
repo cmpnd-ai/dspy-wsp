@@ -28,5 +28,8 @@ jobs:
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[dev]"
+          # This package needs DSPy 3.5. Remove this line once 3.5 is on PyPI and pyproject.toml pins it.
+          # DSPy main still reports the 3.4.1 version number, so pip must be forced to replace the PyPI build.
+          pip install --force-reinstall --no-deps "dspy @ git+https://github.com/stanfordnlp/dspy@main"
       - run: ruff check .
       - run: pytest -q

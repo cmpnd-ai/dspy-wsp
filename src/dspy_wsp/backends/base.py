@@ -232,7 +232,7 @@ class GenerativeBackend(WeightBackend):
 
 
 class BackendEngine:
-    """A DSPy 3.4 engine: one canonical request in, one response out, run on a GenerativeBackend's current weights.
+    """A DSPy engine: one canonical request in, one response out, run on a GenerativeBackend's current weights.
 
     Subclasses set `backend_class`. DSPy saves a program's LM through `dump_state`
     (the base model, its settings and the patch) and rebuilds it with `load_state`.

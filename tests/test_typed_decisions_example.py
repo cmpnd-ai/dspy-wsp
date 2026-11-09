@@ -1,5 +1,6 @@
 """The Typed Decisions example's program, metric and scoring, on synthetic cases in the dataset's format."""
 
+import json
 import math
 import sys
 from pathlib import Path
@@ -63,10 +64,11 @@ def test_program_runs_on_a_decision_backend(tmp_path):
     try:
         program = td.TypedDecisions([example()])
         program.set_lm(backend.lm())
-        pred = program(workflow="agent_trace", state={"steps": 3})
+        with backend.record_calls() as calls:
+            pred = program(workflow="agent_trace", state={"steps": 3})
         out = td.metric(example(), pred)
         assert 0 <= out.score <= 1 and out.feedback.count(";") == 2
-        noul_q = backend.lm().history[-1]["request"]["questions"]["needs_review"]
+        noul_q = json.loads(calls[-1].prompt)["questions"]["needs_review"]
         assert noul_q["type"] == "noul" and noul_q["criteria"]["true"] == "A human should look."
     finally:
         backend.close()

@@ -39,7 +39,7 @@ def test_generate_both_reports_a_paired_gain(tool):
     assert s["original"]["score"] == 0.0 and s["edited"]["score"] == 1.0
     assert s["paired"]["gain"] == 1.0 and s["paired"]["improved"] == 4
     rows = [json.loads(line) for line in open(tool.work_dir / "gen_1_edited.jsonl")]
-    assert rows[0]["calls"][0]["completion"].startswith("[[ ## answer ## ]]")
+    assert rows[0]["calls"][0]["completion"].startswith("<answer>")
     assert rows[0]["outputs"]["answer"] == "4"
 
 

@@ -259,7 +259,7 @@ The check confirms four things. `check_decision_model` runs the same check from 
 - A request gets the same answer alone and in a batch.
 - An edit to one tensor moves the answers, and restoring the tensor restores them.
 
-**Write the program.** The backend runs a local `/v1/systemone` server, and a DSPy program calls it through DSPy's TypeSafe client, as it would call TypeSafe's hosted Jev. Give the program's signatures `bool` and `Literal` outputs, or `Choice`, `Noul` and `Score` outputs from `dspy.experimental`.
+**Write the program.** The backend runs a local `/v1/systemone` server, and a DSPy program calls it through `dspy.LM` on DSPy's TypeSafe provider, as it would call TypeSafe's hosted Jev. Give the program's signatures `bool` and `Literal` outputs, or `Choice`, `Noul` and `Score` outputs from `dspy.experimental`.
 
 **What the writer gets.** A decision model changes the writer's tools:
 

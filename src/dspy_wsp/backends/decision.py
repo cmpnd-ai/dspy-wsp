@@ -7,7 +7,7 @@ answers everything queued with one forward. Weight swaps run on the same
 thread between forwards, so every answer comes from one set of weights.
 
 DSPy programs reach the model through `lm()`: a local `/v1/systemone` server and
-DSPy's TypeSafe client (`dspy_wsp.decision.client`).
+a `dspy.LM` on DSPy's TypeSafe provider (`dspy_wsp.decision.client`).
 """
 
 from __future__ import annotations
@@ -311,15 +311,15 @@ class DecisionBackend(WeightBackend):
         return self._dir
 
     def lm(self, cache: bool = False):
-        """DSPy's TypeSafe client for this backend. With cache=True, identical requests on the same weights reuse answers."""
+        """A `dspy.LM` for this backend. With cache=True, identical requests on the same weights reuse answers."""
         if self._client is None:
-            from dspy_wsp.decision.client import DecisionTypeSafe
+            from dspy_wsp.decision.client import DecisionLM
             from dspy_wsp.decision.server import SystemOneServer
 
             self._server = SystemOneServer(self)
             self._server.start()
-            self._client = DecisionTypeSafe.for_backend(self)
-            self._cached_client = self._client.copy(cache=True)
+            self._client = DecisionLM.for_backend(self)
+            self._cached_client = DecisionLM.for_backend(self, cache=True)
         return self._cached_client if cache else self._client
 
     def close(self) -> None:

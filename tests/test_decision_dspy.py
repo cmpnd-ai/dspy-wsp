@@ -1,4 +1,4 @@
-"""DSPy programs calling a decision backend through the TypeSafe client and the local server."""
+"""DSPy programs calling a decision backend through `dspy.LM` and the local server."""
 
 import json
 from typing import Literal
@@ -40,13 +40,13 @@ def backend(d1_dir):
 
 
 def test_predict_with_choice_noul_score(backend):
-    pred = dspy.Predict(Triage)(state=STATE, lm=backend.lm())
+    with backend.record_calls() as calls:
+        pred = dspy.Predict(Triage)(state=STATE, lm=backend.lm())
     assert pred.action.value in ("stop", "continue", "review")
     assert isinstance(pred.needs_review.value, bool)
     assert set(pred.risk.probabilities) == {0, 1, 2, 3}
-    lm = backend.lm()
-    history = lm.history[-1]["request"]
-    direct = backend.system_one(history["state"], history["questions"])["answers"]
+    sent = json.loads(calls[0].prompt)
+    direct = backend.system_one(sent["state"], sent["questions"])["answers"]
     assert pred.action.probabilities == pytest.approx(direct["action"]["probabilities"])
     assert pred.needs_review.probability == pytest.approx(direct["needs_review"]["noul"])
 
@@ -97,7 +97,7 @@ def test_save_and_load_rebuilds_backend(backend, d1_dir, tmp_path):
     LOADED_BACKENDS.clear()
     loaded = dspy.Predict(Triage)
     loaded.load(str(tmp_path / "program.json"), allow_unsafe_lm_state=True)
-    assert loaded.lm._backend is not backend and loaded.lm.base_url != backend.lm().base_url
+    assert loaded.lm._backend is not backend and loaded.lm.kwargs["api_base"] != backend.lm().kwargs["api_base"]
     got = loaded(state=STATE)
     assert got.action.probabilities == pytest.approx(expected.action.probabilities, abs=1e-5)
     loaded.lm._backend.close()

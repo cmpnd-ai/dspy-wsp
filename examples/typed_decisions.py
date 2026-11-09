@@ -4,7 +4,7 @@ Typed Decisions (LocalLLaMA/typed-decisions, Apache-2.0) gives a model one state
 from one of four workflows and asks five typed questions about it (choice, noul
 and score). Every decision has a gold distribution. This example runs the
 decision model behind a local System One server, calls it from a DSPy program
-through DSPy's TypeSafe client, and lets a writer edit its weights.
+through `dspy.LM` on DSPy's TypeSafe provider, and lets a writer edit its weights.
 
     pip install -e ".[examples]"
     python examples/typed_decisions.py --baseline protocol        # the benchmark's own request format
