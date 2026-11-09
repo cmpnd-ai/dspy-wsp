@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The benchmark scripts in `examples/` use `gpt-6-astra` as the writer by default. Pass `--writer sol` for `gpt-6.1-sol`. Run folder names are unchanged.
 - `dspy_wsp.__version__` reads the installed package's version. It reported `0.1.0` in the 0.1.1 release.
 - The sandbox is an allowlist. The writer's kernel reads only the system's libraries, the Python install, this package and the model's files. It read the whole disk before. `sandbox_readonly=[...]` adds folders.
 - `sandbox="auto"` works on macOS, through `sandbox-exec`. The examples no longer pass `sandbox="none"` on a Mac.

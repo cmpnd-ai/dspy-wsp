@@ -28,7 +28,7 @@ Typed Decisions (`LocalLLaMA/typed-decisions`, Apache-2.0) gives a model one rec
 The command, run from `examples/`:
 
 ```bash
-OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx
+OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx --writer sol
 ```
 
 ## Baselines
@@ -122,8 +122,8 @@ pip install -e ".[examples]"
 cd examples
 python typed_decisions.py --model d1 --framework mlx --baseline protocol
 python typed_decisions.py --model d1 --framework mlx --baseline program
-OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx --smoke
-OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx
+OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx --smoke --writer sol
+OPENAI_API_KEY=... python typed_decisions.py --model d1 --framework mlx --writer sol
 ```
 
 The writer's answers are sampled, so a new run will make different choices. d1-omni-600M uses the LFM Open License v1.0, which limits commercial use for organizations with $10 million or more in annual revenue. Check it before you share edited weights.
