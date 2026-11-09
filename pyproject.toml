@@ -13,7 +13,6 @@ authors = [{ name = "Drew Breunig", email = "dbreunig@gmail.com" }]
 keywords = ["dspy", "llm", "optimizer", "interpretability", "weight editing"]
 dependencies = [
     "dspy[typesafe]>=3.4,<3.5",
-    "typesafe-sdk>=0.7.5,<0.8",
     "gepa>=0.1.4",
     "numpy>=1.26",
     "safetensors>=0.4",

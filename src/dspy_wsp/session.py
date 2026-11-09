@@ -19,6 +19,7 @@ from dspy_wsp import prompts
 from dspy_wsp.blocks import parse_reply
 from dspy_wsp.budget import Budget
 from dspy_wsp.edits import read_notes
+from dspy_wsp.writer import ask_writer
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +117,7 @@ class Session:
             try:
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    out = self.writer_lm(messages=messages)
+                    reply = ask_writer(self.writer_lm, messages)
                 break
             except (LMTransportError, LMInvalidRequestError) as e:
                 # a timeout or dropped connection, or a reply cut off at the model's output limit
@@ -125,10 +126,7 @@ class Session:
                     raise
                 logger.warning("the writer's call failed (%s); retrying", e)
         self._record_usage()
-        first = out[0] if out else ""
-        if isinstance(first, dict):
-            first = first.get("text") or ""
-        return str(first)
+        return reply
 
     def _record_usage(self) -> None:
         """Keep the last writer call's tokens and cost, and add them to the run's total."""

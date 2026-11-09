@@ -92,7 +92,7 @@ class FakeEngine:
 
     def complete(self, request):
         ans = "4" if self.backend.current_edits else "5"
-        text = f"[[ ## answer ## ]]\n{ans}\n\n[[ ## completed ## ]]"
+        text = f"<answer>\n{ans}\n</answer>"
         prompt = "\n".join(m.text or "" for m in request.messages)
         self.backend._record(LMCall(prompt=prompt, completion=text, finish_reason="stop", input_tokens=10, output_tokens=5))
         return Response(id=None, model="fake", message=Message.assistant([TextPart(text)]), finish_reason="stop",
@@ -113,7 +113,8 @@ class ScriptedEngine:
         self.received = []
 
     def complete(self, request):
-        self.received.append([(m.role, m.text or "") for m in request.messages])
+        system = [("system", request.system)] if request.system else []
+        self.received.append(system + [(m.role, m.text or "") for m in request.messages])
         text = next(self.replies, "Done. I have nothing more to add.")
         return Response(id=None, model="scripted", message=Message.assistant([TextPart(text)]), finish_reason="stop",
                         usage=Usage(input_tokens=1, output_tokens=1, total_tokens=2))
