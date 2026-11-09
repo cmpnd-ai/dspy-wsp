@@ -71,6 +71,11 @@ A decision model reads `bool` outputs as yes or no questions and `Literal` outpu
 
 We edited three decision models on the Typed Decisions benchmark with `gpt-6-astra` at maximum reasoning effort as the writer. The writer had one conversation with 25 forward passes for each model. The table scores the answers each program returns on 400 held-out test cases. Each gain is the paired gain over the plain model in points, with its standard error.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions-dark.svg">
+  <img src="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions-light.svg" width="100%" alt="Bar chart of test accuracy on the Typed Decisions benchmark for d1-omni-600M, NanoJev and d1-2B: unoptimized, with ReAnchor, with WeightSpace, and with both. The table below has the same numbers.">
+</picture>
+
 | Version | d1-omni-600M | NanoJev (Qwen3-0.6B) | d1-2B |
 |---|---|---|---|
 | Plain | 50.9% | 39.2% | 60.6% |
