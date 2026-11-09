@@ -12,8 +12,12 @@ This is an early release. We are releasing it outside the core DSPy library so t
 
 ```bash
 pip install dspy-wsp
-apt install bubblewrap       # sandboxes the writer's code (Linux)
 ```
+
+The writer's code runs in a sandbox (see [Safety](https://github.com/cmpnd-ai/dspy-wsp#safety)):
+
+- **macOS** uses the built-in `sandbox-exec`. It needs no setup.
+- **Linux** uses [bubblewrap](https://github.com/containers/bubblewrap): `apt install bubblewrap`. On Ubuntu 24.04, AppArmor blocks the user namespaces that bubblewrap needs. Allow them with `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`.
 
 The base install runs every supported decision model, with MLX on Apple silicon and PyTorch elsewhere. Two extras add more:
 
@@ -237,7 +241,15 @@ program.set_lm(dspy.LM("openai/qwen-edited", api_base="http://localhost:8000/v1"
 
 ## Safety
 
-The writer's code runs on your machine. With `sandbox="auto"` (the default), the kernel runs under bubblewrap: the filesystem is read-only except the work folder, and there is no network. If `bwrap` is missing, the optimizer refuses to start. `sandbox="none"` runs the writer's code with your permissions and network; use it only on a machine you're willing to hand to the writer.
+The writer's code runs on your machine. With `sandbox="auto"` (the default), the kernel runs in a sandbox: bubblewrap on Linux and `sandbox-exec` on macOS. The sandbox is an allowlist:
+
+- **Read:** the system's libraries, the Python install and its packages, this package, and the model's files. Your home folder, your keys and your other projects are outside it.
+- **Write:** the run's work folder and a scratch folder.
+- **Network:** none.
+
+Everything the kernel prints goes to the writer's API, so the writer's provider sees the model's weights and your practice examples as the writer reads them. The host reads the writer's notes and edits from the work folder, and it refuses links there.
+
+If no sandbox is available, `WeightSpace(...)` raises an error before it loads anything. If your Python install keeps libraries outside its own prefix (e.g. `/nix/store`), name those folders in `sandbox_readonly=[...]`. `sandbox="none"` runs the writer's code with your permissions and network; use it only on a machine you're willing to hand to the writer.
 
 ## Differences from the paper
 

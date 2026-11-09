@@ -19,7 +19,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from dspy_wsp.budget import Budget
-from dspy_wsp.edits import EditError, EditStore
+from dspy_wsp.edits import EditError, EditStore, plain_file, read_notes
 from dspy_wsp.session import Session
 
 logger = logging.getLogger(__name__)
@@ -56,19 +56,19 @@ def restore_candidate(cand_dir: Path, work_dir: Path) -> None:
     edited = Path(work_dir) / "edited"
     if edited.exists():
         shutil.rmtree(edited)
-    shutil.copytree(Path(cand_dir) / "edited", edited)
+    shutil.copytree(Path(cand_dir) / "edited", edited, symlinks=True)
     notes, saved = Path(work_dir) / "notes.md", Path(cand_dir) / "notes.md"
     if saved.exists():
         shutil.copyfile(saved, notes)
-    elif notes.exists():
+    elif notes.exists() or notes.is_symlink():
         notes.unlink()
 
 
 def _save_candidate(work_dir: Path, cand_dir: Path, answer: str = "") -> None:
     cand_dir.mkdir(parents=True)
-    shutil.copytree(Path(work_dir) / "edited", cand_dir / "edited")
+    shutil.copytree(Path(work_dir) / "edited", cand_dir / "edited", symlinks=True)  # a linked edit stays a link, and the checks refuse it
     notes = Path(work_dir) / "notes.md"
-    if notes.exists():
+    if plain_file(notes):
         shutil.copyfile(notes, cand_dir / "notes.md")
     (cand_dir / "answer.md").write_text(answer)
 
@@ -185,8 +185,7 @@ class _Search:
         n = self.round
         feedback = reflective_dataset["edit"][0]["feedback"]
         restore_candidate(self.cands / parent, self.work_dir)
-        notes_path = self.work_dir / "notes.md"
-        notes = notes_path.read_text()[:20_000] if notes_path.exists() else ""
+        notes = read_notes(self.work_dir)
         b = Budget(max_passes=min(self.s.passes_per_proposal, self.budget.passes_left),
                    max_code_runs=min(self.s.code_runs_per_proposal, self.budget.code_runs_left))
         opening = (

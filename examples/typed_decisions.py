@@ -27,7 +27,6 @@ import argparse
 import json
 import logging
 import math
-import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -252,7 +251,6 @@ def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout
         task_description=task,
         holdout=holdout,
         holdout_key=lambda ex: ex.workflow,
-        sandbox="none" if sys.platform == "darwin" else "auto",  # bubblewrap is Linux-only
         run_dir=run_dir,
         resume=True,
         search=search,

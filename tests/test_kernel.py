@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from dspy_wsp.edits import DEFAULT_PROTECTED
-from dspy_wsp.kernel import Kernel, KernelError
+from dspy_wsp.kernel import Kernel, KernelError, find_sandbox
 from dspy_wsp.tensors import TensorReader
 
 L0 = "model.layers.0.mlp.down_proj.weight"
@@ -69,9 +69,18 @@ def test_output_is_cut(kernel):
     assert "output cut" in kernel.run("print('x' * 5000)")
 
 
-def test_auto_sandbox_needs_bwrap(weights_dir, tmp_path, monkeypatch):
-    import shutil
+def has_sandbox() -> bool:
+    try:
+        return find_sandbox("auto") is not None
+    except KernelError:
+        return False
 
+
+def test_auto_sandbox_needs_bwrap_on_linux(weights_dir, tmp_path, monkeypatch):
+    import shutil
+    import sys
+
+    monkeypatch.setattr(sys, "platform", "linux")
     monkeypatch.setattr(shutil, "which", lambda name: None)
     work = tmp_path / "w3" / "work"
     work.mkdir(parents=True)
@@ -80,23 +89,90 @@ def test_auto_sandbox_needs_bwrap(weights_dir, tmp_path, monkeypatch):
         k.start()
 
 
-@pytest.mark.skipif(__import__("shutil").which("bwrap") is None, reason="bubblewrap not installed")
-def test_bwrap_sandbox_blocks_network_and_outside_writes(weights_dir, tmp_path):
+def test_optimizer_refuses_a_missing_sandbox_at_construction(monkeypatch):
+    import shutil
+    import sys
+
+    from dspy_wsp import WeightSpace
+
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    with pytest.raises(KernelError, match="bubblewrap"):
+        WeightSpace(metric=lambda *a: 1.0, writer_lm=None, backend=object(), sandbox="auto")
+    with pytest.raises(ValueError, match="sandbox must be"):
+        WeightSpace(metric=lambda *a: 1.0, writer_lm=None, backend=object(), sandbox="docker")
+    monkeypatch.setattr(sys, "platform", "win32")
+    with pytest.raises(KernelError, match="no sandbox for win32"):
+        WeightSpace(metric=lambda *a: 1.0, writer_lm=None, backend=object(), sandbox="auto")
+
+
+def test_allowlist_keeps_parents_first_and_refuses_home(tmp_path):
+    from pathlib import Path
+
+    from dspy_wsp.kernel import _allowlist
+
+    (tmp_path / "a" / "b").mkdir(parents=True)
+    real = str(tmp_path.resolve())
+    assert [r for r, _ in _allowlist([tmp_path / "a" / "b", tmp_path / "a", tmp_path / "missing"])] == [f"{real}/a"]
+    assert _allowlist([tmp_path / "a"], covered=[real]) == []
+    with pytest.raises(KernelError, match="will not expose"):
+        _allowlist([Path.home()])
+
+
+TRY = "try:\n    {}\n    print('OPEN')\nexcept OSError as e:\n    print('BLOCKED', type(e).__name__)"
+
+
+@pytest.mark.skipif(not has_sandbox(), reason="no sandbox on this machine")
+def test_sandbox_reads_an_allowlist_and_has_no_network(weights_dir, tmp_path):
+    from pathlib import Path
+
     work = tmp_path / "sb" / "work"
     work.mkdir(parents=True)
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOPSECRET")
     outside = tmp_path / "outside.txt"
     k = Kernel(work_dir=work, model_dir=weights_dir, tensor_index=TensorReader(weights_dir).index,
-               protected=DEFAULT_PROTECTED, sandbox="auto", timeout=30)
+               protected=DEFAULT_PROTECTED, sandbox="auto", timeout=60)
     k.start()
     try:
-        net = k.run("import socket\ntry:\n    socket.create_connection(('1.1.1.1', 80), timeout=3); print('NET OPEN')\nexcept OSError as e:\n    print('NET BLOCKED', type(e).__name__)")
-        assert "NET BLOCKED" in net
-        k.run(f"open({str(outside)!r}, 'w').write('x')")  # lands in the sandbox's throwaway /tmp
-        assert not outside.exists()
-        probe = __import__("pathlib").Path(__file__).with_name("sandbox_probe.txt")
-        out = k.run(f"open({str(probe)!r}, 'w').write('x')")
-        assert "Read-only file system" in out and not probe.exists()
         assert "saved edit" in k.run(f"w = load('{L0}'); w[0, 0] += 1; save_edit('{L0}', w)")
         assert (work / "edited" / f"{L0}.npy").exists()
+        assert "tmp ok" in k.run("import tempfile; f = tempfile.NamedTemporaryFile(); f.write(b'x'); print('tmp ok')")
+        assert "BLOCKED" in k.run(TRY.format("import socket; socket.create_connection(('1.1.1.1', 80), timeout=3)"))
+        for probe in (f"open({str(secret)!r}).read()", f"os.listdir({str(Path.home())!r})", f"open({str(Path.home() / '.profile')!r}).read()"):
+            out = k.run(TRY.format(probe))
+            assert "BLOCKED" in out and "TOPSECRET" not in out, probe
+        k.run(TRY.format(f"open({str(outside)!r}, 'w').write('x')"))  # refused, or it lands in the sandbox's own /tmp
+        assert not outside.exists()
+        # A link made inside the sandbox cannot read the file for the kernel, and the host refuses to follow it.
+        out = k.run(f"os.symlink({str(secret)!r}, os.path.join(WORK, 'notes.md'))\n" + TRY.format("print(open(os.path.join(WORK, 'notes.md')).read())"))
+        assert "BLOCKED" in out and "TOPSECRET" not in out
     finally:
         k.close()
+    from dspy_wsp.edits import read_notes
+
+    assert "TOPSECRET" not in read_notes(work) and "link" in read_notes(work)
+
+
+def test_host_refuses_links_in_the_work_folder(weights_dir, tmp_path):
+    import os
+
+    from dspy_wsp.edits import EditError, EditStore, read_notes
+
+    work = tmp_path / "work"
+    store = EditStore(work / "edited", TensorReader(weights_dir))
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOPSECRET")
+    assert read_notes(work) == ""
+    (work / "notes.md").write_text("my notes")
+    assert read_notes(work) == "my notes"
+    os.link(secret, work / "hard.md")
+    (work / "notes.md").unlink()
+    os.rename(work / "hard.md", work / "notes.md")
+    assert "TOPSECRET" not in read_notes(work)
+
+    np.save(tmp_path / "elsewhere.npy", np.zeros((4, 8), np.float32))
+    os.symlink(tmp_path / "elsewhere.npy", work / "edited" / f"{L0}.npy")
+    with pytest.raises(EditError, match="link"):
+        store.load_all()
+    assert "INVALID" in store.describe()

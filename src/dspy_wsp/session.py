@@ -18,6 +18,7 @@ from pathlib import Path
 from dspy_wsp import prompts
 from dspy_wsp.blocks import parse_reply
 from dspy_wsp.budget import Budget
+from dspy_wsp.edits import read_notes
 
 logger = logging.getLogger(__name__)
 
@@ -154,9 +155,7 @@ class Session:
             total[k] = round(total[k] + v, 6) if k == "usd" else total[k] + v
 
     def _handoff(self, kernel_restarted: bool) -> str:
-        notes_path = self.work_dir / "notes.md"
-        notes = notes_path.read_text()[:20_000] if notes_path.exists() else ""
-        return prompts.handoff(self.task_prompt, notes, self.edit_store.describe(), self.budget.status(), kernel_restarted)
+        return prompts.handoff(self.task_prompt, read_notes(self.work_dir), self.edit_store.describe(), self.budget.status(), kernel_restarted)
 
     # --- the loop -------------------------------------------------------------------
     def run(self, resume: bool = False) -> str:

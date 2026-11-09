@@ -1,4 +1,3 @@
-import itertools
 from pathlib import Path
 
 import dspy
@@ -8,7 +7,7 @@ import torch
 from dspy.lm15 import Message, Response, TextPart, Usage, response_to_events
 from safetensors.torch import save_file
 
-from dspy_wsp.backends.base import LMCall, WeightBackend
+from dspy_wsp.backends.base import GenerativeBackend, LMCall
 
 TENSORS = {
     "model.embed_tokens.weight": (10, 4),
@@ -29,7 +28,7 @@ def weights_dir(tmp_path) -> Path:
     return d
 
 
-class FakeBackend(WeightBackend):
+class FakeBackend(GenerativeBackend):
     """Answers "4" when any edit is applied and "5" otherwise, so edits visibly matter."""
 
     def __init__(self, weights_dir):
@@ -56,6 +55,9 @@ class FakeBackend(WeightBackend):
 
     def seed(self, seed):
         pass
+
+    def generate(self, prompt, **kw):
+        raise NotImplementedError("FakeEngine answers without the backend")
 
     def render_chat(self, messages, *, add_generation_prompt=False, **kw):
         return "\n".join(f"{m['role']}: {m['content']}" for m in messages)

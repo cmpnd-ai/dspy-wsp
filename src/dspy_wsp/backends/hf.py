@@ -14,14 +14,14 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from dspy_wsp.backends.base import LOADED_BACKENDS, BackendEngine, LMCall, WeightBackend
+from dspy_wsp.backends.base import LOADED_BACKENDS, BackendEngine, GenerativeBackend, LMCall
 from dspy_wsp.tensors import TensorReader
 
 _ALLOW = ["*.safetensors", "*.json", "*.txt", "*.model", "*.jinja", "*.tiktoken", "tokenizer*", "merges*", "vocab*"]
 _BLOCK = re.compile(r"(?:^|\.)(?:layers|h|blocks)\.(\d+)\.(.+)$")
 
 
-class HFBackend(WeightBackend):
+class HFBackend(GenerativeBackend):
     """Run the student model with transformers, in this process.
 
     Args:
@@ -66,7 +66,6 @@ class HFBackend(WeightBackend):
             "chat_template_kwargs": chat_template_kwargs, "split_thinking": split_thinking, "generation_kwargs": generation_kwargs,
             "attn_implementation": attn_implementation, "mlp_module": mlp_module, "trust_remote_code": trust_remote_code,
         }
-        self.patch_dir: str | None = None  # set by WeightSpace.compile; saved with the program
 
         path = Path(model)
         if path.is_dir():

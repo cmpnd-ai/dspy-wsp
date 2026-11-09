@@ -69,7 +69,7 @@ class DecisionTypeSafe(TypeSafe, BaseLM):
         return {
             LM_CLASS_STATE_KEY: f"{type(self).__module__}.{type(self).__qualname__}",
             "backend_class": f"{type(b).__module__}.{type(b).__qualname__}",
-            "backend": b._init_kwargs,
+            "backend": b.init_kwargs(),
             "patch": b.patch_dir,
         }
 

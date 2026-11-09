@@ -13,7 +13,8 @@ authors = [{ name = "Drew Breunig", email = "dbreunig@gmail.com" }]
 keywords = ["dspy", "llm", "optimizer", "interpretability", "weight editing"]
 dependencies = [
     "dspy[typesafe]>=3.4,<3.5",
-    "typesafe-sdk==0.7.5",
+    "typesafe-sdk>=0.7.5,<0.8",
+    "gepa>=0.1.4",
     "numpy>=1.26",
     "safetensors>=0.4",
     "tokenizers>=0.20",
@@ -31,7 +32,7 @@ Issues = "https://github.com/cmpnd-ai/dspy-wsp/issues"
 [project.optional-dependencies]
 vllm = ["vllm>=0.32"]
 examples = ["datasets>=2.14", "math-verify>=0.7"]
-dev = ["pytest>=8", "requests>=2.31"]
+dev = ["pytest>=8", "requests>=2.31", "ruff>=0.11"]
 
 [project.scripts]
 dspy-wsp = "dspy_wsp.cli:main"
@@ -42,3 +43,15 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 200
+target-version = "py310"
+extend-exclude = ["examples/runs", "results"]
+
+[tool.ruff.lint]
+ignore = ["E741"]
+
+[tool.ruff.lint.per-file-ignores]
+# Choice["stop", "continue"] subscripts read as forward annotations.
+"tests/*" = ["F722", "F821"]

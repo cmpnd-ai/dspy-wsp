@@ -29,14 +29,14 @@ from pathlib import Path
 
 import numpy as np
 
-from dspy_wsp.backends.base import BackendEngine, LMCall, WeightBackend
+from dspy_wsp.backends.base import BackendEngine, GenerativeBackend, LMCall
 from dspy_wsp.tensors import TensorReader
 
 _ALLOW = ["*.safetensors", "*.json", "*.txt", "*.model", "*.jinja", "*.tiktoken", "tokenizer*", "merges*", "vocab*"]
 _EXTENSION = "dspy_wsp.backends._vllm_worker.WeightSwapExtension"
 
 
-class VLLMBackend(WeightBackend):
+class VLLMBackend(GenerativeBackend):
     """Run the student model with vLLM on NVIDIA GPUs, batching concurrent LM calls.
 
     Args:
@@ -83,7 +83,6 @@ class VLLMBackend(WeightBackend):
             "gpu_memory_utilization": gpu_memory_utilization, "max_model_len": max_model_len,
             "batch_invariant": batch_invariant, "engine_kwargs": engine_kwargs, "hf_kwargs": hf_kwargs,
         }
-        self.patch_dir: str | None = None  # set by WeightSpace.compile; saved with the program
 
         path = Path(model)
         if path.is_dir():

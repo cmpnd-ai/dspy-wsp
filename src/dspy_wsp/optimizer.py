@@ -15,9 +15,9 @@ from dspy.teleprompt.teleprompt import Teleprompter
 from dspy_wsp import prompts
 from dspy_wsp.backends.base import WeightBackend
 from dspy_wsp.budget import Budget
-from dspy_wsp.edits import DEFAULT_PROTECTED, EditStore, is_protected
+from dspy_wsp.edits import EditStore, is_protected
 from dspy_wsp.forward import ForwardTool, Limits, _jsonable, copy_program
-from dspy_wsp.kernel import Kernel
+from dspy_wsp.kernel import Kernel, find_sandbox
 from dspy_wsp.patch import Patch
 from dspy_wsp.search import GEPASearch, run_gepa
 from dspy_wsp.session import Session
@@ -40,7 +40,8 @@ class WeightSpace(Teleprompter):
             or dspy.Prediction(score=..., feedback=...). Feedback is shown to the writer.
         writer_lm: the dspy.LM that reads and edits the weights. The paper used a frontier
             model at maximum reasoning effort.
-        backend: a WeightBackend that owns the student model's weights (e.g. HFBackend).
+        backend: the WeightBackend that owns the student model's weights: a decision backend from
+            load_decision_backend, or a GenerativeBackend such as VLLMBackend.
         max_passes: forward-pass budget (the paper: 10, 25 or 50).
         max_code_runs: Python runs allowed in the writer's kernel (the paper: 300).
         task_description: optional sentence of context for the writer.
@@ -54,8 +55,11 @@ class WeightSpace(Teleprompter):
             The writer can score edits on them but sees only aggregate results; supported
             for decision backends.
         holdout_key: groups for a stratified holdout, e.g. lambda ex: ex.workflow.
-        sandbox: "auto" isolates the writer's code with bubblewrap (required);
-            "none" runs it with your permissions and network.
+        sandbox: "auto" isolates the writer's code, with bubblewrap on Linux and sandbox-exec on macOS.
+            The kernel then reads only the Python runtime, this package and the model's files, writes
+            only its work folder, and has no network. "none" runs it with your permissions and network.
+        sandbox_readonly: more folders the sandboxed kernel may read, for a Python install whose
+            libraries live outside its own prefix (e.g. /nix/store).
         kernel_timeout, kernel_memory_bytes, kernel_threads: limits for each Python run.
         handoff_every: restart the writer's conversation every N turns.
         require_explanations: send back blocks that come without a plain-English explanation.
@@ -87,6 +91,7 @@ class WeightSpace(Teleprompter):
         limits: Limits | None = None,
         protected: tuple[str, ...] | None = None,
         sandbox: str = "auto",
+        sandbox_readonly: tuple[str | Path, ...] = (),
         kernel_timeout: float = 900,
         kernel_memory_bytes: int | None = None,
         kernel_threads: int | None = None,
@@ -104,6 +109,7 @@ class WeightSpace(Teleprompter):
         simulate_head: bool = True,
     ):
         super().__init__()
+        find_sandbox(sandbox)  # fail here, before the run loads anything
         self.metric = metric
         self.writer_lm = writer_lm
         self.backend = backend
@@ -112,16 +118,14 @@ class WeightSpace(Teleprompter):
         self.task_description = task_description
         self.run_dir = Path(run_dir) if run_dir else None
         self.limits = limits or Limits()
-        if protected is None:
-            default = getattr(backend, "default_protected", None)
-            protected = default() if callable(default) else DEFAULT_PROTECTED
-        self.protected = tuple(protected)
+        self.protected = tuple(backend.default_protected() if protected is None else protected)
         self.holdout = holdout
         self.holdout_key = holdout_key
-        self.decision = getattr(backend, "kind", "llm") == "decision"
+        self.decision = backend.kind == "decision"
         if holdout and not self.decision:
             raise ValueError("holdout is supported for decision backends only")
         self.sandbox = sandbox
+        self.sandbox_readonly = tuple(sandbox_readonly)
         self.kernel_timeout = kernel_timeout
         self.kernel_memory_bytes = kernel_memory_bytes
         self.kernel_threads = kernel_threads
@@ -203,8 +207,8 @@ class WeightSpace(Teleprompter):
             task_description=self.task_description,
             program_description=prompts.describe_program(program),
             metric_description=prompts.describe_metric(self.metric),
-            sampling=self._sampling(),
-            protected_description=getattr(self.backend, "protected_description", None)
+            sampling=self.backend.describe_sampling(),
+            protected_description=self.backend.protected_description
             or "the tensors marked (out of scope) below (the input embedding, the output layer and the final norm)",
             kernel_environment="no internet, no GPU" if self.sandbox != "none" else "no GPU",
             model_dir=str(Path(self.backend.weights_dir).resolve()),
@@ -228,8 +232,9 @@ class WeightSpace(Teleprompter):
         kernel = Kernel(
             work_dir=work, model_dir=self.backend.weights_dir, tensor_index=reader.index, protected=protected,
             practice_dir=practice_dir, timeout=self.kernel_timeout, max_output=self.max_output,
-            tokenizer_dir=getattr(self.backend, "tokenizer_dir", None) if self.decision else None,
+            tokenizer_dir=self.backend.tokenizer_dir,
             memory_bytes=self.kernel_memory_bytes, sandbox=self.sandbox, threads=self.kernel_threads,
+            readonly=self.sandbox_readonly,
         )
         search_report = None
         if self.search is not None:
@@ -280,7 +285,7 @@ class WeightSpace(Teleprompter):
             reader, edits,
             meta={
                 "base_model": self.backend.model_id,
-                "revision": getattr(self.backend, "revision", None),
+                "revision": self.backend.revision,
                 "writer": getattr(self.writer_lm, "model", str(self.writer_lm)),
                 "budget": budget.to_dict(),
                 "run_dir": str(run_dir),
@@ -292,8 +297,7 @@ class WeightSpace(Teleprompter):
         (run_dir / "report.json").write_text(json.dumps(report, indent=1, default=str))
 
         self.backend.set_weights(edits)
-        if hasattr(self.backend, "patch_dir"):
-            self.backend.patch_dir = str(run_dir / "patch") if edits else None
+        self.backend.patch_dir = str(run_dir / "patch") if edits else None
         program._compiled = True
         program.wsp_patch = patch
         program.wsp_report = report
@@ -323,15 +327,3 @@ class WeightSpace(Teleprompter):
             chosen += ids[: take[key]]
         validation = {pid: practice.pop(pid) for pid in sorted(chosen)}
         return validation
-
-    def _sampling(self) -> str:
-        b = self.backend
-        parts = []
-        for attr, label in (("temperature", "temperature"), ("top_p", "top_p"), ("top_k", "top_k"), ("max_tokens", "at most {} new tokens per LM call")):
-            v = getattr(b, attr, None)
-            if v is not None:
-                parts.append(label.format(v) if "{}" in label else f"{label} {v}")
-        ctk = getattr(b, "chat_template_kwargs", None)
-        if ctk:
-            parts.append(f"chat template options {ctk}")
-        return ", ".join(parts) or "the backend's defaults"

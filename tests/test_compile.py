@@ -113,3 +113,16 @@ def test_each_turn_records_the_writers_usage(backend, trainset, tmp_path):
     total = json.loads((run / "state.json").read_text())["writer_usage"]
     assert total["calls"] == 4
     assert total["tokens_in"] == sum(t["tokens_in"] for t in turns)
+
+
+def test_compile_runs_the_writer_in_the_sandbox(backend, trainset, tmp_path):
+    from dspy_wsp.kernel import KernelError, find_sandbox
+
+    try:
+        find_sandbox("auto")
+    except KernelError:
+        pytest.skip("no sandbox on this machine")
+    opt, _ = make(backend, tmp_path, [EXPLORE, EDIT, MEASURE, FINAL], sandbox="auto")
+    compiled = opt.compile(dspy.Predict("question -> answer"), trainset=trainset)
+    assert compiled.wsp_patch.names == [L0]
+    assert "no internet" in (tmp_path / "run" / "task_prompt.txt").read_text()

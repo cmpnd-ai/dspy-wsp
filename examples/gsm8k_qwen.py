@@ -1,7 +1,7 @@
 """Edit Qwen3.5-0.8B's weights to improve a DSPy GSM8K program.
 
 A scaled-down version of the paper's Experiment 8. Needs a GPU for the student
-model, bubblewrap for the sandbox, and an API key for the writer.
+model, a sandbox (bubblewrap on Linux, built in on macOS), and an API key for the writer.
 
     pip install -e ".[examples]"
     python examples/gsm8k_qwen.py

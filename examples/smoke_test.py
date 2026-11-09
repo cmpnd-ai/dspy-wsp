@@ -42,7 +42,6 @@ optimizer = WeightSpace(
     max_code_runs=20,
     limits=Limits(max_generations=8, max_generations_both=8),
     task_description="The program answers grade-school math word problems; the answer field must be the final number.",
-    sandbox="none",  # bubblewrap is Linux-only; the writer's code runs with your permissions
     kernel_timeout=120,
     run_dir=RUN_DIR,
     resume=True,

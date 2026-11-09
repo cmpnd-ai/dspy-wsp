@@ -9,8 +9,6 @@ Imports are lazy so the writer's kernel can import `dspy_wsp.edits` without
 loading DSPy.
 """
 
-__version__ = "0.1.0"
-
 _EXPORTS = {
     "WeightSpace": "dspy_wsp.optimizer",
     "GEPASearch": "dspy_wsp.search",
@@ -23,6 +21,8 @@ _EXPORTS = {
     "load_decision_backend": "dspy_wsp.decision.loading",
     "check_decision_model": "dspy_wsp.decision.loading",
     "WeightBackend": "dspy_wsp.backends.base",
+    "GenerativeBackend": "dspy_wsp.backends.base",
+    "DecisionBackend": "dspy_wsp.backends.decision",
     "Patch": "dspy_wsp.patch",
     "Limits": "dspy_wsp.forward",
     "Budget": "dspy_wsp.budget",
@@ -33,6 +33,13 @@ __all__ = sorted(_EXPORTS)
 
 
 def __getattr__(name):
+    if name == "__version__":
+        from importlib.metadata import PackageNotFoundError, version
+
+        try:
+            return version("dspy-wsp")
+        except PackageNotFoundError:  # a source tree that was never installed
+            return "0+unknown"
     if name in _EXPORTS:
         import importlib
 
