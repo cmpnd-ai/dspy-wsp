@@ -17,7 +17,7 @@ import threading
 from collections.abc import Mapping, Sequence
 from concurrent.futures import Future
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 
@@ -32,7 +32,7 @@ MLX_CACHE_LIMIT = 1 << 30  # bytes of freed MLX buffers kept for reuse
 class DecisionBackend(WeightBackend):
     """Shared machinery; a subclass supplies the model family's encoding and network."""
 
-    kind = "decision"
+    kind: ClassVar[str] = "decision"
     concurrency = 16
     family = ""
     download_patterns: list[str] = []
@@ -40,7 +40,6 @@ class DecisionBackend(WeightBackend):
     def __init__(self, model: str, *, revision: str | None, framework: str | None = None, device: str | None = None, max_length: int | None = None):
         super().__init__()
         self._init_kwargs = {"model": model, "revision": revision, "framework": framework, "device": device, "max_length": max_length}
-        self.patch_dir: str | None = None
         path = Path(model)
         if path.is_dir():
             self._dir = path.resolve()
@@ -310,15 +309,6 @@ class DecisionBackend(WeightBackend):
     @property
     def tokenizer_dir(self) -> Path:
         return self._dir
-
-    def render_chat(self, messages, *, add_generation_prompt=False, **kw) -> str:
-        raise NotImplementedError("decision models answer typed questions; they have no chat template")
-
-    def teacher_forced(self, texts, **kw):
-        raise NotImplementedError("decision models have no text reads; use read()")
-
-    def pooled_activations(self, pairs, **kw):
-        raise NotImplementedError("decision models have no text reads; use read()")
 
     def lm(self, cache: bool = False):
         """DSPy's TypeSafe client for this backend. With cache=True, identical requests on the same weights reuse answers."""

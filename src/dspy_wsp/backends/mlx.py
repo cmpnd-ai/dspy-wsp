@@ -25,7 +25,7 @@ from pathlib import Path
 
 import numpy as np
 
-from dspy_wsp.backends.base import BackendEngine, LMCall, WeightBackend
+from dspy_wsp.backends.base import BackendEngine, GenerativeBackend, LMCall
 from dspy_wsp.tensors import TensorReader
 
 _ALLOW = ["*.safetensors", "*.json", "*.txt", "*.model", "*.jinja", "*.tiktoken", "tokenizer*", "merges*", "vocab*"]
@@ -106,7 +106,7 @@ class _PresencePenalty:
         return logits - self.mask
 
 
-class MLXBackend(WeightBackend):
+class MLXBackend(GenerativeBackend):
     """Run the student model with mlx-lm on Apple silicon, batching concurrent LM calls.
 
     Args:
@@ -143,7 +143,6 @@ class MLXBackend(WeightBackend):
             "chat_template_kwargs": chat_template_kwargs, "split_thinking": split_thinking,
             "prefill_batch_size": prefill_batch_size,
         }
-        self.patch_dir: str | None = None  # set by WeightSpace.compile; saved with the program
 
         path = Path(model)
         if path.is_dir():

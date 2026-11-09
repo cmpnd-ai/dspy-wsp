@@ -8,3 +8,6 @@ runs/
 .env
 docs/superpowers/
 .superpowers/
+.DS_Store
+.venv/
+.ruff_cache/

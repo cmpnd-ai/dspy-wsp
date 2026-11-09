@@ -1,3 +1,3 @@
-from dspy_wsp.backends.base import LMCall, WeightBackend
+from dspy_wsp.backends.base import GenerativeBackend, LMCall, WeightBackend
 
-__all__ = ["LMCall", "WeightBackend"]
+__all__ = ["GenerativeBackend", "LMCall", "WeightBackend"]

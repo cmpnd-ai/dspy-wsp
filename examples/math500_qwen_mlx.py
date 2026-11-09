@@ -155,7 +155,6 @@ def main() -> None:
         max_passes=MAX_PASSES,
         limits=Limits(max_generations=128, max_generations_both=64),  # smaller passes than the paper's 512 / 256
         task_description="The program solves competition math problems; the answer field holds the final answer in \\boxed{}.",
-        sandbox="none",  # bubblewrap is Linux-only; the writer's code runs with your permissions
         run_dir=RUN_DIR,
         resume=True,
     )

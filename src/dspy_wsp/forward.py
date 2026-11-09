@@ -26,7 +26,7 @@ from pathlib import Path
 import numpy as np
 
 from dspy_wsp import stats
-from dspy_wsp.edits import EditError, EditStore
+from dspy_wsp.edits import EditError, EditStore, plain_file
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ class ForwardTool:
         self.input_keys = sorted(first.inputs().keys()) if first is not None else []
         self._metric_arity = self._arity(metric)
         self.layers = backend.dims().get("layers")
-        self.decision = getattr(backend, "kind", "llm") == "decision"
+        self.decision = backend.kind == "decision"
         self.validation = dict(validation or {})
         self.validation_log: list[dict] = []
         self.allow_validation = True  # a population search turns this off: it scores candidates on validation itself
@@ -332,7 +332,7 @@ class ForwardTool:
             raise RequestError('"from" must be {"pass": <k>, "ids": [...], "model": "original" or "edited" (for a "both" pass)}')
         k, which = src["pass"], src.get("model")
         path = self.work_dir / (f"gen_{k}_{which}.jsonl" if which else f"gen_{k}.jsonl")
-        if not path.exists():
+        if not plain_file(path):
             raise RequestError(f"no records for pass {k}" + ("" if which else ' (a "both" pass needs "model")') + "; validation runs keep no records")
         wanted = src.get("ids")
         rows = [json.loads(line) for line in path.open()]
@@ -355,7 +355,7 @@ class ForwardTool:
         their LM calls together. Each run's seed depends only on its item and sample.
         """
         jobs = [(item_id, ex, j) for item_id, ex in items for j in range(n)]
-        workers = max(1, int(getattr(self.backend, "concurrency", 1) or 1))
+        workers = max(1, int(self.backend.concurrency or 1))
         if workers == 1 or len(jobs) <= 1:
             return [self._run_one(program, *job, which) for job in jobs]
         from concurrent.futures import ThreadPoolExecutor

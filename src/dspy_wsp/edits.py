@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import re
+import stat
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -64,6 +65,29 @@ def check_edit(name: str, new: np.ndarray, original: np.ndarray, protected: Iter
     }
 
 
+def plain_file(path: str | Path) -> bool:
+    """Whether `path` is a regular file with one name.
+
+    The writer owns the work folder, and the host reads files there outside the
+    sandbox. A symlink or a hard link could point the host at any other file.
+    """
+    try:
+        st = os.lstat(path)
+    except OSError:
+        return False
+    return stat.S_ISREG(st.st_mode) and st.st_nlink == 1
+
+
+def read_notes(work_dir: str | Path, limit: int = 20_000) -> str:
+    """The writer's notebook, or a refusal if it is not a plain file."""
+    path = Path(work_dir) / "notes.md"
+    if not os.path.lexists(path):
+        return ""
+    if not plain_file(path):
+        return "(notes.md is a link, not a file, so it was not read; write your notes into the file itself)"
+    return path.read_text(errors="replace")[:limit]
+
+
 def edit_path(edit_dir: str | Path, name: str) -> Path:
     return Path(edit_dir) / f"{name}.npy"
 
@@ -89,7 +113,15 @@ class EditStore:
         self.protected = tuple(protected)
 
     def names(self) -> list[str]:
+        if self.dir.is_symlink():
+            raise EditError(f"{self.dir} is a link, not a folder; edits must be files in the edit folder itself")
         return sorted(p.name[: -len(".npy")] for p in self.dir.glob("*.npy"))
+
+    def _load(self, name: str) -> np.ndarray:
+        path = edit_path(self.dir, name)
+        if not plain_file(path):
+            raise EditError(f"{name}.npy is a link, not a file; save edits with save_edit")
+        return np.load(path)
 
     def load_all(self) -> dict[str, np.ndarray]:
         """Every current edit, checked against the rules. Raises EditError on the first bad one."""
@@ -97,19 +129,22 @@ class EditStore:
         for name in self.names():
             if name not in self.reader:
                 raise EditError(f"{name}.npy in the edit folder does not name a tensor of the model")
-            arr = np.load(edit_path(self.dir, name))
+            arr = self._load(name)
             check_edit(name, arr, self.reader.get_f32(name), self.protected)
             edits[name] = arr.astype(np.float32, copy=False)
         return edits
 
     def describe(self) -> str:
-        names = self.names()
+        try:
+            names = self.names()
+        except EditError as e:
+            return f"INVALID ({e})"
         if not names:
             return "no edits (the model is unchanged)"
         lines = []
         for name in names:
-            arr = np.load(edit_path(self.dir, name))
             try:
+                arr = self._load(name)
                 s = check_edit(name, arr, self.reader.get_f32(name), self.protected)
                 lines.append(f"{name}: {s['changed_entries']:,} of {s['total_entries']:,} entries changed, relative change {s['relative_change']:.4f}")
             except EditError as e:

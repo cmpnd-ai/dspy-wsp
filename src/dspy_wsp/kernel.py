@@ -2,8 +2,11 @@
 
 The paper ran the writer's code under bubblewrap with no network, a read-write
 work folder and a time limit per run. `sandbox="auto"` (the default) does the
-same when `bwrap` is installed and refuses to start otherwise; pass
-`sandbox="none"` to run the writer's code with your own permissions.
+same with bubblewrap on Linux and with `sandbox-exec` on macOS, and it refuses
+to start when neither is there. The sandbox is an allowlist: the kernel reads
+the Python runtime, this package and the model's files, writes the work folder
+and a scratch folder, and has no network. Pass `sandbox="none"` to run the
+writer's code with your own permissions.
 """
 
 from __future__ import annotations
@@ -16,35 +19,155 @@ import shutil
 import signal
 import subprocess
 import sys
+import sysconfig
+import tempfile
 import threading
 import time
+from collections.abc import Iterable
 from pathlib import Path
 
 from dspy_wsp._kernel_main import MARK
 
 logger = logging.getLogger(__name__)
 
+SANDBOX_EXEC = "/usr/bin/sandbox-exec"
+# System folders a Linux process needs: the dynamic loader and shared libraries.
+LINUX_SYSTEM = ("/usr", "/bin", "/sbin", "/lib", "/lib32", "/lib64", "/libx32")
+LINUX_SYSTEM_FILES = ("/etc/ld.so.cache", "/etc/alternatives")
+# System folders a macOS process needs: dyld, the system frameworks and Homebrew's libraries.
+MACOS_SYSTEM = ("/usr", "/bin", "/sbin", "/System", "/Library/Apple", "/opt/homebrew", "/private/var/db/dyld",
+                "/private/var/db/timezone", "/private/etc/localtime", "/dev")
+
+SEATBELT_PROFILE = """(version 1)
+(deny default)
+(allow process-fork)
+(allow process-exec)
+(allow signal (target same-sandbox))
+(allow sysctl-read)
+(allow file-read-metadata)
+(allow file-read-data (literal "/"))
+(allow file-write-data (literal "/dev/null") (literal "/dev/dtracehelper"))
+(allow file-ioctl (literal "/dev/null") (literal "/dev/dtracehelper"))
+"""
+
 
 class KernelError(RuntimeError):
     pass
 
 
-def sandbox_prefix(mode: str, writable: list[Path], readonly: list[Path] = ()) -> list[str]:
+def find_sandbox(mode: str) -> tuple[str, str] | None:
+    """The sandbox for sandbox='auto' as (kind, program), or None for sandbox='none'. Raises if none is available."""
+    if mode not in ("auto", "none"):
+        raise ValueError("sandbox must be 'auto' or 'none'")
     if mode == "none":
-        return []
-    bwrap = shutil.which("bwrap")
-    if bwrap is None:
-        raise KernelError(
-            "sandbox='auto' needs bubblewrap (`bwrap`) to isolate the writer's code. Install it "
-            "(apt install bubblewrap), or pass sandbox='none' to run the writer's code with your own permissions and network."
-        )
-    cmd = [bwrap, "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--tmpfs", "/tmp"]
-    # /tmp is replaced by an empty tmpfs: bind back what the kernel must read, read-only.
-    for r in readonly:
-        cmd += ["--ro-bind", str(r), str(r)]
-    for w in writable:
-        cmd += ["--bind", str(w), str(w)]
+        return None
+    none = "pass sandbox='none' to run the writer's code with your own permissions and network"
+    if sys.platform == "darwin":
+        if os.access(SANDBOX_EXEC, os.X_OK):
+            return "seatbelt", SANDBOX_EXEC
+        raise KernelError(f"sandbox='auto' needs {SANDBOX_EXEC} to isolate the writer's code, and it is missing. Or {none}.")
+    bwrap = shutil.which("bwrap") if sys.platform.startswith("linux") else None
+    if bwrap is not None:
+        return "bwrap", bwrap
+    if sys.platform.startswith("linux"):
+        raise KernelError(f"sandbox='auto' needs bubblewrap (`bwrap`) to isolate the writer's code. Install it (apt install bubblewrap), or {none}.")
+    raise KernelError(f"sandbox='auto' has no sandbox for {sys.platform}: it uses bubblewrap on Linux and sandbox-exec on macOS. On this platform, {none}.")
+
+
+def _inside(path: str, folder: str) -> bool:
+    return path == folder or path.startswith(folder.rstrip("/") + "/")
+
+
+def runtime_paths(python: str | None = None) -> list[str]:
+    """What a Python process must read to start: the interpreter, its standard library and its installed packages."""
+    paths = [sys.prefix, sys.base_prefix, sys.exec_prefix, sys.base_exec_prefix, os.path.realpath(python or sys.executable)]
+    paths += [v for k, v in sysconfig.get_paths().items() if k in ("stdlib", "platstdlib", "purelib", "platlib")]
+    return paths
+
+
+def link_targets(folder: str | Path) -> list[str]:
+    """Files outside `folder` that its symlinks point to (a Hugging Face snapshot links to its blobs)."""
+    root = os.path.realpath(folder)
+    out = set()
+    for dirpath, dirnames, filenames in os.walk(folder):
+        for name in dirnames + filenames:
+            path = os.path.join(dirpath, name)
+            if os.path.islink(path):
+                target = os.path.realpath(path)
+                if os.path.exists(target) and not _inside(target, root):
+                    out.add(target)
+    return sorted(out)
+
+
+def _allowlist(paths: Iterable[str | Path], covered: Iterable[str] = ()) -> list[tuple[str, str]]:
+    """(real path, path as given) for every existing path, parents first, without paths inside another."""
+    pairs = {}
+    for p in paths:
+        given = os.path.abspath(str(p))
+        if os.path.exists(given):
+            pairs.setdefault(os.path.realpath(given), given)
+    for real in pairs:
+        if real == "/" or real == os.path.realpath(Path.home()):
+            raise KernelError(f"the sandbox will not expose {real}; give narrower folders")
+    out = []
+    for real in sorted(pairs, key=lambda r: (r.count("/"), r)):
+        if not any(_inside(real, c) for c in list(covered) + [r for r, _ in out]):
+            out.append((real, pairs[real]))
+    return out
+
+
+def _bwrap_prefix(bwrap: str, writable: list[tuple[str, str]], readonly: list[tuple[str, str]]) -> list[str]:
+    cmd = [bwrap, "--tmpfs", "/tmp", "--dev", "/dev", "--proc", "/proc"]
+    for folder in LINUX_SYSTEM:
+        if os.path.islink(folder):  # a merged /usr: /lib is a link to usr/lib
+            cmd += ["--symlink", os.readlink(folder), folder]
+        elif os.path.isdir(folder):
+            cmd += ["--ro-bind", folder, folder]
+    for f in LINUX_SYSTEM_FILES:
+        if os.path.exists(f):
+            cmd += ["--ro-bind", f, f]
+    for flag, pairs in (("--ro-bind", readonly), ("--bind", writable)):
+        for real, given in pairs:
+            cmd += [flag, real, real]
+            if given != real:  # reached through a symlink: the kernel is started by that path
+                cmd += [flag, real, given]
     return cmd + ["--unshare-all", "--die-with-parent", "--new-session"]
+
+
+def _seatbelt_prefix(program: str, writable: list[tuple[str, str]], readonly: list[tuple[str, str]], listable: list[str]) -> list[str]:
+    # The profile takes each path as a parameter, so no path is quoted into the profile's text.
+    params, lines = [], []
+    for i, folder in enumerate(listable):
+        params += ["-D", f"L{i}={folder}"]
+        lines.append(f'(allow file-read-data (literal (param "L{i}")))')
+    for i, (real, _) in enumerate(readonly + writable):
+        params += ["-D", f"P{i}={real}"]
+        rule = "subpath" if os.path.isdir(real) else "literal"
+        lines.append(f'(allow file-read* ({rule} (param "P{i}")))')
+        if i >= len(readonly):
+            lines.append(f'(allow file-write* ({rule} (param "P{i}")))')
+    return [program, "-p", SEATBELT_PROFILE + "\n".join(lines) + "\n", *params]
+
+
+def sandbox_prefix(mode: str, writable: list[Path], readonly: Iterable[str | Path] = (), python: str | None = None,
+                   listable: Iterable[str | Path] = ()) -> list[str]:
+    """The command prefix that runs a Python process in the sandbox ([] for sandbox='none').
+
+    The process may write `writable`. It may read `readonly`, the Python runtime
+    and the system's libraries. It may list the folders in `listable` without
+    reading their files. It has no network.
+    """
+    found = find_sandbox(mode)
+    if found is None:
+        return []
+    kind, program = found
+    system = [os.path.realpath(p) for p in (MACOS_SYSTEM if kind == "seatbelt" else LINUX_SYSTEM) if os.path.exists(p)]
+    rw = _allowlist(writable)
+    ro = _allowlist(list(readonly) + runtime_paths(python), covered=system if kind == "bwrap" else ())
+    if kind == "bwrap":
+        return _bwrap_prefix(program, rw, ro)
+    ro = _allowlist(system) + [p for p in ro if not any(_inside(p[0], s) for s in system)]
+    return _seatbelt_prefix(program, rw, ro, [os.path.realpath(p) for p in listable])
 
 
 class Kernel:
@@ -64,9 +187,12 @@ class Kernel:
         python: str | None = None,
         startup_timeout: float = 600,
         tokenizer_dir: str | Path | None = None,
+        readonly: Iterable[str | Path] = (),
     ):
         if sandbox not in ("auto", "none"):
             raise ValueError("sandbox must be 'auto' or 'none'")
+        self.readonly = [str(p) for p in readonly]  # more folders the sandboxed kernel may read
+        self._scratch: str | None = None
         self.work_dir = Path(work_dir).resolve()
         self.model_dir = Path(model_dir).resolve()
         self.timeout = timeout
@@ -97,11 +223,21 @@ class Kernel:
     # --- lifecycle -------------------------------------------------------------------
     def start(self) -> None:
         script = Path(__file__).with_name("_kernel_main.py")
-        readonly = [self.model_dir, self._config_path, script.parent] + ([Path(tokenizer_dir).resolve()] if (tokenizer_dir := self._tokenizer_dir) else [])
-        cmd = sandbox_prefix(self.sandbox, [self.work_dir], readonly) + [self.python, "-I", "-u", str(script), str(self._config_path)]
+        models = [self.model_dir] + ([Path(self._tokenizer_dir).resolve()] if self._tokenizer_dir else [])
+        readonly = [*models, self._config_path, script.parent, *self.readonly] + [t for m in models for t in link_targets(m)]
+        writable, home = [self.work_dir], os.environ.get("HOME", "/tmp")
+        found = find_sandbox(self.sandbox)
+        if found is not None:
+            home = "/tmp"  # bubblewrap gives the kernel an empty /tmp of its own
+            if found[0] == "seatbelt":
+                home = self._scratch = os.path.realpath(tempfile.mkdtemp(prefix="wsp-kernel-"))
+                writable.append(Path(home))
+        # Python lists the package's parent folder to import the package.
+        cmd = sandbox_prefix(self.sandbox, writable, readonly, self.python, listable=[script.parent.parent]) + [self.python, "-I", "-u", str(script), str(self._config_path)]
         env = {
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-            "HOME": "/tmp" if self.sandbox != "none" else os.environ.get("HOME", "/tmp"),
+            "HOME": home,
+            **({"TMPDIR": home} if self._scratch else {}),
             "LANG": "C.UTF-8",
             "CUDA_VISIBLE_DEVICES": "",
             "HF_HUB_OFFLINE": "1",
@@ -138,7 +274,11 @@ class Kernel:
         if msg is None or not msg.get("ready"):
             detail = (msg or {}).get("error") or stray or "no response"
             self.close()
-            raise KernelError(f"the writer's kernel failed to start:\n{detail}")
+            hint = ""
+            if find_sandbox(self.sandbox) is not None:
+                hint = ("\nThe sandbox lets the kernel read only the Python runtime, this package and the model's files. "
+                        "If a library lives elsewhere, name its folder in sandbox_readonly=[...].")
+            raise KernelError(f"the writer's kernel failed to start:\n{detail}{hint}")
 
     @staticmethod
     def _pump(proc: subprocess.Popen, q: queue.Queue) -> None:
@@ -172,6 +312,9 @@ class Kernel:
                 self._proc.kill()
             self._proc.wait(timeout=30)
         self._proc = None
+        if self._scratch is not None:
+            shutil.rmtree(self._scratch, ignore_errors=True)
+            self._scratch = None
 
     def restart(self) -> None:
         self.close()

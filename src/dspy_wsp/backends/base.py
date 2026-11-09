@@ -1,10 +1,19 @@
 """What WeightSpace needs from a model backend.
 
-A backend owns the student model's weights. It must:
+A backend owns the student model's weights. Every backend (`WeightBackend`) must:
   * expose the original weights as safetensors files (`weights_dir`) for the kernel and patches;
-  * swap edited tensors in and out (`set_weights`);
+  * swap edited tensors in and out (`_apply`, called by `set_weights`);
   * provide a `dspy.LM` whose calls run on the current weights (`lm`), recording each call;
-  * run teacher-forced reads that return log-probs and internals (`teacher_forced`, `pooled_activations`).
+  * count a text's tokens (`num_tokens`).
+
+There are two kinds, and WeightSpace gives the writer different passes for each:
+  * `GenerativeBackend` (kind "llm") generates text. It adds `generate`, `render_chat`
+    and the teacher-forced reads (`teacher_forced`, `pooled_activations`).
+  * `DecisionBackend` (kind "decision", in `dspy_wsp.backends.decision`) answers typed
+    questions with probabilities. It adds `system_one` and `read`.
+
+To write a backend, subclass one of the two and implement its abstract methods.
+The other attributes and methods here have defaults.
 """
 
 from __future__ import annotations
@@ -15,8 +24,11 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import ClassVar
 
 import numpy as np
+
+from dspy_wsp.edits import DEFAULT_PROTECTED
 
 
 @dataclass
@@ -29,13 +41,53 @@ class LMCall:
 
 
 class WeightBackend(ABC):
+    # "llm" or "decision": which passes and task prompt the writer gets.
+    kind: ClassVar[str] = "llm"
     # How many program runs the forward-pass tool may have in flight at once.
     # Batched backends raise this so concurrent LM calls share a batch.
     concurrency: int = 1
+    # The checkpoint's revision on the Hugging Face Hub, recorded in the patch.
+    revision: str | None = None
+    # The folder of the patch whose edits the backend holds. WeightSpace.compile sets it, and a saved program records it.
+    patch_dir: str | None = None
+    # How the task prompt names the protected tensors. None uses the standard sentence.
+    protected_description: str | None = None
 
     def __init__(self) -> None:
         self._edits: dict[str, np.ndarray] = {}
         self._local = threading.local()  # per-thread seed and call recording
+        self._init_kwargs: dict = {}
+        self._reader = None
+
+    def init_kwargs(self) -> dict:
+        """The constructor arguments that rebuild this backend. A saved program stores them."""
+        return self._init_kwargs
+
+    @property
+    def reader(self):
+        """A TensorReader over the original weights in `weights_dir`."""
+        if self._reader is None:
+            from dspy_wsp.tensors import TensorReader
+
+            self._reader = TensorReader(self.weights_dir)
+        return self._reader
+
+    @reader.setter
+    def reader(self, value) -> None:
+        self._reader = value
+
+    @property
+    def tokenizer_dir(self) -> Path | None:
+        """A folder with `tokenizer.json` for the writer's `tok`. None loads the tokenizer from `weights_dir` with transformers."""
+        return None
+
+    def default_protected(self) -> tuple[str, ...]:
+        """Regexes of tensor names the writer may read but not edit, used when WeightSpace gets no `protected`."""
+        return DEFAULT_PROTECTED
+
+    def describe_sampling(self) -> str:
+        """The sampling settings, for the writer's task prompt."""
+        return "the backend's defaults"
 
     # --- identity -------------------------------------------------------------------
     @property
@@ -109,6 +161,52 @@ class WeightBackend(ABC):
         if calls is not None:
             calls.append(call)
 
+    def editable_names(self) -> list[str]:
+        """Checkpoint tensors the backend can swap in."""
+        return self.reader.names
+
+    def dims(self) -> dict:
+        """The network's sizes: layers, hidden, intermediate, heads. They bound layer indices and size a pass's results."""
+        return {}
+
+    @abstractmethod
+    def num_tokens(self, text: str) -> int: ...
+
+    def close(self) -> None:
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.close()
+
+
+class GenerativeBackend(WeightBackend):
+    """A backend for a text-generating LLM."""
+
+    kind: ClassVar[str] = "llm"
+    # Return text before "</think>" as reasoning, not as the answer.
+    split_thinking: bool = True
+    # Sampling settings, described to the writer. None leaves a setting out.
+    temperature: float | None = None
+    top_p: float | None = None
+    top_k: int | None = None
+    max_tokens: int | None = None
+    chat_template_kwargs: dict | None = None
+
+    def describe_sampling(self) -> str:
+        parts = [f"{name} {v}" for name in ("temperature", "top_p", "top_k") if (v := getattr(self, name)) is not None]
+        if self.max_tokens is not None:
+            parts.append(f"at most {self.max_tokens} new tokens per LM call")
+        if self.chat_template_kwargs:
+            parts.append(f"chat template options {self.chat_template_kwargs}")
+        return ", ".join(parts) or super().describe_sampling()
+
+    @abstractmethod
+    def generate(self, prompt: str, *, max_tokens=None, temperature=None, top_p=None, top_k=None, seed=None, stop=()) -> LMCall:
+        """Complete one rendered prompt on the current weights, and record the call."""
+
     @abstractmethod
     def render_chat(self, messages: Sequence[dict], *, add_generation_prompt: bool = False, **template_kwargs) -> str: ...
 
@@ -132,25 +230,9 @@ class WeightBackend(ABC):
     ) -> dict[str, np.ndarray]:
         """For each (prompt, completion): states at the prompt's last token and averaged over the completion."""
 
-    def editable_names(self) -> list[str]:
-        """Checkpoint tensors the backend can swap in."""
-        from dspy_wsp.tensors import TensorReader
-
-        return TensorReader(self.weights_dir).names
-
-    def dims(self) -> dict:
-        """Sizes used to estimate how much a teacher-forced pass will write: layers, hidden, intermediate, heads."""
-        return {}
-
-    @abstractmethod
-    def num_tokens(self, text: str) -> int: ...
-
-    def close(self) -> None:
-        pass
-
 
 class BackendEngine:
-    """A DSPy 3.4 engine: one canonical request in, one response out, run on the backend's current weights.
+    """A DSPy 3.4 engine: one canonical request in, one response out, run on a GenerativeBackend's current weights.
 
     Subclasses set `backend_class`. DSPy saves a program's LM through `dump_state`
     (the base model, its settings and the patch) and rebuilds it with `load_state`.
@@ -199,7 +281,7 @@ class BackendEngine:
         pass
 
     def dump_state(self) -> dict:
-        return {"backend": self.backend._init_kwargs, "patch": self.backend.patch_dir}
+        return {"backend": self.backend.init_kwargs(), "patch": self.backend.patch_dir}
 
     @classmethod
     def load_state(cls, state: dict):
