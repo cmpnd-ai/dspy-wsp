@@ -10,7 +10,8 @@
 - `WeightSpace(...)` checks the sandbox when it is built. A missing sandbox now raises before the run loads a model.
 - `WeightBackend` states its whole contract. `GenerativeBackend` is the new base class for text-generating backends: it holds `generate`, `render_chat`, `teacher_forced` and `pooled_activations`. A custom backend that implements those methods must now subclass `GenerativeBackend`. `DecisionBackend` no longer carries them.
 - Backends are context managers: `with load_decision_backend("d1") as backend:` closes the backend at the end.
-- `gepa` is a declared dependency, and `typesafe-sdk` accepts any 0.7 release from 0.7.5.
+- The package requires DSPy 3.5 (`dspy>=3.5,<3.6`). Decision models use DSPy's built-in TypeSafe provider, so `typesafe-sdk` is no longer a dependency.
+- `gepa` is a declared dependency.
 - The README covers the Ubuntu 24.04 sandbox setup.
 
 ## 0.1.1
