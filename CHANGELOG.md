@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2
 
 - The benchmark scripts in `examples/` use `gpt-6-astra` as the writer by default. Pass `--writer sol` for `gpt-6.1-sol`. Run folder names are unchanged.
 - `dspy_wsp.__version__` reads the installed package's version. It reported `0.1.0` in the 0.1.1 release.
