@@ -8,10 +8,7 @@ The method comes from [*Sparks of Weight-Space Programming*](https://rikiyat.git
 
 On the Typed Decisions benchmark, `WeightSpace` raised the test accuracy of three small decision models by 13 to 16 points, and the gain compounds with `dspy.experimental.ReAnchor` to reach 17 to 18 points.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions-dark.svg">
-  <img src="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions-light.svg" width="100%" alt="Bar chart of test accuracy on the Typed Decisions benchmark for d1-omni-600M, NanoJev and d1-2B: unoptimized, with ReAnchor, with WeightSpace, and with both.">
-</picture>
+<img src="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions.png" width="100%" alt="Bar chart of test accuracy on the Typed Decisions benchmark for d1-omni-600M, NanoJev and d1-2B: unoptimized, with ReAnchor, with WeightSpace, and with both.">
 
 This is an early release. We are releasing it outside the core DSPy library so that more people can try it and tell us what breaks. Please report problems and results, and tell us which models you would like us to support, in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
 
