@@ -1,0 +1,9 @@
+OUTPUT of Python run 60 of at most 300:
+```
+Max errors: {'features': 0.0, 'predicted_logits': 0.00042629241943359375, 'prior': 0.0, 'cosine': 0.0}
+Reserved practice request: {'type': 'decide', 'model': 'both', 'problems': 300}
+Traceback (most recent call last):
+  File "<cell>", line 22, in <module>
+NameError: name 'tune_ids' is not defined
+```
+[forward passes used: 23 of 25; Python runs used: 60 of 300]

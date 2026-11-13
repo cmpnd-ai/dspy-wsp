@@ -1,0 +1,35 @@
+OUTPUT of Python run 17 of at most 300:
+```
+Saved edit vs simulation: max logit error 4.1961669921875e-05
+Upstream feature change: 0.0
+All-field conditional accuracies (baseline, shared, field soft .01 full):
+agent_t action [0.6, 0.64, 0.6]
+agent_t needs_review [0.88, 0.88, 0.88]
+agent_t outcome [0.4, 0.72, 0.72]
+agent_t risk [0.68, 0.76, 0.72]
+agent_t urgency [0.56, 0.64, 0.88]
+custome action [0.6, 0.68, 0.76]
+custome category [1.0, 1.0, 1.0]
+custome churn_risk [0.76, 0.84, 0.8]
+custome needs_human [0.72, 0.72, 0.84]
+custome urgency [0.72, 0.88, 0.72]
+invoice discrepancy_severity [0.68, 0.68, 0.64]
+invoice disposition [0.76, 0.72, 0.68]
+invoice duplicate [0.88, 0.88, 0.84]
+invoice matches_order [0.88, 0.88, 0.88]
+invoice urgency [0.56, 0.6, 0.68]
+securit credential_compromise [0.6, 0.64, 0.64]
+securit disposition [0.84, 0.88, 0.76]
+securit severity [0.76, 0.76, 0.8]
+securit true_positive [0.76, 0.84, 0.8]
+securit urgency [0.56, 0.68, 0.52]
+Complementary mixtures: shared strength, field strength, fit, tune gain SE
+1 0.25 0.8468 {'accuracy': 0.758, 'gain': 0.048, 'se': 0.018, 'n': 100.0}
+0.75 0.25 0.8288 {'accuracy': 0.762, 'gain': 0.052, 'se': 0.0162, 'n': 100.0}
+0.5 0.5 0.8484 {'accuracy': 0.754, 'gain': 0.044, 'se': 0.0183, 'n': 100.0}
+1 0.5 0.8884 {'accuracy': 0.756, 'gain': 0.046, 'se': 0.0199, 'n': 100.0}
+0.5 0.75 0.8872 {'accuracy': 0.75, 'gain': 0.04, 'se': 0.0205, 'n': 100.0}
+Replace urgency only 0.5 {'accuracy': 0.7580000162124634, 'gain': np.float64(0.04800000000000001), 'se': np.float64(0.014528272680215878), 'n': 100}
+Replace urgency only 1.0 {'accuracy': 0.765999972820282, 'gain': np.float64(0.05600000000000001), 'se': np.float64(0.01683670833253185), 'n': 100}
+```
+[forward passes used: 7 of 25; Python runs used: 17 of 300]

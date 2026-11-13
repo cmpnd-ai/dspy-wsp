@@ -603,3 +603,250 @@ class D1LMBackend(DecisionBackend):
                 "head_inputs": "the final normed hidden state at the question's answer position, one copy per option",
                 "option_rows": "each option's best-form row of embed_tokens, which the readout multiplies by head_inputs",
                 "hidden_mean": "hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens"}
+
+
+class ClefBackend(DecisionBackend):
+    """Cloudflare's Clef decision models (text only): Clef-Flash by default, at a pinned revision.
+
+    The backbone stays fixed and only the joint schema head takes edits, so each prompt's backbone
+    output is computed once and reused. MLX only.
+    """
+
+    family = "clef"
+    concurrency = 4
+    # The model's own code (*.py) is downloaded, never run, so a saved checkpoint loads with it.
+    download_patterns = ["config.json", "model-*.safetensors", "model.safetensors.index.json", "joint_head.safetensors",
+                         "joint_head_config.json", "tokenizer.json", "tokenizer_config.json", "chat_template.jinja",
+                         "processor_config.json", "generation_config.json", "LICENSE", "*.py"]
+    protected_description = "the tensors marked (out of scope) below (the whole backbone, which this backend keeps fixed)"
+
+    def __init__(self, model: str = "Cloudflare/clef-flash", *, revision: str | None = "22b75507981345858dd152fbd9a6f8c0c4068b0a",
+                 framework: str | None = None, device: str | None = None, max_length: int | None = None):
+        super().__init__(model, revision=revision, framework=framework, device=device, max_length=max_length)
+
+    def _setup(self, max_length):
+        import json
+
+        from dspy_wsp.decision.families.clef import encoding
+
+        if self.framework != "mlx":
+            raise NotImplementedError("Clef models load in MLX only; pass framework='mlx' on Apple silicon")
+        self.config = json.loads((self._dir / "config.json").read_text())
+        self.head_config = json.loads((self._dir / "joint_head_config.json").read_text())
+        self.tok = encoding.Tokenizer(self._dir)
+        self.max_length = int(max_length or encoding.MAX_LENGTH)
+
+    def _load_network(self):
+        from dspy_wsp.decision.families.clef.mlx import ClefMLX
+
+        return ClefMLX.from_dir(self._dir)
+
+    def _encode_request(self, state, questions):
+        from dspy_wsp.decision.families.clef import encoding
+
+        return [(encoding.encode_request(self.tok, state, dict(questions), self.max_length), list(questions))]
+
+    def _row_outputs(self, output, n):
+        return output
+
+    def _row_tokens(self, row) -> int:
+        return len(row.ids)
+
+    def _probabilities(self, logits, q):
+        from dspy_wsp.decision.families.clef import encoding
+
+        return encoding.probabilities(logits)
+
+    def num_tokens(self, text: str) -> int:
+        return len(self.tok.encode(text))
+
+    def dims(self) -> dict:
+        t = self.config["text_config"]
+        return {"layers": t["num_hidden_layers"], "hidden": t["hidden_size"], "intermediate": t["intermediate_size"],
+                "heads": t["num_attention_heads"], "kv_heads": t["num_key_value_heads"], "vocab": t["vocab_size"]}
+
+    def describe(self) -> str:
+        t, h = self.config["text_config"], self.head_config
+        n = sum(int(np.prod(self.reader.shape(k))) for k in self._param_for)
+        return (
+            f"{self.model_id} (Clef decision model, text path): a Qwen3.5 backbone ({t['num_hidden_layers']} causal blocks, width "
+            f"{t['hidden_size']}) and a joint schema head. The backbone is fixed in this run: its tensors are out of scope, and "
+            "only the head's tensors (the names without a `model.` prefix) take edits. A request is one ChatML prompt: a system "
+            "line, 'STATE:' and the state, then 'SCHEMA FIELDS:' with one block per question (FIELD i, ID, TYPE, INSTRUCTION, "
+            "then 'OPTION j: {\"description\":...,\"option_id\":...}' per option), then the assistant header and 'JOINT SCHEMA "
+            "DECISIONS:'. A choice's options are written in sorted key order and a noul's as true, then false. The head reads the "
+            f"backbone's final hidden states x = hidden_norm(h) (width {h['hidden_size']}), and it works at width {h['width']}. "
+            "memory = memory_projection(x) over every token. Each option's query is option_context_projection(mean of x over "
+            "the option's tokens) + option_lexical_projection(mean of the output-embedding rows of those tokens) + "
+            f"option_question_projection(mean of x over the question's instruction tokens). {h['routing_layers']} "
+            "`evidence_layers` let every option query read memory by cross-attention (query_norm, memory_norm, attention, "
+            "then feedforward_norm and a GELU MLP `feedforward.0`, `feedforward.3`). Each question's field vector is "
+            "question_projection(question mean) + option_summary_norm(a softmax-weighted sum of its routed options) + "
+            f"global_projection(x at the last token) + type_embedding (rows noul, choice, score). {h['layers']} pre-norm "
+            "transformer decoder `layers` let the fields read each other (self_attn) and memory (multihead_attn), then "
+            "field_norm. With option = option_norm(routed option) and features = [field, option, field * option, "
+            "|field - option|], an option's logit is prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * "
+            "cosine(field, option) + residual_scorer(features)), where residual_scorer is Linear (`residual_scorer.0`), GELU, "
+            "Linear to one logit (`residual_scorer.3`), and prior is exp(prior_logit_scale) times the cosine of the option's "
+            "lexical mean and (question mean + x at the last token). A softmax per question gives the probabilities, with no "
+            f"temperature. A noul's options are [false, true]. The head has {n:,} parameters, stored as bfloat16 and computed "
+            "in float32; an edit is rounded to bfloat16 when it is applied."
+        )
+
+    def read_conventions(self) -> dict:
+        return {**super().read_conventions(),
+                "option_logits": "each option's logit: prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * cosine + residual_scorer(head_inputs))",
+                "head_inputs": "residual_scorer's input per option: [field, option, field * option, |field - option|], each of the head's width",
+                "prior": "the lexical prior added to each option's logit",
+                "cosine": "the cosine of the question's field vector and the option vector",
+                "hidden_mean": "the backbone's hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens"}
+
+
+class StrandsBackend(DecisionBackend):
+    """Strands decider models (text only): strands-decider-2B-qwen3.5-v1 by default, at a pinned revision.
+
+    A released checkpoint is a LoRA adapter and a pointer head on a Qwen3.5 base model. On first use
+    the backend downloads the base model and writes a folded copy of the whole network to the
+    dspy-wsp cache (`DSPY_WSP_CACHE`, default `~/.cache/dspy-wsp`). It loads that copy, so the
+    writer can edit the backbone and the head. MLX only.
+    """
+
+    family = "strands"
+    download_patterns = ["strands_decider_config.json", "head.safetensors", "lora/*", "tokenizer.json", "tokenizer_config.json",
+                         "chat_template.jinja", "provenance.json", "LICENSE.md"]
+    base_patterns = ["config.json", "model*.safetensors", "model.safetensors.index.json"]
+    protected_description = "the tensors marked (out of scope) below (the token embedding and the backbone's final norm)"
+
+    def __init__(self, model: str = "StrandsAgents/strands-decider-2B-qwen3.5-v1-2610", *,
+                 revision: str | None = "216d1ccb46a9e9b036eb9187b248db98480f77d4", framework: str | None = None,
+                 device: str | None = None, max_length: int | None = None):
+        if (framework or _default_framework()) != "mlx":
+            raise NotImplementedError("Strands decider models load in MLX only; pass framework='mlx' on Apple silicon")
+        folded = self._folded(model, revision)
+        super().__init__(str(folded), revision=revision, framework=framework, device=device, max_length=max_length)
+        self._model_id = model
+        self._init_kwargs["model"] = model
+
+    def _folded(self, model: str, revision: str | None) -> Path:
+        """The folded copy of a checkpoint, written on first use. A folder that is already folded is returned as it is."""
+        import hashlib
+        import json
+        import os
+
+        from dspy_wsp.decision.families.strands.mlx import CONFIG, fold
+
+        if Path(model).is_dir():
+            source = Path(model).resolve()
+            stamp = f"{source}:{(source / 'head.safetensors').stat().st_mtime_ns}"
+            key = f"{source.name}-{hashlib.sha256(stamp.encode()).hexdigest()[:12]}"
+        else:
+            from huggingface_hub import snapshot_download
+
+            source = Path(snapshot_download(model, revision=revision, allow_patterns=self.download_patterns))
+            key = f"{model.replace('/', '--')}-{(revision or source.name)[:12]}"
+        config = json.loads((source / CONFIG).read_text())
+        if config.get("head_type", "pointer") != "pointer":
+            raise NotImplementedError(f"head_type {config['head_type']!r} is not supported; only the pointer head is")
+        if "folded" in config:
+            return source
+        out = Path(os.environ.get("DSPY_WSP_CACHE", "~/.cache/dspy-wsp")).expanduser() / "folded" / key
+        if not (out / CONFIG).is_file():
+            fold(source, self._base_dir(source, config), out, {"model": model, "revision": revision})
+        return out
+
+    def _base_dir(self, source: Path, config: dict) -> Path:
+        """The base model's folder: a local path (beside the checkpoint, or absolute) or a Hub repo at the recorded revision."""
+        import json
+
+        base = config["base_model"]
+        for folder in (source / base, Path(base)):
+            if (folder / "config.json").is_file():
+                return folder.resolve()
+        from huggingface_hub import snapshot_download
+
+        provenance = source / "provenance.json"
+        revision = json.loads(provenance.read_text()).get("base_model_revision") if provenance.is_file() else None
+        return Path(snapshot_download(base, revision=revision, allow_patterns=self.base_patterns))
+
+    def _setup(self, max_length):
+        import json
+
+        from dspy_wsp.decision.families.strands import encoding
+        from dspy_wsp.decision.families.strands.mlx import CONFIG
+
+        self.head_config = json.loads((self._dir / CONFIG).read_text())
+        self.config = json.loads((self._dir / "config.json").read_text())
+        self.tok = encoding.Tokenizer(self._dir)
+        self.max_length = int(max_length or self.head_config.get("max_length") or encoding.MAX_LENGTH)
+
+    def _load_network(self):
+        from dspy_wsp.decision.families.strands.mlx import StrandsMLX
+
+        return StrandsMLX.from_dir(self._dir)
+
+    def _swap(self, edits) -> None:
+        super()._swap(edits)
+        # An edit to the head leaves the backbone's outputs as they were, so only backbone edits select a new cache.
+        self.net.set_backbone_key(self._fingerprint_of({n: a for n, a in edits.items() if n.startswith("backbone.")}))
+
+    def _encode(self, state, q):
+        from dspy_wsp.decision.families.strands import encoding
+
+        return encoding.encode(self.tok, state, q, self.max_length)
+
+    def _row_tokens(self, row) -> int:
+        return len(row.ids)
+
+    def _probabilities(self, logits, q):
+        from dspy_wsp.decision.families.strands import encoding
+
+        by_kind = self.head_config.get("temperature_by_kind") or {}
+        return encoding.probabilities(logits, by_kind.get(q.type, self.head_config.get("temperature", 1.0)))
+
+    def default_protected(self):
+        return (r"^backbone\.embed_tokens\.weight$", r"^backbone\.norm\.weight$")
+
+    def num_tokens(self, text: str) -> int:
+        return len(self.tok.encode(text).ids)
+
+    def dims(self) -> dict:
+        t = self.config.get("text_config", self.config)
+        return {"layers": t["num_hidden_layers"], "hidden": t["hidden_size"], "intermediate": t["intermediate_size"],
+                "heads": t["num_attention_heads"], "kv_heads": t["num_key_value_heads"], "vocab": t["vocab_size"]}
+
+    def describe(self) -> str:
+        t, h = self.config.get("text_config", self.config), self.head_config
+        head = sum(int(np.prod(self.reader.shape(k))) for k in self._param_for if not k.startswith("backbone."))
+        every = t.get("full_attention_interval", 4)
+        by_kind = h.get("temperature_by_kind") or {}
+        temps = ", ".join(f"{kind} {by_kind.get(kind, h.get('temperature', 1.0)):.3f}" for kind in ("noul", "choice", "score"))
+        return (
+            f"{self.model_id} (Strands decider, text path): a Qwen3.5 backbone ({t['num_hidden_layers']} causal blocks, width "
+            f"{t['hidden_size']}) and a pointer head. The backbone is {h['folded']['base_model']} with the checkpoint's LoRA adapter "
+            "already folded into its weights, so there are no separate adapter tensors. Its tensors are named `backbone.` plus "
+            f"the module path and are stored as {h.get('torch_dtype', 'bfloat16')}; an edit is rounded to that type when it is applied. `backbone.embed_tokens` "
+            f"embeds the tokens. Block i (`backbone.layers.i`) is pre-norm: x += mixer(input_layernorm(x)), then x += "
+            f"mlp(post_attention_layernorm(x)). Every {every}th block (i + 1 divisible by {every}) mixes with full causal "
+            "attention (`self_attn.q_proj`, `k_proj`, `v_proj`, `o_proj`, with RMSNorms `q_norm` and `k_norm` on each head's "
+            "queries and keys, and rotary positions). The other blocks mix with a Gated DeltaNet, a causal linear-attention "
+            "recurrence (`linear_attn.in_proj_qkv`, `in_proj_z`, `in_proj_a`, `in_proj_b`, a depthwise causal `conv1d`, `dt_bias`, "
+            "`A_log`, `norm`, `out_proj`). mlp is SwiGLU: down_proj(silu(gate_proj(x)) * up_proj(x)). The layernorms are "
+            "RMSNorms with a stored scale. `backbone.norm` is the final RMSNorm. Every question gets its own prompt: '<state>', "
+            "the state (a string as written, anything else as indented JSON) and '</state>', then '<question type=\"...\">', a "
+            "fixed header line for the type, the instructions, '<options>', one numbered line per option ('1. name — "
+            "description'), '</options>', '</question>' and '<answer>'. A noul's options are false, then true; a score's are "
+            "its levels, named by index. With decide = the backbone's output (after `backbone.norm`) at the prompt's last "
+            "token and option = its output at the last token of the option's line, an option's logit is "
+            f"k(norm(option)) . q(norm(decide)) / sqrt({h['pointer_dim']}), where norm is one LayerNorm (`norm.weight`, `norm.bias`) "
+            f"shared by both and q and k are Linear layers to {h['pointer_dim']} dimensions. The probabilities are a softmax of "
+            f"the logits divided by a fixed temperature per question type ({temps}), which is not a tensor. The head has "
+            f"{head:,} parameters, stored and computed in float32. A pass with an edited backbone recomputes every prompt; a "
+            "pass that edits only the head reuses the backbone's outputs and is much faster."
+        )
+
+    def read_conventions(self) -> dict:
+        return {**super().read_conventions(),
+                "option_logits": "each option's logit, k(norm(head_inputs)) . q(norm(decide)) / sqrt(dim), before the temperature",
+                "head_inputs": "the backbone's output at the last token of each option's line",
+                "decide": "the backbone's output at the prompt's last token, repeated for each option of the question",
+                "hidden_mean": "the backbone's hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens"}

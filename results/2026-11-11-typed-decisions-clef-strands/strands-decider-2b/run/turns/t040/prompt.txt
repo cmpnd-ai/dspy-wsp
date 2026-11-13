@@ -1,0 +1,7 @@
+OUTPUT of Python run 24 of at most 300:
+```
+Joint tensor exact centered-logit reproduction error: 3.814697265625e-05
+Joint delta norm 1152.07958984375 rank at most 5
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 46.6856
+```
+[forward passes used: 14 of 25; Python runs used: 24 of 300]

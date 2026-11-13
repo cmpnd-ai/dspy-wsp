@@ -1,0 +1,29 @@
+OUTPUT of Python run 13 of at most 300:
+```
+Tune field performance, baseline -> confirmed bypass:
+agent_tra action 0.60->0.64
+agent_tra needs_review 0.88->0.88
+agent_tra outcome 0.40->0.72
+agent_tra risk 0.68->0.76
+agent_tra urgency 0.56->0.64
+customer_ action 0.60->0.68
+customer_ category 1.00->1.00
+customer_ churn_risk 0.76->0.84
+customer_ needs_human 0.72->0.72
+customer_ urgency 0.72->0.88
+invoice_p discrepancy_severity 0.68->0.68
+invoice_p disposition 0.76->0.72
+invoice_p duplicate 0.88->0.88
+invoice_p matches_order 0.88->0.88
+invoice_p urgency 0.56->0.60
+security_ credential_compromise 0.60->0.64
+security_ disposition 0.84->0.88
+security_ severity 0.76->0.76
+security_ true_positive 0.76->0.84
+security_ urgency 0.56->0.68
+Block alone option {'accuracy': 0.24199999868869781, 'gain': np.float64(-0.468), 'se': np.float64(0.032314114875732255), 'n': 100}
+Block alone field*option {'accuracy': 0.722000002861023, 'gain': np.float64(0.012), 'se': np.float64(0.008442317648177383), 'n': 100}
+Block alone |field-option| {'accuracy': 0.5099999904632568, 'gain': np.float64(-0.20000000000000004), 'se': np.float64(0.025898012871783633), 'n': 100}
+Feature block correction norms: [39.28575134277344, 31.938461303710938, 24.251708984375]
+```
+[forward passes used: 6 of 25; Python runs used: 13 of 300]

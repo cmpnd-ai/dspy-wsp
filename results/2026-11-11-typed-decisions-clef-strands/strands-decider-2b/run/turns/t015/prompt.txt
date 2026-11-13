@@ -1,0 +1,25 @@
+OUTPUT of Python run 8 of at most 300:
+```
+Closed-form eigensolve seconds: 1.08
+Gram eigenvalues quantiles [2.287464288591212e-12, 0.00036266964558464144, 0.0011735208787509404, 0.005287377590744331, 0.02723037247490976, 1.942978339232735, 316.22065098281456]
+ridge=  0.001 strength=0.5 | fit=0.529 dev=0.426 gain=+0.019 SE=0.014 Brier=0.244 | deltaK norm=209.06
+ridge=  0.001 strength=1.0 | fit=0.607 dev=0.443 gain=+0.037 SE=0.020 Brier=0.237 | deltaK norm=418.11
+ridge=  0.001 strength=1.5 | fit=0.586 dev=0.439 gain=+0.032 SE=0.025 Brier=0.276 | deltaK norm=627.17
+ridge=   0.01 strength=0.5 | fit=0.504 dev=0.444 gain=+0.038 SE=0.013 Brier=0.241 | deltaK norm=61.26
+ridge=   0.01 strength=1.0 | fit=0.556 dev=0.461 gain=+0.054 SE=0.020 Brier=0.216 | deltaK norm=122.52
+ridge=   0.01 strength=1.5 | fit=0.533 dev=0.442 gain=+0.036 SE=0.025 Brier=0.240 | deltaK norm=183.77
+ridge=    0.1 strength=0.5 | fit=0.470 dev=0.439 gain=+0.032 SE=0.012 Brier=0.242 | deltaK norm=18.67
+ridge=    0.1 strength=1.0 | fit=0.508 dev=0.468 gain=+0.061 SE=0.019 Brier=0.209 | deltaK norm=37.34
+ridge=    0.1 strength=1.5 | fit=0.486 dev=0.454 gain=+0.048 SE=0.026 Brier=0.226 | deltaK norm=56.01
+ridge=      1 strength=0.5 | fit=0.457 dev=0.437 gain=+0.030 SE=0.011 Brier=0.249 | deltaK norm=6.75
+ridge=      1 strength=1.0 | fit=0.470 dev=0.446 gain=+0.039 SE=0.018 Brier=0.213 | deltaK norm=13.51
+ridge=      1 strength=1.5 | fit=0.449 dev=0.450 gain=+0.043 SE=0.024 Brier=0.224 | deltaK norm=20.26
+ridge=     10 strength=0.5 | fit=0.437 dev=0.430 gain=+0.023 SE=0.009 Brier=0.266 | deltaK norm=2.29
+ridge=     10 strength=1.0 | fit=0.449 dev=0.429 gain=+0.022 SE=0.014 Brier=0.227 | deltaK norm=4.58
+ridge=     10 strength=1.5 | fit=0.428 dev=0.426 gain=+0.019 SE=0.022 Brier=0.218 | deltaK norm=6.87
+ridge=    100 strength=0.5 | fit=0.424 dev=0.411 gain=+0.004 SE=0.004 Brier=0.284 | deltaK norm=0.61
+ridge=    100 strength=1.0 | fit=0.432 dev=0.419 gain=+0.012 SE=0.006 Brier=0.260 | deltaK norm=1.22
+ridge=    100 strength=1.5 | fit=0.437 dev=0.429 gain=+0.022 SE=0.008 Brier=0.240 | deltaK norm=1.83
+Original fit/dev: (0.4248148202896118, 0.0, 0.0, 0.2920379340648651) (0.40666666626930237, 0.0, 0.0, 0.30778685212135315)
+```
+[forward passes used: 5 of 25; Python runs used: 8 of 300]

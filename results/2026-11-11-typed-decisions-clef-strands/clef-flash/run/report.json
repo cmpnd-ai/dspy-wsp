@@ -1,0 +1,254 @@
+{
+ "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra",
+ "final_answer": "**Submitted the saved `best_2` edit**, left in `work/edited`.\n\n### What changed\nOnly three head tensors were edited:\n- `residual_scorer.0.weight`\n- `residual_scorer.0.bias`\n- `residual_scorer.3.weight`\n\nThe repair repurposes **24 low-contribution scorer neurons**: two provide a shared linear correction through opposite GELU activations; 22 provide gated corrections for agent urgency and customer action/human-review decisions. Directions were computed by closed-form ridge solves on practice data\u2014no gradients or iterative training. The backbone, attention routing, priors, and global scales remain unchanged.\n\n### Evidence for the repair\nThe failure localized to the final scorer: useful state-sensitive contrasts existed in its field/option inputs but were poorly reflected in option margins. Directly adjusting the existing output weights did not help; exposing these contrasts through the replacement neurons did.\n\nCausal checks showed:\n- Graded responses as repair strength changed.\n- **Exactly unchanged upstream scorer inputs**, priors, and cosine scores.\n- Predicted versus actual edited logits agreeing within **0.00043**.\n- On independent-seed probes, one tool error shifted the partial-versus-success margin from **\u22120.35 to +0.39**; constraint violations also produced substantially stronger urgency responses.\n\n### Measured results\n\n| Evaluation | Original | Edited | Gain \u00b1 paired SE |\n|---|---:|---:|---:|\n| Reserved practice, 300 records | 70.53% | 76.20% | **+5.67 \u00b1 0.99 pp** |\n| Hidden validation, 300 records | 70.20% | 77.07% | **+6.87 \u00b1 0.90 pp** |\n\nValidation had **110 improved records and 25 worsened**. Final deployment checks exactly reproduced the earlier results; repeated runs were not counted as additional samples.\n\nThe shared two-neuron repair accounts for most of the clearly established gain. The gated extension\u2019s incremental benefit remains uncertain on reserved practice, although the combined edit achieved the best confirmed validation score. Duplicate detection and some customer-review cues remain imperfect.\n\nI expect this edit to help because it improves how existing state evidence affects decisions\u2014not merely confidence\u2014and its overall gain substantially exceeds the paired standard error on both evaluation sets.",
+ "budget": {
+  "max_passes": 25,
+  "max_code_runs": 300,
+  "passes_used": 25,
+  "code_runs_used": 62
+ },
+ "turns": 95,
+ "conversations": 3,
+ "validation_runs": [
+  {
+   "pass": 6,
+   "model": "both",
+   "edited_tensors": [
+    "residual_scorer.0.bias",
+    "residual_scorer.0.weight",
+    "residual_scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.702,
+    "score_se_over_items": 0.012965437289292026,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 243
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7626666666666667,
+    "score_se_over_items": 0.01259163365895832,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 210
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.702,
+    "edited": 0.7626666666666667,
+    "gain": 0.06066666666666667,
+    "se": 0.0080521341034208,
+    "improved": 97,
+    "worsened": 20
+   }
+  },
+  {
+   "pass": 11,
+   "model": "both",
+   "edited_tensors": [
+    "residual_scorer.0.bias",
+    "residual_scorer.0.weight",
+    "residual_scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.702,
+    "score_se_over_items": 0.012965437289292026,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 243
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7706666666666667,
+    "score_se_over_items": 0.012268760424287749,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 205
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.702,
+    "edited": 0.7706666666666667,
+    "gain": 0.06866666666666667,
+    "se": 0.008999855484202466,
+    "improved": 110,
+    "worsened": 25
+   }
+  },
+  {
+   "pass": 14,
+   "model": "both",
+   "edited_tensors": [
+    "residual_scorer.0.bias",
+    "residual_scorer.0.weight",
+    "residual_scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.702,
+    "score_se_over_items": 0.012965437289292026,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 243
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7553333333333333,
+    "score_se_over_items": 0.012600307311052446,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 213
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.702,
+    "edited": 0.7553333333333333,
+    "gain": 0.05333333333333334,
+    "se": 0.007920076423475819,
+    "improved": 91,
+    "worsened": 23
+   }
+  },
+  {
+   "pass": 15,
+   "model": "both",
+   "edited_tensors": [
+    "residual_scorer.0.bias",
+    "residual_scorer.0.weight",
+    "residual_scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.702,
+    "score_se_over_items": 0.012965437289292026,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 243
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7653333333333333,
+    "score_se_over_items": 0.012687596391456245,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 203
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.702,
+    "edited": 0.7653333333333333,
+    "gain": 0.06333333333333334,
+    "se": 0.00922689749100695,
+    "improved": 105,
+    "worsened": 28
+   }
+  },
+  {
+   "pass": 25,
+   "model": "both",
+   "edited_tensors": [
+    "residual_scorer.0.bias",
+    "residual_scorer.0.weight",
+    "residual_scorer.3.weight"
+   ],
+   "original": {
+    "graded": 300,
+    "score": 0.702,
+    "score_se_over_items": 0.012965437289292026,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 243
+    }
+   },
+   "edited": {
+    "graded": 300,
+    "score": 0.7706666666666667,
+    "score_se_over_items": 0.012268760424287749,
+    "failures": {
+     "cut_at_max_tokens": 0,
+     "program_error": 0,
+     "metric_error": 0,
+     "scored_below_1": 205
+    }
+   },
+   "paired": {
+    "items": 300,
+    "original": 0.702,
+    "edited": 0.7706666666666667,
+    "gain": 0.06866666666666667,
+    "se": 0.008999855484202466,
+    "improved": 110,
+    "worsened": 25
+   }
+  }
+ ],
+ "validation_size": 300,
+ "simulate_head": true,
+ "validation": {
+  "original": {
+   "graded": 400,
+   "score": 0.6965,
+   "score_se_over_items": 0.011148097379731213,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 326
+   }
+  },
+  "edited": {
+   "graded": 400,
+   "score": 0.7545000000000001,
+   "score_se_over_items": 0.011017160230697935,
+   "mean_output_tokens": 0.0,
+   "cut_share": 0.0,
+   "failures": {
+    "cut_at_max_tokens": 0,
+    "program_error": 0,
+    "metric_error": 0,
+    "scored_below_1": 281
+   }
+  },
+  "paired": {
+   "items": 400,
+   "original": 0.6965,
+   "edited": 0.7545000000000001,
+   "gain": 0.057999999999999996,
+   "se": 0.007631224605031035,
+   "improved": 136,
+   "worsened": 43
+  }
+ },
+ "patch": "3 tensors, 98,350 entries changed\n  residual_scorer.0.bias bfloat16[1024]: 24 entries (sparse), relative change 329.5971\n  residual_scorer.0.weight bfloat16[1024, 4096]: 98,302 entries (sparse), relative change 47.1967\n  residual_scorer.3.weight bfloat16[1, 1024]: 24 entries (sparse), relative change 203.3978"
+}

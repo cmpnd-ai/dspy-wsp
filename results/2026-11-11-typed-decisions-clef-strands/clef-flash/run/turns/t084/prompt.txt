@@ -1,0 +1,18 @@
+OUTPUT of Python run 55 of at most 300:
+```
+read_probe_arrays source unavailable
+simulate_probe_scoring source unavailable
+probe_margin source unavailable
+note source unavailable
+edit_fingerprint source unavailable
+
+Saved best_2 tensor keys: ['tensors', 'neurons', 'qkeys']
+Traceback (most recent call last):
+  File "<cell>", line 11, in <module>
+  File "/Users/dbreunig/Development/cmpnd/dspy-wsp/src/dspy_wsp/_kernel_main.py", line 70, in load
+    _check_name(name)
+  File "/Users/dbreunig/Development/cmpnd/dspy-wsp/src/dspy_wsp/_kernel_main.py", line 62, in _check_name
+    raise KeyError(f"unknown tensor {name!r}; see NAMES")
+KeyError: "unknown tensor 'tensors'; see NAMES"
+```
+[forward passes used: 22 of 25; Python runs used: 55 of 300]

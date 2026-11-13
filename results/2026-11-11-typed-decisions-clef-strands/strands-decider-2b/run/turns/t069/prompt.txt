@@ -1,0 +1,44 @@
+RESULT of forward pass 25:
+```
+{
+ "type": "decide",
+ "validation": true,
+ "model": "both",
+ "items": 300,
+ "note": "validation runs report aggregate scores only",
+ "original": {
+  "graded": 300,
+  "score": 0.582,
+  "score_se_over_items": 0.013856567371062977,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 279
+  }
+ },
+ "edited": {
+  "graded": 300,
+  "score": 0.7340000000000001,
+  "score_se_over_items": 0.012711181534732269,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 218
+  }
+ },
+ "paired": {
+  "items": 300,
+  "original": 0.582,
+  "edited": 0.7340000000000001,
+  "gain": 0.152,
+  "se": 0.014018939251885253,
+  "improved": 174,
+  "worsened": 35
+ },
+ "seconds": 5.1
+}
+```
+That was your last forward pass. Make your final choice: leave the edit you submit in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/edited, then reply without a code block.
+[forward passes used: 25 of 25; Python runs used: 41 of 300]

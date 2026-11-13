@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- `ClefBackend` loads Cloudflare's Clef decision models in MLX, with the alias `"clef-flash"`. The backbone stays fixed and the writer edits the joint schema head.
+- `StrandsBackend` loads Strands decider models in MLX, with the alias `"strands-2b"`. It folds the checkpoint's LoRA adapter into the base model's weights and saves the result in `~/.cache/dspy-wsp`, so the writer can edit the backbone and the head.
+- The package requires Python 3.11 or later. `mlx-lm` needs it on Apple silicon.
+- The README shows how to save an edited model and load it in a new file.
+- `results/2026-11-11-typed-decisions-clef-strands/` documents the Clef-Flash and Strands Decider 2B runs, and the results chart shows all five models.
+- A decision model's family can be recognized without a `config.json` at the checkpoint's root.
+- The tensor index covers safetensors files outside a checkpoint's shard map.
+- `examples/typed_decisions.py --no-checkpoint` keeps the patch and skips the full copy of the edited model.
+- `--baseline protocol` works again on DSPy 3.5.
+
 ## 0.1.2
 
 - The benchmark scripts in `examples/` use `gpt-6-astra` as the writer by default. Pass `--writer sol` for `gpt-6.1-sol`. Run folder names are unchanged.

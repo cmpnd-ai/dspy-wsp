@@ -1,0 +1,68 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-10T22:59:23+00:00",
+  "base_model": "Cloudflare/clef-flash",
+  "revision": "22b75507981345858dd152fbd9a6f8c0c4068b0a",
+  "writer": "openai/gpt-6-astra",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 62
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra",
+  "validation": {
+   "items": 400,
+   "original": 0.6965,
+   "edited": 0.7545000000000001,
+   "gain": 0.057999999999999996,
+   "se": 0.007631224605031035,
+   "improved": 136,
+   "worsened": 43
+  }
+ },
+ "changed_tensors": 3,
+ "changed_entries_total": 98350,
+ "tensors": [
+  {
+   "name": "residual_scorer.0.bias",
+   "shape": [
+    1024
+   ],
+   "dtype": "bfloat16",
+   "form": "sparse",
+   "changed_entries": 24,
+   "relative_change": 329.5970764160156,
+   "base_sha256": "29d6a8244a8bf5c8aeaaf3f76f614cfb047bf9be03dfd50aac364fb17a613dbe",
+   "edited_sha256": "c88e5925fc3bfa516d74be5f750fb64918581006792dec89096e9e4b9a1012f4"
+  },
+  {
+   "name": "residual_scorer.0.weight",
+   "shape": [
+    1024,
+    4096
+   ],
+   "dtype": "bfloat16",
+   "form": "sparse",
+   "changed_entries": 98302,
+   "relative_change": 47.19672775268555,
+   "base_sha256": "cacd1d55639675ed3fedaee0e1492be2520140dc43855f6f5324684f7ae72f25",
+   "edited_sha256": "7fcbd95bb91e3dd9ecdb5146389894d44411f14c7a5e4395d0d7d68ed85dc7fb"
+  },
+  {
+   "name": "residual_scorer.3.weight",
+   "shape": [
+    1,
+    1024
+   ],
+   "dtype": "bfloat16",
+   "form": "sparse",
+   "changed_entries": 24,
+   "relative_change": 203.39779663085938,
+   "base_sha256": "77e8bc1fa9dd30005c464cd511b8240ce2096666d4f40077c9aafead7a2785e8",
+   "edited_sha256": "67925b42dbb4a3af84d666a0586211a340a459795b2d63f9cb834fd2aca64ae0"
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+OUTPUT of Python run 28 of at most 300:
+```
+Top10 dims: [98, 1816, 1035, 893, 1855, 281, 1630, 2, 636, 456]
+none {'accuracy': 0.5777777891192172, 'gain': 0.0, 'se': 0.0, 'brier': 0.16840681433677673}
+top10_only {'accuracy': 0.5777777894503541, 'gain': 0.0, 'se': 0.003859738279646906, 'brier': 0.16686628758907318}
+other2038_only {'accuracy': 0.7711111207803091, 'gain': 0.19333333753877216, 'se': 0.018096918631288664, 'brier': 0.0777728334069252}
+full_best2 {'accuracy': 0.7722222317424086, 'gain': 0.19444444866644012, 'se': 0.018539508509868297, 'brier': 0.07758436352014542}
+top10 RMS centered logit change 12.798181533813477
+other2038 RMS centered logit change 5.296318531036377
+full RMS centered logit change 18.014678955078125
+Schema mean span rank 51
+schema_mean_span_only {'accuracy': 0.6433333453204897, 'gain': 0.06555555711189906, 'se': 0.014851264210731217, 'brier': 0.1261548101902008} direction norm share 0.0613330639898777
+schema_mean_null_only {'accuracy': 0.6988888999654187, 'gain': 0.12111111332972845, 'se': 0.01603048203203211, 'brier': 0.1165437400341034} direction norm share 0.9981173276901245
+```
+[forward passes used: 15 of 25; Python runs used: 28 of 300]

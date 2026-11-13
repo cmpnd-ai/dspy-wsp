@@ -1,0 +1,19 @@
+OUTPUT of Python run 18 of at most 300:
+```
+Actual versus predicted counterfactual relative-logit max error: 1.6927719116210938e-05
+Query feature count 1040 Gram eigenvalues min/max 3.0245507397285873 75171.29132618236
+q ridge=     1 strength=0.5 | fit=0.802 dev=0.752 gain vs original=+0.174 SE=0.022 Brier=0.069
+q ridge=     1 strength=1.0 | fit=0.809 dev=0.751 gain vs original=+0.173 SE=0.022 Brier=0.072
+q ridge=     1 strength=1.5 | fit=0.802 dev=0.736 gain vs original=+0.158 SE=0.023 Brier=0.080
+q ridge=    10 strength=0.5 | fit=0.800 dev=0.758 gain vs original=+0.180 SE=0.021 Brier=0.069
+q ridge=    10 strength=1.0 | fit=0.808 dev=0.753 gain vs original=+0.176 SE=0.022 Brier=0.071
+q ridge=    10 strength=1.5 | fit=0.803 dev=0.738 gain vs original=+0.160 SE=0.022 Brier=0.077
+q ridge=   100 strength=0.5 | fit=0.794 dev=0.750 gain vs original=+0.172 SE=0.022 Brier=0.070
+q ridge=   100 strength=1.0 | fit=0.804 dev=0.750 gain vs original=+0.172 SE=0.022 Brier=0.069
+q ridge=   100 strength=1.5 | fit=0.800 dev=0.744 gain vs original=+0.167 SE=0.023 Brier=0.072
+q ridge=  1000 strength=0.5 | fit=0.785 dev=0.749 gain vs original=+0.171 SE=0.022 Brier=0.071
+q ridge=  1000 strength=1.0 | fit=0.792 dev=0.747 gain vs original=+0.169 SE=0.022 Brier=0.070
+q ridge=  1000 strength=1.5 | fit=0.791 dev=0.747 gain vs original=+0.169 SE=0.022 Brier=0.069
+Best query addition: (10.0, 0.5, (0.7996296286582947, 0.2240740805864334, 0.011788324811150257, 0.04704703018069267), (0.757777750492096, 0.18000000715255737, 0.021438058489325472, 0.06903643161058426))
+```
+[forward passes used: 12 of 25; Python runs used: 18 of 300]

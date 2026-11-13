@@ -1,0 +1,12 @@
+OUTPUT of Python run 31 of at most 300:
+```
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 10.5890
+Existing X convention: 0.1489003598690033 weighted: 0.0
+weights range 0.4472135901451111 0.7071067690849304
+Gram diagonal 0 0.18803937779762372 X squared sum 0.18803937779762195
+Gram diagonal 10 0.09745521360057537 X squared sum 0.09745521360057469
+Gram diagonal 500 0.1769622995419377 X squared sum 0.17696229954193574
+Reconstructed v_ref error: 1.1581283843042911e-07
+Ridge system scale: 316.22065098281456 2.287464288591212e-12 number rows 9585
+```
+[forward passes used: 17 of 25; Python runs used: 31 of 300]

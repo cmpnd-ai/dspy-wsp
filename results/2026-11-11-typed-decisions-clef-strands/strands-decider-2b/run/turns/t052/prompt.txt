@@ -1,0 +1,14 @@
+OUTPUT of Python run 33 of at most 300:
+```
+Candidate fit: {'accuracy': 0.790000009233201, 'gain': 0.21444444957154768, 'se': 0.010499667890737481, 'brier': 0.06377065926790237}
+Candidate development: {'accuracy': 0.7822222313119306, 'gain': 0.20444444922937288, 'se': 0.018507673699077458, 'brier': 0.07868214696645737}
+Direction cosine with best2: 0.9363985061645508
+Norm ratio: 0.9246886372566223
+Development dose response (same closed-form direction):
+0.0 {'accuracy': 0.5777777891192172, 'gain': 0.0, 'se': 0.0, 'brier': 0.17925088107585907}
+0.5 {'accuracy': 0.7233333438634872, 'gain': 0.14555555830399194, 'se': 0.014254106026698627, 'brier': 0.109911248087883}
+1.0 {'accuracy': 0.7822222313119306, 'gain': 0.20444444922937288, 'se': 0.018507673699077458, 'brier': 0.07868214696645737}
+1.5 {'accuracy': 0.7633333426382807, 'gain': 0.18555555989344916, 'se': 0.02149187855948059, 'brier': 0.07694718986749649}
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 9.7915
+```
+[forward passes used: 17 of 25; Python runs used: 33 of 300]

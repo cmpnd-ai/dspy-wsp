@@ -38,6 +38,14 @@ def _d1_lm(read: Read) -> bool:
             and config.get("d1_attention") == "set")
 
 
+def _clef(read: Read) -> bool:
+    return (read("config.json") or {}).get("model_type") == "qwen3_5" and "routing_layers" in (read("joint_head_config.json") or {})
+
+
+def _strands(read: Read) -> bool:
+    return (read("strands_decider_config.json") or {}).get("head_type") == "pointer"
+
+
 FAMILIES: list[Family] = [
     Family("d1_omni", "dspy_wsp.backends.decision.D1Backend", _d1_omni,
            "config.json with model_type 'd1_omni'",
@@ -48,6 +56,12 @@ FAMILIES: list[Family] = [
     Family("d1_lm", "dspy_wsp.backends.decision.D1LMBackend", _d1_lm,
            "config.json with model_type 'lfm3_vl' and d1_attention 'set'",
            {"d1-2b": ("LiquidAI/d1-2B", "652f920e544ea37f81e4b0ce89b81d4ed0da90b1")}),
+    Family("clef", "dspy_wsp.backends.decision.ClefBackend", _clef,
+           "config.json with model_type 'qwen3_5', and joint_head_config.json",
+           {"clef-flash": ("Cloudflare/clef-flash", "22b75507981345858dd152fbd9a6f8c0c4068b0a")}),
+    Family("strands", "dspy_wsp.backends.decision.StrandsBackend", _strands,
+           "strands_decider_config.json with head_type 'pointer'",
+           {"strands-2b": ("StrandsAgents/strands-decider-2B-qwen3.5-v1-2610", "216d1ccb46a9e9b036eb9187b248db98480f77d4")}),
 ]
 
 

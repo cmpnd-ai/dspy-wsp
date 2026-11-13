@@ -1,0 +1,8 @@
+OUTPUT of Python run 56 of at most 300:
+```
+Best_1 bundle keys: ['delta', 'pair', 'strength', 'first_weight', 'first_bias', 'last_weight']
+Traceback (most recent call last):
+  File "<cell>", line 7, in <module>
+AttributeError: 'tuple' object has no attribute 'items'
+```
+[forward passes used: 22 of 25; Python runs used: 56 of 300]

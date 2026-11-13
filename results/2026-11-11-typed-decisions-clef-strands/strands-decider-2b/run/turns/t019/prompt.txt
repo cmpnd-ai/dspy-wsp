@@ -1,0 +1,49 @@
+RESULT of forward pass 6:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 180,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/gen_6_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/gen_6_edited.jsonl"
+ ],
+ "original": {
+  "graded": 180,
+  "score": 0.5777777777777777,
+  "score_se_over_items": 0.01823284727555676,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 162
+  }
+ },
+ "edited": {
+  "graded": 180,
+  "score": 0.7233333333333333,
+  "score_se_over_items": 0.016244179590772848,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 141
+  }
+ },
+ "paired": {
+  "items": 180,
+  "original": 0.5777777777777777,
+  "edited": 0.7233333333333333,
+  "gain": 0.14555555555555555,
+  "se": 0.01636263138711963,
+  "improved": 98,
+  "worsened": 20
+ },
+ "seconds": 3.0
+}
+```
+[forward passes used: 6 of 25; Python runs used: 11 of 300]

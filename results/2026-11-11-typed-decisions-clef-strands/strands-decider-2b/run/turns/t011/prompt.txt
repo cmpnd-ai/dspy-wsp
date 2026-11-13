@@ -1,0 +1,12 @@
+OUTPUT of Python run 6 of at most 300:
+```
+Metadata keys: ['rows', 'layers', 'conventions', 'model', 'files']
+layers []
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "each option's logit, k(norm(head_inputs)) . q(norm(decide)) / sqrt(dim), before the temperature", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "the backbone's hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens", 'head_inputs': "the backbone's output at the last token of each option's line", 'decide': "the backbone's output at the prompt's last token, repeated for each option of the question"}
+model original
+files {'option_mask.npy': [900, 5], 'option_logits.npy': [900, 5], 'head_inputs.npy': [900, 5, 2048], 'decide.npy': [900, 5, 2048], 'probabilities.npy': [900, 5]}
+Max exact-logit error: 3.0994415283203125e-06
+decision top dimensions [(2, 370.01300048828125), (1816, 341.56201171875), (281, 258.3479919433594), (675, 250.03700256347656), (1190, 224.71600341796875), (1379, 194.8679962158203), (1855, 83.9540023803711), (1995, 36.400001525878906), (1035, 34.8650016784668), (1447, 32.36199951171875)] energy share 0.892150821051442 mean norm 45.232215881347656 centered RMS 0.03161992132663727
+option top dimensions [(98, 939.6209716796875), (1816, 502.9939880371094), (1035, 150.5540008544922), (893, 68.63800048828125), (1855, 56.4119987487793), (281, 40.78799819946289), (1630, 35.09299850463867), (2, 25.020999908447266), (636, 15.154000282287598), (456, 8.595999717712402)] energy share 0.8998401283455507 mean norm 45.2160530090332 centered RMS 0.04138968884944916
+```
+[forward passes used: 3 of 25; Python runs used: 6 of 300]

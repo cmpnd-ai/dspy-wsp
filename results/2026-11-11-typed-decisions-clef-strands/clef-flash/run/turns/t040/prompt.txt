@@ -1,0 +1,8 @@
+OUTPUT of Python run 25 of at most 300:
+```
+gate 32.0 target fit mean-error/std median [-0.003  0.061] fit 0.8176 tune {'accuracy': 0.7860000133514404, 'gain': np.float64(0.07600000000000001), 'se': np.float64(0.01723984110170744), 'n': 100}
+per-target error: [('0', -0.567, 0.109), ('1', 0.059, 0.061), ('2', 0.927, 0.102), ('3', -0.322, 0.06), ('answer_directly', 0.42, 0.038), ('close_no_action', -0.003, 0.035), ('escalate_to_human', 0.215, 0.035), ('execute_refund', -0.079, 0.21), ('request_information', -0.258, 0.147), ('false', 0.082, 0.033), ('true', -0.662, 0.085)]
+gate 64.0 target fit mean-error/std median [0.261 0.113] fit 0.82 tune {'accuracy': 0.777999997138977, 'gain': np.float64(0.06800000000000002), 'se': np.float64(0.018028036526757458), 'n': 100}
+per-target error: [('0', 0.261, 0.099), ('1', 0.897, 0.113), ('2', -0.571, 0.077), ('3', 1.225, 0.123), ('answer_directly', 0.194, 0.325), ('close_no_action', 0.825, 0.056), ('escalate_to_human', -1.04, 0.179), ('execute_refund', 0.263, 0.172), ('request_information', -0.304, 0.37), ('false', 0.696, 0.05), ('true', 0.199, 0.067)]
+```
+[forward passes used: 9 of 25; Python runs used: 25 of 300]

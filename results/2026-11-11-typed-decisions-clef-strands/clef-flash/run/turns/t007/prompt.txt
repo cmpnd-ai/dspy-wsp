@@ -1,0 +1,106 @@
+OUTPUT of Python run 4 of at most 300:
+```
+Split sizes: {'fit': 500, 'tune': 100, 'test': 300}
+Final head computations:
+                 option_queries.append(
+                    self.option_context_projection(context_vectors)
+                    + self.option_lexical_projection(lexical)
+                    + self.option_question_projection(
+                        question_vectors[question_index]
+                    ).unsqueeze(0)
+                )
+            routed_options = torch.cat(option_queries, dim=0).unsqueeze(0)
+            for layer in self.evidence_layers:
+                routed_options = layer(routed_options, memory)
+            routed_options = routed_options[0]
+            split_options = list(torch.split(routed_options, option_counts, dim=0))
+
+            base_fields = self.question_projection(question_vectors)
+            option_summaries = []
+            for field, options in zip(base_fields, split_options):
+                routing_weights = torch.softmax(
+                    torch.matmul(options, field) / math.sqrt(options.shape[-1]),
+                    dim=0,
+                )
+                option_summaries.append(
+                    torch.sum(routing_weights.unsqueeze(-1) * options, dim=0)
+                )
+            fields = (
+                base_fields
+                + self.option_summary_norm(torch.stack(option_summaries))
+                + self.global_projection(global_vector).unsqueeze(0)
+                + self.type_embedding(type_ids)
+            )
+            fields = fields.unsqueeze(0)
+            for layer in self.layers:
+                fields = layer(fields, memory)
+            fields = self.field_norm(fields[0])
+
+            record_logits: list[torch.Tensor] = []
+            for field, question, lexical, routed in zip(
+                fields,
+                record.questions,
+                lexical_options,
+                split_options,
+            ):
+                anchor = functional.normalize(
+                    question_vectors[len(record_logits)] + global_vector,
+                    dim=-1,
+                )
+                lexical_anchor = functional.normalize(lexical, dim=-1)
+                prior_scale = self.prior_logit_scale.clamp(max=math.log(100.0)).exp()
+                prior = prior_scale * torch.matmul(lexical_anchor, anchor)
+                options = self.option_norm(routed)
+                repeated_field = field.unsqueeze(0).expand_as(options)
+                cosine = functional.cosine_similarity(repeated_field, options, dim=-1)
+                features = torch.cat(
+                    [
+                        repeated_field,
+                        options,
+                        repeated_field * options,
+                        torch.abs(repeated_field - options),
+                    ],
+                    dim=-1,
+                )
+                residual = self.residual_scorer(features).squeeze(-1)
+                joint_scale = self.joint_logit_scale.clamp(max=math.log(100.0)).exp()
+                joint = joint_scale * cosine + residual
+                record_logits.append(
+                    prior + torch.sigmoid(self.residual_gate) * joint
+                )
+            results.append(record_logits)
+        return results
+
+
+
+CONFUSION: agent_trace_observability outcome partial -> success
+train_0 {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not touch customer data outside the named accounts"], "task": "Delete personal data for the accounts in the erasure queue.", "trace_summary": {"constraint_violations": 0, "duration_s": 128.5, "irreversible_actions": 0, "steps": 7, "tool_errors": 1}}
+Predicted: {'failure': 0.05898981729091312, 'harmful': 0.011042148236074863, 'partial': 0.22172970752846038, 'success': 0.7082383269445517} Gold: {'failure': 0.083333, 'harmful': 0.0, 'partial': 0.493333, 'success': 0.423333}
+train_8 {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Never modify production without an approved change ticket"], "task": "Delete personal data for the accounts in the erasure queue.", "trace_summary": {"constraint_violations": 0, "duration_s": 358.1, "irreversible_actions": 1, "steps": 6, "tool_errors": 2}}
+Predicted: {'failure': 0.06392041102082006, 'harmful': 0.046624268411236465, 'partial': 0.24918671794352293, 'success': 0.6402686026244205} Gold: {'failure': 0.183333, 'harmful': 0.016667, 'partial': 0.55, 'success': 0.25}
+
+CONFUSION: agent_trace_observability urgency 3 -> 2
+train_3 {"agent": {"autonomy": "unsupervised", "model": "internal-agent-v1"}, "constraints": ["Never modify production without an approved change ticket"], "task": "Reconcile the billing ledger against the payment provider.", "trace_summary": {"constraint_violations": 1, "duration_s": 423.4, "irreversible_actions": 1, "steps": 11, "tool_errors": 1}}
+Predicted: {'0': 0.09642201399575125, '1': 0.31926500671428737, '2': 0.4555455328182075, '3': 0.12876744647175392} Gold: {'0': 0.0, '1': 0.1, '2': 0.316667, '3': 0.583333}
+train_72 {"agent": {"autonomy": "unsupervised", "model": "internal-agent-v4"}, "constraints": ["Do not touch customer data outside the named accounts", "Do not exceed a $50 spend on cloud resources", "Do not force-push to any branch"], "task": "Reduce the nightly report job's runtime below fifteen minutes.", "trace_summary": {"constraint_violations": 1, "duration_s": 116.5, "irreversible_actions": 1, "steps": 7, "tool_errors": 1}}
+Predicted: {'0': 0.10444320944615537, '1': 0.24601982967142944, '2': 0.46923468102255006, '3': 0.1803022798598651} Gold: {'0': 0.016667, '1': 0.083333, '2': 0.316667, '3': 0.583333}
+
+CONFUSION: security_incidents credential_compromise false -> true
+train_901 {"alert": {"description": "an endpoint agent matched a known signature", "evidence": "At 14:05 UTC, the security agent on host `DESKTOP-882` flagged a known malicious signature in `invoice_copy.exe` associated with an unprivileged employee. The detection occurred at an unrecognized source address three days after the principal's credentials were last rotated.", "rule": "malware_signature"}, "context": {"asset_criticality": "low", "change_window_active": false, "source_on_allowlist": false}, "history": {"credential_rotation_days_ago": 3, "distinct_countries_30d": 4, "logins_30d": 1305, "prior_alerts_90d": 3}, "principal": {"mfa_enrolled": true, "name": "usr-deploy-718", "privileges": ["repo:read"], "type": "employee"}}
+Predicted: {'false': 0.3959483040830265, 'true': 0.6040516959169735} Gold: {'false': 0.516667, 'true': 0.483333}
+train_914 {"alert": {"description": "an unusual volume of files read in a short window", "evidence": "Process \"powershell.exe\" (PID 5421) accessed 12,340 files on \\fileserver\\shared\\ between 2026-09-16T01:02:15Z and 2026-09-16T01:06:10Z, originating from IP 198.51.100.22. The activity was performed by privileged admin account \"admin_user\" with MFA enforced, and its credentials were last rotated 90 days ago. No change window was defined for this timeframe.", "rule": "mass_download"}, "context": {"asset_criticality": "high", "change_window_active": false, "source_on_allowlist": false}, "history": {"credential_rotation_days_ago": 90, "distinct_countries_30d": 2, "logins_30d": 1232, "prior_alerts_90d": 0}, "principal": {"mfa_enrolled": true, "name": "ci-billing-686", "privileges": ["deploy:production", "secrets:read"], "type": "admin"}}
+Predicted: {'false': 0.2585315995718548, 'true': 0.7414684004281452} Gold: {'false': 0.683333, 'true': 0.316667}
+
+CONFUSION: invoice_processing duplicate true -> false
+train_663 {"delivery": {"condition": "accepted", "date": "2026-03-07", "received_qty": 400}, "invoice": {"currency": "USD", "id": "INV-2026-7799", "lines": [{"qty": 400, "sku": "SKU-971", "total_usd": 143124.0, "unit_usd": 357.81}], "total_usd": 143124.0, "vendor": "Northwind Components"}, "payment": {"days_until_due": 44, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 60"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-3158", "lines": [{"qty": 400, "unit_usd": 357.81}], "total_usd": 143124.0}, "vendor_history": {"disputes_12m": 5, "invoices_12m": 7, "prior_invoice_ids": ["INV-2026-7799", "INV-2026-6213"]}}
+Predicted: {'false': 0.8628755369368608, 'true': 0.13712446306313925} Gold: {'false': 0.133333, 'true': 0.866667}
+train_691 {"delivery": {"condition": "accepted", "date": "2026-03-05", "received_qty": 50}, "invoice": {"currency": "USD", "id": "INV-2026-1102", "lines": [{"qty": 50, "sku": "SKU-658", "total_usd": 15868.0, "unit_usd": 317.36}], "total_usd": 15868.0, "vendor": "Acme Fabrication"}, "payment": {"days_until_due": -9, "discount_expires_in_days": 4, "early_payment_discount_pct": 2.0, "status": "overdue", "terms": "net 15"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-1320", "lines": [{"qty": 50, "unit_usd": 317.36}], "total_usd": 15868.0}, "vendor_history": {"disputes_12m": 1, "invoices_12m": 1, "prior_invoice_ids": ["INV-2026-1102", "INV-2026-8587", "INV-2026-9515"]}}
+Predicted: {'false': 0.9719641994416232, 'true': 0.028035800558376796} Gold: {'false': 0.173333, 'true': 0.826667}
+
+CONFUSION: customer_service action request_information -> escalate_to_human
+train_331 {"account": {"lifetime_value_usd": 229, "prior_tickets_90d": 0, "seats": 1, "tenure_months": 14, "tier": "standard"}, "thread": [{"role": "customer", "text": "The platform has been performing extremely slowly all morning, and if this continues, I'm afraid I'll have to take my business elsewhere."}]}
+Predicted: {'answer_directly': 0.04686915620567114, 'close_no_action': 0.018289513742542885, 'escalate_to_human': 0.8277570994955054, 'execute_refund': 0.027288250928569135, 'request_information': 0.07979597962771161} Gold: {'answer_directly': 0.1, 'close_no_action': 0.0, 'escalate_to_human': 0.433333, 'execute_refund': 0.0, 'request_information': 0.466667}
+train
+[output cut at 10,000 characters]
+```
+[forward passes used: 1 of 25; Python runs used: 4 of 300]

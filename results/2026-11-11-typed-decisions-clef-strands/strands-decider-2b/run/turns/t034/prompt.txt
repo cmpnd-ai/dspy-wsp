@@ -1,0 +1,8 @@
+OUTPUT of Python run 20 of at most 300:
+```
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 10.5890
+Refined correction vs validated direction cosine: 0.8327565789222717
+Refined dev vs original: (0.7722222208976746, 0.1944444626569748, 0.0185395086686121, 0.08730112761259079)
+Refined dev vs validated: (0.024444447830319405, 0.01087774799864464)
+```
+[forward passes used: 12 of 25; Python runs used: 20 of 300]

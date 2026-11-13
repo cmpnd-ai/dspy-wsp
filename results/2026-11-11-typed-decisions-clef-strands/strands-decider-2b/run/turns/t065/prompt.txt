@@ -1,0 +1,8 @@
+OUTPUT of Python run 39 of at most 300:
+```
+Final counterfactual max centered-logit error: nan
+Traceback (most recent call last):
+  File "<cell>", line 9, in <module>
+AssertionError
+```
+[forward passes used: 23 of 25; Python runs used: 39 of 300]

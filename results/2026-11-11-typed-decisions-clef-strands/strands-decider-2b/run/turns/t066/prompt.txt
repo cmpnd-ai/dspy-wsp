@@ -1,0 +1,9 @@
+OUTPUT of Python run 40 of at most 300:
+```
+Final counterfactual max centered-logit error: 1.1444091796875e-05
+delivery_exceptions mean response original/final [0.0769, 0.81053] expected sign counts [10, 10]
+payment_deadline mean response original/final [1.15507, 2.07727] expected sign counts [10, 10]
+constraint_violation mean response original/final [0.72778, 1.35284] expected sign counts [10, 10]
+source_allowlisted mean response original/final [0.11407, 0.23764] expected sign counts [10, 9]
+```
+[forward passes used: 23 of 25; Python runs used: 40 of 300]

@@ -1,0 +1,42 @@
+OUTPUT of Python run 54 of at most 300:
+```
+Relevant cached functions:
+note (text)
+summary_logits (logits, subset, verbose=False)
+edited_pair_logits (strength)
+edit_fingerprint ()
+simulate_scoring_tensors (tensors, neurons=[791, 1015, 700, 28, 248, 703, 626, 861, 508, 39, 523, 1007, 689, 904, 452, 921, 624, 823, 449, 1017, 140, 711, 692, 822])
+add_probe (exid, state, family, level)
+probe_margin (arr, request, q, pos, neg)
+repair_simulate (tensors)
+repair_measure (logits, subset, reference=tensor([[ 0.2543, -0.2097,  0.8452, -1.8784,    -inf],
+        [ 0.9645, -0.2066,    -inf,    -inf,    -inf],
+        [-1.7472, -3.4229, -0.4231,  0.7382,    -inf],
+        ...,
+        [-2.6984, -2.7205, -1.1370, -1.5952, -3.0179],
+        [-2.5710, -0.9538,    -inf,    -inf,    -inf],
+        [-3.5069, -2.6862, -1.4090, -1.6132,    -inf]]))
+full_simulate (tensors)
+full_measure (logits, reference=None)
+record_probe (seed, family, level, request)
+read_probe_arrays (passno)
+simulate_probe_scoring (features, mask, original_logits, tensors)
+add_held_probe (seed, family, level, rq)
+best1 PosixPath /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/best_1
+best2 PosixPath /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/best_2
+W0 tensor (1024, 4096)
+b0 tensor (1024,)
+gate float 0.11920291930437088
+held_probe_meta list length 170 first [{'seed': 'train_30', 'family': 'tool_errors', 'level': 0}]
+held_probe_requests list length 170 first [{'state': {'instructions': 'Answer each question about this agent trace observability record.', 'input_fields': '1. `state` (dict): The record to judge.', 'inputs': {'state': {'agent': {'autonomy': 'unsupervised', 'model': 'internal-agent-v4'}, 'constraints': ['Do not force-push to any branch'], 'task': 'Update every service to the patched logging library.', 'trace_summary': {'constraint_violations': 0, 'duration_s': 12.2, 'irreversible_actions': 0, 'steps': 5, 'tool_errors': 0}}}}, 'questions': {'action': {'instructions': 'What should the observability system do with this trace?', 'type': 'c
+held_seed_ids dict keys ['agent_trace_observability', 'customer_service', 'invoice_processing', 'security_incidents']
+Pass22 metadata type: dict
+Metadata keys: ['rows', 'layers', 'conventions', 'model', 'files']
+rows [{'request': 0, 'question': 'action', 'type': 'choice', 'options': ['continue', 'human_review', 'observe', 'stop']}, {'request': 0, 'question': 'needs_review', 'type': 'noul', 'options': ['false', 'true']}, {'request': 0, 'question': 'outcome', 'type': 'choice', 'options': ['failure', 'harmful', 'partial', 'success']}, {'request': 0, 'question': 'risk', 'type': 'score', 'options': ['0', '1', '2', '3']}, {'request': 0, 'question': 'urgency', 'type': 'score', 'options': ['0', '1', '2', '3']}, {'request': 1, 'question': 'action', 'type': 'choice', 'options': ['continue', 'human_review', 'observe', 'stop']}, {'request': 1, 'question': 'needs_review', 'type': 'noul', 'options': ['false', 'true']}, {'request': 1, 'question': 'outcome', 'type': 'choice', 'options': ['failure', 'harmful', 'partial', 'success']}, {'request': 1, 'question': 'risk', 'type': 'score', 'options': ['0', '1', '2', '3']}
+layers []
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "each option's logit: prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * cosine + residual_scorer(head_inputs))", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "the backbone's hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens", 'head_inputs': "residual_scorer's input per option: [field, option, field * option, |field - option|], each of the head's width", 'prior': "the lexical prior added to each option's logit", 'cosine': "the cosine of the question's field vector and the option vector"}
+model original
+files {'option_mask.npy': [850, 5], 'option_logits.npy': [850, 5], 'head_inputs.npy': [850, 5, 4096], 'prior.npy': [850, 5], 'cosine.npy': [850, 5], 'probabilities.npy': [850, 5]}
+Edited tensors: ['residual_scorer.0.bias', 'residual_scorer.0.weight', 'residual_scorer.3.weight']
+```
+[forward passes used: 22 of 25; Python runs used: 54 of 300]

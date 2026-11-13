@@ -1,0 +1,58 @@
+OUTPUT of Python run 53 of at most 300:
+```
+ll candidate once; no validation-based hyperparameter search.
+
+## Full-practice fixed-design targeted candidate
+Same 24 neurons as best_2. Shared hard-margin ridge 1e-4, half strength; three selected field readouts soft ridge .01; schema gates ridge 1e-5, threshold .5, strength32; direct bfloat16 offset compensation. All refit once on 900 practice. In-sample practice: {'acc': 0.8035555481910706, 'gain': 0.10222222222222223, 'se': 0.005477513899235792, 'n': 900}. Not an independent test.
+
+## Planned pass 15
+Exact edits in full_targeted_candidate.pt: 24 scorer rows/biases/output entries, same three tensors only. DECIDE both on 300 hidden validation items. No backbone/routing changes; best_2 saved as fallback.
+
+## Pass 15 complete; best_2 restored
+Fixed-design full-data targeted refit: validation original 0.702000, edited 0.765333, gain +0.063333 ±0.009227 paired SE, n=300. Lower than saved best_2 (0.770667), so rejected as final. Restored best_2 exactly from targeted_candidate.pt. Remaining experiments focus on controlled cue response, extension dose/ablation, and exact reconstruction, not validation hyperparameter search.
+
+## Planned pass 16 — original target-cue probes
+Current edit best_2 unchanged. READ original on 156 controlled requests, 780 questions: 12 fit agent seeds x (4 violation counts +4 irreversible-action counts); 12 fit customer accounts x5 routine/authority/resolved/refund/underspecified threads. Files target_cue_probes_original.json and target_cue_probe_meta.json. No gold/score. Prespecified expectations: urgency critical-routine increases with violations/irreversible actions; explicit human request increases needs_human and escalation; resolved selects close_no_action; missing info selects request_information. Compare original/shared/full edits to isolate pathway.
+
+## Pass 16 local target-cue analysis
+Simulated original/shared/best_2 target-cue margins: [(('urgency_constraint_violations', '0', 'urgency', '3-1'), [-2.537, -2.109, -2.835]), (('urgency_constraint_violations', '1', 'urgency', '3-1'), [-2.402, -1.095, 0.157]), (('urgency_constraint_violations', '2', 'urgency', '3-1'), [-2.014, -1.003, 0.766]), (('urgency_constraint_violations', '4', 'urgency', '3-1'), [-0.714, -0.074, 1.584]), (('urgency_irreversible_actions', '0', 'urgency', '3-1'), [-2.537, -2.109, -2.835]), (('urgency_irreversible_actions', '1', 'urgency', '3-1'), [-2.661, -2.101, -1.845]), (('urgency_irreversible_actions', '2', 'urgency', '3-1'), [-2.686, -2.378, -2.056]), (('urgency_irreversible_actions', '4', 'urgency', '3-1'), [-2.51, -2.054, -1.979]), (('customer_resolution_authority', 'routine_information', 'action', 'answer_directly-best_other'), [1.897, 0.951, 4.078]), (('customer_resolution_authority', 'routine_information', 'needs_human', 'true-false'), [-2.248, -2.315, -2.055]), (('customer_resolution_authority', 'human_authority', 'action', 'escalate_to_human-best_other'), [5.027, 2.354, 3.167]), (('customer_resolution_authority', 'human_authority', 'needs_human', 'true-false'), [3.335, 1.302, 2.015]), (('customer_resolution_authority', 'resolved', 'action', 'close_no_action-best_other'), [4.592, 3.31, 2.468]), (('customer_resolution_authority', 'resolved', 'needs_human', 'true-false'), [-0.166, 0.264, 0.284]), (('customer_resolution_authority', 'verified_refund', 'action', 'execute_refund-best_other'), [1.372, 1.165, 1.889]), (('customer_resolution_authority', 'verified_refund', 'needs_human', 'true-false'), [-0.059, -0.008, -0.834]), (('customer_resolution_authority', 'missing_information', 'action', 'request_information-best_other'), [4.528, 3.003, 2.743]), (('customer_resolution_authority', 'missing_information', 'needs_human', 'true-false'), [-0.113, -0.423, 0.573])]. Unscored probes only.
+
+## Planned pass 17
+Exact edit: best_1 two-neuron repair from linear_bypass_candidate.pt; no gated neurons. READ edited on same 156 target-cue requests (target_cue_probes_edited.json). Will compare exact features/logits with pass16 simulation. This is causal ablation of 22 gated neurons, not a candidate-selection run.
+
+## Pass 17 verification
+Shared repair probe max feature difference 0; max local-vs-tool logit error 4.81606e-05. Controlled target probes show strong violation→urgency repair, weaker/mixed customer-human cues; do not claim all cues fixed.
+
+## Planned pass 18
+Exact edit best_2 restored: shared neurons791/1015 plus22 gated field-specific neurons, tensors from targeted_candidate.pt. READ edited on same156 target-cue requests, target_cue_probes_edited.json. No labels/score; compare against passes16(original) and17(shared only).
+
+## Pass 18 verification
+Best_2 target probes: upstream max feature difference 0; local-vs-tool max logit error 0.000339508. Constraint violation counts0/1/2/4 yield critical−routine urgency margins original[-2.537,-2.402,-2.014,-0.714], shared[-2.109,-1.095,-1.003,-0.074], best_2[-2.835,+0.157,+0.766,+1.584]. Irreversible actions alone remain weak/nonmonotonic; customer needs_human responses mixed. These limitations are recorded, not hidden.
+
+## Planned pass 19 — half extension causal dose
+Exact edit: best_2 incoming rows/biases unchanged, shared output entries unchanged, only22 targeted outgoing weights halved (±4.1875 instead of±8.375). READ edited on156 target-cue probes, target_cue_probes_edited.json. Mechanism test only; no validation selection. best_2 saved.
+
+## Pass 19 dose verification
+Half-extension actual logit margins match midpoint of shared-only and full extension to float32 precision; upstream features identical. This confirms graded causal control through the selected22 output entries. Full best_2 restored; no new candidate selected.
+
+## Planned pass 20 — nuisance robustness original
+Exact current edits best_2 unchanged. READ original on120 requests:40 former-test seeds(10/workflow), each original/short archive metadata/long archive metadata. Business evidence and schema unchanged. nuisance_probes_original.json. No gold supplied and no edit fitting; robustness diagnostic only.
+
+## Pass 20 metadata diagnostic
+Original backbone features collected for40 seeds x3 metadata conditions. Local best_2 simulation, descriptive only: {'original': {'accuracy_original_edited': [0.745, 0.805], 'flip_rate_original_edited': [0.0, 0.0], 'probability_TV_original_edited': [0.0, 0.0]}, 'short_metadata': {'accuracy_original_edited': [0.77, 0.84], 'flip_rate_original_edited': [0.045, 0.07], 'probability_TV_original_edited': [0.026789746421854943, 0.040806120747001844]}, 'long_metadata': {'accuracy_original_edited': [0.775, 0.815], 'flip_rate_original_edited': [0.055, 0.055], 'probability_TV_original_edited': [0.035204838360659775, 0.0565395827894099]}}. No fitting or candidate selection from this diagnostic.
+
+## Planned pass 21
+Exact edits best_2 unchanged: targeted_candidate.pt, 24 scorer neurons, three tensors. READ edited on identical120 nuisance requests, nuisance_probes_edited.json. Verify local predictions and unchanged scorer inputs.
+
+## Pass 21 verification
+Metadata edited run matched scorer simulation; upstream features unchanged. Positive descriptive accuracy differences persisted under metadata perturbations, but edited probabilities were somewhat more sensitive. Not claiming invariance.
+
+## Planned pass 22 — independent-seed cue probes
+Exact edits best_2 unchanged. READ original on170 requests/850 questions from40 practice seeds excluded from best_2's fit and tune (10/workflow, test positions10:20). Agent tool_errors0/1/2/4, violations0/1/2; customer5 authority/resolution states; invoice duplicate-ID absent/present at fixed prior-list length; security unapproved/allowlisted/allowlisted+window. No gold supplied, no fitting, prespecified margins from earlier probes. Files held_cue_probes_original.json and held_cue_probe_meta.json.
+
+
+CACHED VARIABLE NAMES:
+A2, Cfit, D, F, FG, FULL, FX, Frhs, G, GF, GFC, GG, GR, GY, H2, L, Lbest, Lraw, Ls, Ltarget, MODEL, P0, P1, PG, PRACTICE, PX, Path, R, T, U, W0, WORK, X, Y, a, a7, actual, actual_shared_row, add_held_probe, add_probe, agent_seeds, agentfit, all_modified, allowlisted, alt_candidates, alt_targets, an, ans, answers, arhs, arr, ast, aunit, b, b0, b1, balance, base, base_bf, base_wf, base_wl, basebyid, baseline_ids, basepred, batches, bc, best, best1, best2, bf, bias, bo, bout, builtins, byid, bypass_delta, bywf_test, c, call_answers, candidate_dir, candidates, canonical, cc, center_options, centroids, cg, change, class_ids, class_index, coef, collections, comparisons, components, components2, conditional_L, conditional_candidates, conditional_table, confusions, contextlib, contrib, copy, cor, corr, corrected, correction, count, customer_seeds, customer_texts, d, data, dd, delta, desired, diag_names, diff, difference, directions, dis, dose_results, dpart, drop_edit, dup, dw, ebias, ec, edit_fingerprint, edited, edited_pair_logits, effect, eid, erow, err2, errors, errstats, es, ev, evals, evecs, ex, exid, expert_rows, extension_neurons, f, family, fcandidates, fdelta, fevals, fevecs, ff, ff17, ff18, ff19, ff21, field, field_features, fit_flat_mask, fit_ids, fit_rows, fit_sec_errors, fitacc, fitidx, fitset, flips, fn, ftable, full_class_ids, full_direction, full_expert_rows, full_feature_error, full_field, full_field_correction, full_field_params, full_gain, full_gbias, full_gcoef, full_gfeatures, full_gscores, full_linear, full_linear_logits, full_logit_error, full_measure, full_offsets, full_ridge, full_row, full_shared_row, full_simulate, full_soft, full_targeted, full_targeted_logits, funit, g, gU, gate, gate_coef, gate_features, gate_lambda, gate_models, gate_mu, gate_scores, gates, gb, gbias, gcoef, gev, gg, ggl, ggm, ggym, gmean, gold, gold_smooth, gram, groups, grow, gs, gscores, gt, gunit, gymean, half_extension, half_probe_logits, hard, hashlib, held_probe_meta, held_probe_requests, held_seed_ids, hi, hist, i, ideal_targeted, ids, idx7, ii, im, inds, inspect, intercept, inv, invoice_id, invoicefit, io, ip, item, ix, ixq, j, jj, jp, js
+[output cut at 10,000 characters]
+```
+[forward passes used: 22 of 25; Python runs used: 53 of 300]

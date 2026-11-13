@@ -57,17 +57,17 @@ def _read_json(model: str, revision: str | None, name: str) -> dict | None:
 
 def detect_family(model: str, revision: str | None = None) -> str:
     """The name of the family whose config `model` matches."""
-    if _read_json(model, revision, "config.json") is None:
-        raise DecisionModelError(f"{model}: no config.json found (expected a local folder or a Hugging Face repo id)")
     for family in FAMILIES:
         if family.matches(lambda name: _read_json(model, revision, name)):
             return family.name
+    if _read_json(model, revision, "config.json") is None:
+        raise DecisionModelError(f"{model}: no config.json found (expected a local folder or a Hugging Face repo id)")
     raise DecisionModelError(f"{model} is not a supported decision model. Supported families: {FAMILY_HINT}.")
 
 
 def load_decision_backend(model: str, *, revision: str | None = None, framework: str | None = None,
                           device: str | None = None, max_length: int | None = None):
-    """A decision backend for `model`: an alias in `ALIASES` ("d1", "nanojev", "d1-2b"), a Hugging Face repo id or a
+    """A decision backend for `model`: an alias in `ALIASES` ("d1", "nanojev", "d1-2b", "clef-flash", "strands-2b"), a Hugging Face repo id or a
     local folder."""
     repo, revision = resolve_model(model, revision)
     name = detect_family(repo, revision)

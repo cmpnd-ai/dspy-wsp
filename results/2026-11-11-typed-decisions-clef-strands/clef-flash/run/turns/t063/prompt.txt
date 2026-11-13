@@ -1,0 +1,153 @@
+OUTPUT of Python run 42 of at most 300:
+```
+Target gate models:
+1e-06 [('Tensor', (2048, 71)), ('Tensor', (71,)), ('Tensor', (3000, 5, 71))]
+1e-05 [('Tensor', (2048, 71)), ('Tensor', (71,)), ('Tensor', (3000, 5, 71))]
+Target param tuple: [('Tensor', (1024, 5)), ('Tensor', (5,))]
+Target candidate metadata: [791, 1015, 700, 28, 248, 703, 626, 861, 508, 39, 523, 1007, 689, 904, 452, 921, 624, 823, 449, 1017, 140, 711, 692, 822] [('agent_trace_observability', 'urgency'), ('customer_service', 'action'), ('customer_service', 'needs_human')]
+Function constants: ('base_wf', 'clone', 'base_bf', 'base_wl', 'enumerate', 'selected_classes', 'expert_rows', 'torch', 'cat', 'gcoef', 'zeros', 'gbias', 'zip', 'new_neurons', 'pair_gain', 'to', 'bfloat16', 'float') (None, 2048, 0.5, 1.0, -1.0, 2)
+Gate globals: [('torch', 'module'), ('pair_gain', 'float'), ('gcoef', (2048, 71)), ('gbias', (71,)), ('selected_classes', 'list'), ('new_neurons', 'list'), ('base_wf', (1024, 4096)), ('base_bf', (1024,)), ('base_wl', (1024,)), ('expert_rows', 'dict')]
+ 22           0 RESUME                   0
+
+ 23           2 LOAD_GLOBAL              0 (base_wf)
+             12 LOAD_ATTR                3 (NULL|self + clone)
+             32 CALL                     0
+             40 LOAD_GLOBAL              4 (base_bf)
+             50 LOAD_ATTR                3 (NULL|self + clone)
+             70 CALL                     0
+             78 LOAD_GLOBAL              6 (base_wl)
+             88 LOAD_ATTR                3 (NULL|self + clone)
+            108 CALL                     0
+            116 STORE_FAST               4 (wl)
+            118 STORE_FAST               3 (bf)
+            120 STORE_FAST               2 (wf)
+
+ 24         122 LOAD_GLOBAL              9 (NULL + enumerate)
+            132 LOAD_GLOBAL             10 (selected_classes)
+            142 CALL                     1
+            150 GET_ITER
+        >>  152 FOR_ITER               172 (to 500)
+            156 UNPACK_SEQUENCE          2
+            160 STORE_FAST               5 (k)
+            162 STORE_FAST               6 (c)
+
+ 25         164 LOAD_GLOBAL             12 (expert_rows)
+            174 LOAD_FAST                6 (c)
+            176 BINARY_SUBSCR
+            180 UNPACK_SEQUENCE          2
+            184 STORE_FAST               7 (r)
+            186 STORE_FAST               8 (b)
+
+ 26         188 LOAD_GLOBAL             14 (torch)
+            198 LOAD_ATTR               17 (NULL|self + cat)
+            218 LOAD_GLOBAL             18 (gcoef)
+            228 LOAD_CONST               0 (None)
+            230 LOAD_CONST               0 (None)
+            232 BUILD_SLICE              2
+            234 LOAD_FAST                6 (c)
+            236 BUILD_TUPLE              2
+            238 BINARY_SUBSCR
+            242 LOAD_GLOBAL             14 (torch)
+            252 LOAD_ATTR               21 (NULL|self + zeros)
+            272 LOAD_CONST               1 (2048)
+            274 CALL                     1
+            282 BUILD_LIST               2
+            284 CALL                     1
+            292 LOAD_FAST                0 (gate_strength)
+            294 BINARY_OP                5 (*)
+            298 STORE_FAST               9 (gv)
+
+ 27         300 LOAD_GLOBAL             22 (gbias)
+            310 LOAD_FAST                6 (c)
+            312 BINARY_SUBSCR
+            316 LOAD_CONST               2 (0.5)
+            318 BINARY_OP               10 (-)
+            322 LOAD_FAST                0 (gate_strength)
+            324 BINARY_OP                5 (*)
+            328 STORE_FAST              10 (gb)
+
+ 28         330 LOAD_GLOBAL             25 (NULL + zip)
+            340 LOAD_CONST               3 (1.0)
+            342 LOAD_CONST               4 (-1.0)
+            344 BUILD_LIST               2
+            346 LOAD_GLOBAL             26 (new_neurons)
+            356 LOAD_CONST               5 (2)
+            358 LOAD_FAST                5 (k)
+            360 BINARY_OP                5 (*)
+            364 LOAD_CONST               5 (2)
+            366 LOAD_FAST                5 (k)
+            368 BINARY_OP                5 (*)
+            372 LOAD_CONST               5 (2)
+            374 BINARY_OP                0 (+)
+            378 BINARY_SLICE
+            380 CALL                     2
+            388 GET_ITER
+        >>  390 FOR_ITER                51 (to 496)
+            394 UNPACK_SEQUENCE          2
+            398 STORE_FAST              11 (sign)
+            400 STORE_FAST              12 (neuron)
+
+ 29         402 LOAD_FAST                9 (gv)
+            404 LOAD_FAST               11 (sign)
+            406 LOAD_CONST               2 (0.5)
+            408 BINARY_OP                5 (*)
+            412 LOAD_FAST                1 (expert_strength)
+            414 BINARY_OP                5 (*)
+            418 LOAD_FAST                7 (r)
+            420 BINARY_OP                5 (*)
+            424 BINARY_OP                0 (+)
+            428 LOAD_FAST                2 (wf)
+            430 LOAD_FAST               12 (neuron)
+            432 STORE_SUBSCR
+
+ 30         436 LOAD_FAST               10 (gb)
+            438 LOAD_FAST               11 (sign)
+            440 LOAD_CONST               2 (0.5)
+            442 BINARY_OP                5 (*)
+            446 LOAD_FAST                1 (expert_strength)
+            448 BINARY_OP                5 (*)
+            452 LOAD_FAST                8 (b)
+            454 BINARY_OP                5 (*)
+            458 BINARY_OP                0 (+)
+            462 LOAD_FAST                3 (bf)
+            464 LOAD_FAST               12 (neuron)
+            466 STORE_SUBSCR
+
+ 31         470 LOAD_FAST               11 (sign)
+            472 LOAD_GLOBAL             28 (pair_gain)
+            482 BINARY_OP                5 (*)
+            486 LOAD_FAST                4 (wl)
+            488 LOAD_FAST               12 (neuron)
+            490 STORE_SUBSCR
+            494 JUMP_BACKWARD           53 (to 390)
+
+ 28     >>  496 END_FOR
+            498 JUMP_BACKWARD          174 (to 152)
+
+ 24     >>  500 END_FOR
+
+ 32         502 LOAD_FAST                2 (wf)
+            504 LOAD_ATTR               31 (NULL|self + to)
+            524 LOAD_GLOBAL             14 (torch)
+            534 LOAD_ATTR               32 (bfloat16)
+            554 CALL                     1
+            562 LOAD_ATTR               35 (NULL|self + float)
+            582 CALL                     0
+            590 LOAD_FAST                3 (bf)
+            592 LOAD_ATTR               31 (NULL|self + to)
+            612 LOAD_GLOBAL             14 (torch)
+            622 LOAD_ATTR               32 (bfloat16)
+            642 CALL                     1
+            650 LOAD_ATTR               35 (NULL|self + float)
+            670 CALL                     0
+            678 LOAD_FAST                4 (wl)
+            680 LOAD_ATTR               31 (NULL|self + to)
+            700 LOAD_GLOBAL             14 (torch)
+            710 LOAD_ATTR               32 (bfloat16)
+            730 CALL                     1
+            738 LOAD_ATTR               35 (NULL|self + float)
+            758 CALL                     0
+            766 BUILD_TUPLE              3
+            768 RETURN_VALUE
+```
+[forward passes used: 14 of 25; Python runs used: 42 of 300]

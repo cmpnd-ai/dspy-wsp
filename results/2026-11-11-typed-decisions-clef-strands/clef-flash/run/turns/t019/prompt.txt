@@ -1,0 +1,10 @@
+OUTPUT of Python run 12 of at most 300:
+```
+Saved candidate: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/candidate_linear_bypass
+Current edit fingerprints: {'residual_scorer.0.bias': {'shape': [1024], 'sha256': 'f5f6a0354f2e8ea633944bbef303c1c496205ca426de2c3b78ec86836c623133'}, 'residual_scorer.0.weight': {'shape': [1024, 4096], 'sha256': '313fecf06190c42520391ece791b18dea07ffa23d36dbdeca645b2a3025ef0b6'}, 'residual_scorer.3.weight': {'shape': [1, 1024], 'sha256': 'f8aec4e6c0c47c04e6f4c33802431db7ebcbd318a8cf15a96ef904c979cc2a9d'}}
+agent_trace_observability original/edited [0.6293 0.7227] gain 0.0933 SE 0.0232
+customer_service original/edited [0.76   0.7973] gain 0.0373 SE 0.0135
+invoice_processing original/edited [0.7253 0.7707] gain 0.0453 SE 0.0123
+security_incidents original/edited [0.7067 0.7547] gain 0.048 SE 0.0173
+```
+[forward passes used: 5 of 25; Python runs used: 12 of 300]

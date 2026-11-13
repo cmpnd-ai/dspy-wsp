@@ -1,0 +1,9 @@
+OUTPUT of Python run 48 of at most 300:
+```
+Shared repair max feature difference: 0.0
+Shared repair max logit reconstruction error: 4.8160552978515625e-05
+saved edit residual_scorer.0.weight: 98,302 of 4,194,304 entries changed, relative change 47.1994
+saved edit residual_scorer.0.bias: 24 of 1,024 entries changed, relative change 329.5970
+saved edit residual_scorer.3.weight: 24 of 1,024 entries changed, relative change 203.3978
+```
+[forward passes used: 17 of 25; Python runs used: 48 of 300]

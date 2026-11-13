@@ -1,0 +1,26 @@
+OUTPUT of Python run 47 of at most 300:
+```
+(('urgency_constraint_violations', '0', 'urgency', '3-1'), [-2.537, -2.109, -2.835])
+(('urgency_constraint_violations', '1', 'urgency', '3-1'), [-2.402, -1.095, 0.157])
+(('urgency_constraint_violations', '2', 'urgency', '3-1'), [-2.014, -1.003, 0.766])
+(('urgency_constraint_violations', '4', 'urgency', '3-1'), [-0.714, -0.074, 1.584])
+(('urgency_irreversible_actions', '0', 'urgency', '3-1'), [-2.537, -2.109, -2.835])
+(('urgency_irreversible_actions', '1', 'urgency', '3-1'), [-2.661, -2.101, -1.845])
+(('urgency_irreversible_actions', '2', 'urgency', '3-1'), [-2.686, -2.378, -2.056])
+(('urgency_irreversible_actions', '4', 'urgency', '3-1'), [-2.51, -2.054, -1.979])
+(('customer_resolution_authority', 'routine_information', 'action', 'answer_directly-best_other'), [1.897, 0.951, 4.078])
+(('customer_resolution_authority', 'routine_information', 'needs_human', 'true-false'), [-2.248, -2.315, -2.055])
+(('customer_resolution_authority', 'human_authority', 'action', 'escalate_to_human-best_other'), [5.027, 2.354, 3.167])
+(('customer_resolution_authority', 'human_authority', 'needs_human', 'true-false'), [3.335, 1.302, 2.015])
+(('customer_resolution_authority', 'resolved', 'action', 'close_no_action-best_other'), [4.592, 3.31, 2.468])
+(('customer_resolution_authority', 'resolved', 'needs_human', 'true-false'), [-0.166, 0.264, 0.284])
+(('customer_resolution_authority', 'verified_refund', 'action', 'execute_refund-best_other'), [1.372, 1.165, 1.889])
+(('customer_resolution_authority', 'verified_refund', 'needs_human', 'true-false'), [-0.059, -0.008, -0.834])
+(('customer_resolution_authority', 'missing_information', 'action', 'request_information-best_other'), [4.528, 3.003, 2.743])
+(('customer_resolution_authority', 'missing_information', 'needs_human', 'true-false'), [-0.113, -0.423, 0.573])
+Extension centered effect RMS unrelated fields: 0.1664908081293106
+saved edit residual_scorer.0.weight: 8,192 of 4,194,304 entries changed, relative change 1.9327
+saved edit residual_scorer.0.bias: 2 of 1,024 entries changed, relative change 0.0067
+saved edit residual_scorer.3.weight: 2 of 1,024 entries changed, relative change 58.7277
+```
+[forward passes used: 16 of 25; Python runs used: 47 of 300]

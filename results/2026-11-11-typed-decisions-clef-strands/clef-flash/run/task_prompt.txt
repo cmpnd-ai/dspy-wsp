@@ -1,0 +1,168 @@
+TASK. You are given the weights of a decision model: Cloudflare/clef-flash (Clef decision model, text path): a Qwen3.5 backbone (32 causal blocks, width 4096) and a joint schema head. The backbone is fixed in this run: its tensors are out of scope, and only the head's tensors (the names without a `model.` prefix) take edits. A request is one ChatML prompt: a system line, 'STATE:' and the state, then 'SCHEMA FIELDS:' with one block per question (FIELD i, ID, TYPE, INSTRUCTION, then 'OPTION j: {"description":...,"option_id":...}' per option), then the assistant header and 'JOINT SCHEMA DECISIONS:'. A choice's options are written in sorted key order and a noul's as true, then false. The head reads the backbone's final hidden states x = hidden_norm(h) (width 4096), and it works at width 1024. memory = memory_projection(x) over every token. Each option's query is option_context_projection(mean of x over the option's tokens) + option_lexical_projection(mean of the output-embedding rows of those tokens) + option_question_projection(mean of x over the question's instruction tokens). 2 `evidence_layers` let every option query read memory by cross-attention (query_norm, memory_norm, attention, then feedforward_norm and a GELU MLP `feedforward.0`, `feedforward.3`). Each question's field vector is question_projection(question mean) + option_summary_norm(a softmax-weighted sum of its routed options) + global_projection(x at the last token) + type_embedding (rows noul, choice, score). 4 pre-norm transformer decoder `layers` let the fields read each other (self_attn) and memory (multihead_attn), then field_norm. With option = option_norm(routed option) and features = [field, option, field * option, |field - option|], an option's logit is prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * cosine(field, option) + residual_scorer(features)), where residual_scorer is Linear (`residual_scorer.0`), GELU, Linear to one logit (`residual_scorer.3`), and prior is exp(prior_logit_scale) times the cosine of the option's lexical mean and (question mean + x at the last token). A softmax per question gives the probabilities, with no temperature. A noul's options are [false, true]. The head has 121,762,820 parameters, stored as bfloat16 and computed in float32; an edit is rounded to bfloat16 when it is applied. It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program answers five typed questions about a business record (an agent trace, a customer message, an invoice or a security alert). Each question's answer is scored against a gold probability distribution.
+
+THE PROGRAM.
+TypedDecisions, with 4 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'agent_trace_observability': state -> action, needs_review, outcome, risk, urgency
+  instructions: Answer each question about this agent trace observability record.
+  state: The record to judge.
+  action: What should the observability system do with this trace?
+  needs_review: This trace requires human review.
+  outcome: How did this agent run turn out?
+  risk: How risky was the agent's behaviour in this trace?
+  urgency: How quickly does this trace need attention?
+- step 'customer_service': state -> action, category, churn_risk, needs_human, urgency
+  instructions: Answer each question about this customer service record.
+  state: The record to judge.
+  action: What should the assistant do next with this conversation?
+  category: What is this customer conversation primarily about?
+  churn_risk: How likely is this customer to stop doing business with us because of this interaction?
+  needs_human: This conversation requires a human agent rather than automated handling.
+  urgency: How time-sensitive is this conversation?
+- step 'invoice_processing': state -> discrepancy_severity, disposition, duplicate, matches_order, urgency
+  instructions: Answer each question about this invoice processing record.
+  state: The record to judge.
+  discrepancy_severity: How material is any discrepancy between the invoice, the order and the delivery?
+  disposition: How should this vendor invoice be dispositioned?
+  duplicate: This invoice appears to duplicate an invoice already submitted.
+  matches_order: The invoice reconciles with the purchase order and the recorded delivery.
+  urgency: How time-sensitive is processing this invoice?
+- step 'security_incidents': state -> credential_compromise, disposition, severity, true_positive, urgency
+  instructions: Answer each question about this security incidents record.
+  state: The record to judge.
+  credential_compromise: The evidence indicates a credential or account has been compromised.
+  disposition: How should this security alert be dispositioned?
+  severity: How severe is the potential impact if this alert is real?
+  true_positive: This alert reflects genuinely malicious or unauthorised activity.
+  urgency: How quickly must a responder act on this alert?
+Program source:
+class TypedDecisions(dspy.Module):
+    """One Predict per workflow; each case goes to its workflow's questions."""
+
+    def __init__(self, examples: list[dspy.Example]):
+        super().__init__()
+        schemas = {}
+        for ex in examples:
+            schemas.setdefault(ex.workflow, ex.questions)
+        self.workflows = sorted(schemas)
+        for wf in self.workflows:
+            setattr(self, wf, dspy.Predict(make_signature(wf, schemas[wf])))
+
+    def forward(self, workflow: str, state: dict):
+        return getattr(self, workflow)(state=state)
+
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    results, notes = [], []
+    for qid, gold in example.gold.items():
+        probs = predicted_probabilities(pred[qid])
+        ok, _, brier, _ = score_one(probs, gold)
+        results.append((ok, brier))
+        best = max(probs, key=probs.get)
+        target = max(gold["probabilities"], key=gold["probabilities"].get)
+        notes.append(f"{qid}: {'right' if ok else 'WRONG'} (predicted {best} {probs[best]:.2f}, gold {target} {gold['probabilities'][target]:.2f})")
+    accuracy = sum(ok for ok, _ in results) / len(results)
+    brier = sum(b for _, b in results) / len(results)
+    return dspy.Prediction(score=accuracy, feedback="; ".join(notes) + f". Mean Brier {brier:.3f}.")
+
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the whole backbone, which this backend keeps fixed), and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no internet, no GPU): variables survive between your code blocks, like a notebook. The model's files are in /Users/dbreunig/.cache/huggingface/hub/models--Cloudflare--clef-flash/snapshots/22b75507981345858dd152fbd9a6f8c0c4068b0a (read only), practice examples are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/practice, and /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  evidence_layers.0.attention.in_proj_bias [3072]
+  evidence_layers.0.attention.in_proj_weight [3072, 1024]
+  evidence_layers.0.attention.out_proj.bias [1024]
+  evidence_layers.0.attention.out_proj.weight [1024, 1024]
+  evidence_layers.0.feedforward.0.bias [4096]
+  evidence_layers.0.feedforward.0.weight [4096, 1024]
+  evidence_layers.0.feedforward.3.bias [1024]
+  evidence_layers.0.feedforward.3.weight [1024, 4096]
+  evidence_layers.0.feedforward_norm.bias [1024]
+  evidence_layers.0.feedforward_norm.weight [1024]
+  evidence_layers.0.memory_norm.bias [1024]
+  evidence_layers.0.memory_norm.weight [1024]
+  evidence_layers.0.query_norm.bias [1024]
+  evidence_layers.0.query_norm.weight [1024]
+  evidence_layers.1.attention.in_proj_bias [3072]
+  evidence_layers.1.attention.in_proj_weight [3072, 1024]
+  evidence_layers.1.attention.out_proj.bias [1024]
+  evidence_layers.1.attention.out_proj.weight [1024, 1024]
+  evidence_layers.1.feedforward.0.bias [4096]
+  evidence_layers.1.feedforward.0.weight [4096, 1024]
+  evidence_layers.1.feedforward.3.bias [1024]
+  evidence_layers.1.feedforward.3.weight [1024, 4096]
+  evidence_layers.1.feedforward_norm.bias [1024]
+  evidence_layers.1.feedforward_norm.weight [1024]
+  evidence_layers.1.memory_norm.bias [1024]
+  evidence_layers.1.memory_norm.weight [1024]
+  evidence_layers.1.query_norm.bias [1024]
+  evidence_layers.1.query_norm.weight [1024]
+  field_norm.bias [1024]
+  field_norm.weight [1024]
+  global_projection.weight [1024, 4096]
+  hidden_norm.bias [4096]
+  hidden_norm.weight [4096]
+  joint_logit_scale []
+  layers.0.linear1.bias [4096]
+  layers.0.linear1.weight [4096, 1024]
+  layers.0.linear2.bias [1024]
+  layers.0.linear2.weight [1024, 4096]
+  layers.0.multihead_attn.in_proj_bias [3072]
+  layers.0.multihead_attn.in_proj_weight [3072, 1024]
+  layers.0.multihead_attn.out_proj.bias [1024]
+  layers.0.multihead_attn.out_proj.weight [1024, 1024]
+  layers.0.norm1.bias [1024]
+  layers.0.norm1.weight [1024]
+  layers.0.norm2.bias [1024]
+  layers.0.norm2.weight [1024]
+  layers.0.norm3.bias [1024]
+  layers.0.norm3.weight [1024]
+  layers.0.self_attn.in_proj_bias [3072]
+  layers.0.self_attn.in_proj_weight [3072, 1024]
+  layers.0.self_attn.out_proj.bias [1024]
+  layers.0.self_attn.out_proj.weight [1024, 1024]
+  memory_projection.weight [1024, 4096]
+  option_context_projection.weight [1024, 4096]
+  option_lexical_projection.weight [1024, 4096]
+  option_norm.bias [1024]
+  option_norm.weight [1024]
+  option_question_projection.weight [1024, 4096]
+  option_summary_norm.bias [1024]
+  option_summary_norm.weight [1024]
+  prior_logit_scale []
+  question_projection.weight [1024, 4096]
+  residual_gate []
+  residual_scorer.0.bias [1024]
+  residual_scorer.0.weight [1024, 4096]
+  residual_scorer.3.bias [1]
+  residual_scorer.3.weight [1, 1024]
+  type_embedding.weight [3, 1024]
+  ... the same names for blocks 0..3; 122 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/practice/trainset.jsonl (900 examples). Input fields: state, workflow. Label fields: case_id, gold, questions. Choose whichever serve your experiments. A separate validation set of 300 examples is held out from you; you can only score edits on it, as described below.
+
+3. A forward-pass tool with a budget of 25 forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to 900 practice items (with "both", up to 450 per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set (300 examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..32] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most 1,024 questions per pass. The results are .npy files in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to 1,024 questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/edited to /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 25 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/edited when you finish are submitted, so leave there the edit with the best paired gain confirmed on the validation set, or no edit if none was confirmed. Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help.

@@ -25,6 +25,7 @@ class DecisionLM(dspy.LM):
     def for_backend(cls, backend, cache: bool = False) -> DecisionLM:
         client = cls(f"typesafe:{backend.model_id}", api_key="local", api_base=backend._server.url, cache=cache, timeout=TIMEOUT_SECONDS)
         client._backend = backend
+        client.base_url = backend._server.url  # for direct `/v1/systemone` requests
         return client
 
     def _record(self, request, response) -> None:

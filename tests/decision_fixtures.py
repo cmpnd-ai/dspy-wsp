@@ -160,3 +160,93 @@ def build_d1_lm(folder: Path) -> Path:
     state["model.vision_tower.dummy.weight"] = torch.zeros(4, 4)
     save_file(state, str(folder / "model.safetensors"))
     return folder
+
+
+def clef_config(vocab: int) -> dict:
+    """A tiny Clef config: a Qwen3.5 text model with three linear-attention blocks and one full-attention block."""
+    return {
+        "model_type": "qwen3_5", "architectures": ["Qwen3_5ForConditionalGeneration"], "tie_word_embeddings": False, "dtype": "float32",
+        "text_config": {
+            "model_type": "qwen3_5_text", "vocab_size": vocab, "hidden_size": 64, "intermediate_size": 128, "num_hidden_layers": 4,
+            "num_attention_heads": 4, "num_key_value_heads": 2, "head_dim": 16, "full_attention_interval": 4,
+            "linear_num_value_heads": 4, "linear_num_key_heads": 2, "linear_key_head_dim": 16, "linear_value_head_dim": 16,
+            "linear_conv_kernel_dim": 4, "rms_norm_eps": 1e-6, "tie_word_embeddings": False,
+            "rope_parameters": {"rope_type": "default", "rope_theta": 10_000_000, "partial_rotary_factor": 0.25, "mrope_section": [11, 11, 10]},
+        },
+    }
+
+
+CLEF_HEAD = {"hidden_size": 64, "width": 32, "routing_layers": 1, "layers": 2, "heads": 4, "feedforward": 64}
+
+
+def build_clef(folder: Path) -> Path:
+    """A tiny Clef checkpoint folder (needs MLX): config, tokenizer, a sharded random backbone with its index and an
+    unused vision tensor, and a random joint schema head in its own file."""
+    import mlx.core as mx
+    from mlx.utils import tree_flatten
+    from mlx_lm.models.qwen3_5 import Model, ModelArgs
+    from tokenizers import Tokenizer
+
+    from dspy_wsp.decision.families.clef.mlx import JointSchemaHead
+
+    build_d1_lm_tokenizer(folder)
+    vocab = Tokenizer.from_file(str(folder / "tokenizer.json")).get_vocab_size()
+    cfg = clef_config(vocab)
+    (folder / "config.json").write_text(json.dumps(cfg))
+    (folder / "joint_head_config.json").write_text(json.dumps(CLEF_HEAD))
+    mx.random.seed(0)
+    backbone = {}
+    for name, value in tree_flatten(Model(ModelArgs.from_dict(cfg)).parameters()):
+        name = name.removeprefix("language_model.")
+        backbone["model.language_model." + name.removeprefix("model.") if name.startswith("model.") else name] = value
+    backbone["model.visual.patch_embed.weight"] = mx.zeros((4, 4))
+    shard = "model-00001-of-00001.safetensors"
+    mx.save_safetensors(str(folder / shard), backbone, metadata={"format": "pt"})
+    (folder / "model.safetensors.index.json").write_text(json.dumps({"weight_map": {name: shard for name in backbone}}))
+    head = {name: mx.random.normal(value.shape) * 0.2 if value.ndim > 1 else value for name, value in tree_flatten(JointSchemaHead(**CLEF_HEAD).parameters())}
+    mx.save_safetensors(str(folder / "joint_head.safetensors"), head, metadata={"format": "pt"})
+    return folder
+
+
+STRANDS_HEAD = {"head_type": "pointer", "pointer_dim": 24, "max_length": 4096, "torch_dtype": "float32", "use_lora": True,
+                "temperature": 1.0, "temperature_by_kind": {"noul": 1.1, "choice": 0.9, "score": 1.8}}
+STRANDS_LORA = ["layers.0.linear_attn.in_proj_qkv", "layers.1.mlp.gate_proj", "layers.3.self_attn.q_proj"]
+
+
+def build_strands(folder: Path) -> Path:
+    """A tiny Strands decider checkpoint folder (needs MLX): its config, tokenizer, a random pointer head and a LoRA
+    adapter, with a random Qwen3.5 base model in `base/`."""
+    import mlx.core as mx
+    from mlx.utils import tree_flatten
+    from mlx_lm.models.qwen3_5 import Model, ModelArgs
+    from tokenizers import Tokenizer
+
+    from dspy_wsp.decision.families.strands.mlx import PointerHead
+
+    build_d1_lm_tokenizer(folder)
+    vocab = Tokenizer.from_file(str(folder / "tokenizer.json")).get_vocab_size()
+    cfg = clef_config(vocab)
+    base = folder / "base"
+    base.mkdir()
+    (base / "config.json").write_text(json.dumps(cfg))
+    mx.random.seed(0)
+    params = dict(tree_flatten(Model(ModelArgs.from_dict(cfg)).parameters()))
+    weights = {}
+    for name, value in params.items():
+        name = name.removeprefix("language_model.")
+        weights["model.language_model." + name.removeprefix("model.") if name.startswith("model.") else name] = value
+    mx.save_safetensors(str(base / "model.safetensors"), weights, metadata={"format": "pt"})
+    (folder / "strands_decider_config.json").write_text(json.dumps({**STRANDS_HEAD, "base_model": "base"}))
+    lora = folder / "lora"
+    lora.mkdir()
+    (lora / "adapter_config.json").write_text(json.dumps({"r": 2, "lora_alpha": 4, "peft_type": "LORA"}))
+    adapter = {}
+    for stem in STRANDS_LORA:
+        out_dim, in_dim = params[f"language_model.model.{stem}.weight"].shape
+        adapter[f"base_model.model.{stem}.lora_A.weight"] = mx.random.normal((2, in_dim)) * 0.3
+        adapter[f"base_model.model.{stem}.lora_B.weight"] = mx.random.normal((out_dim, 2)) * 0.3
+    mx.save_safetensors(str(lora / "adapter_model.safetensors"), adapter, metadata={"format": "pt"})
+    head = {name: mx.random.normal(value.shape) * 0.3 if value.ndim > 1 else value
+            for name, value in tree_flatten(PointerHead(cfg["text_config"]["hidden_size"], STRANDS_HEAD["pointer_dim"]).parameters())}
+    mx.save_safetensors(str(folder / "head.safetensors"), head, metadata={"format": "pt"})
+    return folder

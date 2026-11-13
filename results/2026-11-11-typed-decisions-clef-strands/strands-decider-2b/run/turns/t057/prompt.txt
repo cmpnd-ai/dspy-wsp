@@ -1,0 +1,11 @@
+OUTPUT of Python run 35 of at most 300:
+```
+Best2 stored direction agreement: 0.0
+Best2 dose 0.0 {'accuracy': 0.5777777891192172, 'gain': 0.0, 'se': 0.0, 'brier': 0.17925088107585907}
+Best2 dose 0.5 {'accuracy': 0.6977777885893981, 'gain': 0.12000000228484471, 'se': 0.014320964177854016, 'brier': 0.1209821030497551}
+Best2 dose 1.0 {'accuracy': 0.7722222317424086, 'gain': 0.19444444866644012, 'se': 0.018539508509868297, 'brier': 0.08730112761259079}
+Best2 dose 1.5 {'accuracy': 0.7466666771305932, 'gain': 0.16888889281286135, 'se': 0.022218498073851987, 'brier': 0.08688518404960632}
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 5.2945
+Counterfactual request file keys: ['type', 'model', 'requests']
+```
+[forward passes used: 19 of 25; Python runs used: 35 of 300]

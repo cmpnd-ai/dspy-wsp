@@ -1,0 +1,8 @@
+OUTPUT of Python run 39 of at most 300:
+```
+Refit READ sizes: 200 100
+Read file request shape: list
+read_batch signature: (k, requested_ids)
+Baseline normalized request example keys: dict_keys(['state', 'questions'])
+```
+[forward passes used: 11 of 25; Python runs used: 39 of 300]

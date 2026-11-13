@@ -1,0 +1,6 @@
+OUTPUT of Python run 36 of at most 300:
+```
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 15.8835
+Predicted 1.5-dose development: {'accuracy': 0.7466666771305932, 'gain': 0.16888889281286135, 'se': 0.022218498073851987, 'brier': 0.08688518404960632}
+```
+[forward passes used: 20 of 25; Python runs used: 36 of 300]

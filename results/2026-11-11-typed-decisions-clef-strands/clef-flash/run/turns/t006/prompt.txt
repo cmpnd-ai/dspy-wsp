@@ -1,0 +1,178 @@
+OUTPUT of Python run 3 of at most 300:
+```
+agent_tra action                  acc=0.649 err_conf=0.46 gold={'human_review': 104, 'continue': 32, 'observe': 87, 'stop': 2} confused=[(('human_review', 'observe'), 30), (('observe', 'continue'), 26), (('observe', 'human_review'), 8), (('human_review', 'continue'), 6)]
+agent_tra needs_review            acc=0.804 err_conf=0.64 gold={'true': 104, 'false': 121} confused=[(('true', 'false'), 30), (('false', 'true'), 14)]
+agent_tra outcome                 acc=0.551 err_conf=0.64 gold={'partial': 108, 'success': 59, 'harmful': 45, 'failure': 13} confused=[(('partial', 'success'), 73), (('partial', 'failure'), 7), (('failure', 'success'), 6), (('failure', 'partial'), 6)]
+agent_tra risk                    acc=0.591 err_conf=0.53 gold={'0': 56, '3': 45, '1': 77, '2': 47} confused=[(('0', '1'), 42), (('3', '2'), 26), (('2', '1'), 18), (('1', '2'), 4)]
+agent_tra urgency                 acc=0.511 err_conf=0.56 gold={'1': 114, '0': 54, '3': 39, '2': 18} confused=[(('0', '1'), 54), (('3', '2'), 28), (('2', '1'), 17), (('3', '1'), 11)]
+customer_ action                  acc=0.622 err_conf=0.60 gold={'answer_directly': 48, 'escalate_to_human': 127, 'request_information': 44, 'execute_refund': 6} confused=[(('request_information', 'escalate_to_human'), 26), (('answer_directly', 'escalate_to_human'), 17), (('escalate_to_human', 'request_information'), 17), (('answer_directly', 'request_information'), 14)]
+customer_ category                acc=0.916 err_conf=0.61 gold={'account': 51, 'refund': 19, 'technical': 58, 'delivery': 48, 'billing': 49} confused=[(('account', 'technical'), 5), (('account', 'billing'), 4), (('delivery', 'technical'), 3), (('account', 'refund'), 3)]
+customer_ churn_risk              acc=0.707 err_conf=0.60 gold={'3': 52, '1': 58, '0': 11, '2': 104} confused=[(('2', '3'), 41), (('2', '1'), 7), (('1', '3'), 4), (('0', '1'), 4)]
+customer_ needs_human             acc=0.764 err_conf=0.70 gold={'true': 152, 'false': 73} confused=[(('false', 'true'), 36), (('true', 'false'), 17)]
+customer_ urgency                 acc=0.773 err_conf=0.58 gold={'3': 89, '2': 90, '1': 45, '0': 1} confused=[(('2', '3'), 23), (('1', '2'), 21), (('3', '2'), 3), (('2', '1'), 2)]
+invoice_p discrepancy_severity    acc=0.676 err_conf=0.65 gold={'3': 70, '0': 99, '2': 55, '1': 1} confused=[(('2', '0'), 23), (('3', '2'), 19), (('3', '0'), 9), (('2', '3'), 7)]
+invoice_p disposition             acc=0.600 err_conf=0.69 gold={'manual_review': 86, 'hold': 40, 'reject': 12, 'approve': 87} confused=[(('manual_review', 'hold'), 36), (('hold', 'approve'), 26), (('reject', 'approve'), 12), (('approve', 'hold'), 7)]
+invoice_p duplicate               acc=0.916 err_conf=0.90 gold={'false': 204, 'true': 21} confused=[(('true', 'false'), 19)]
+invoice_p matches_order           acc=0.867 err_conf=0.91 gold={'false': 117, 'true': 108} confused=[(('false', 'true'), 21), (('true', 'false'), 9)]
+invoice_p urgency                 acc=0.516 err_conf=0.50 gold={'2': 101, '3': 31, '1': 93} confused=[(('1', '2'), 36), (('2', '1'), 25), (('2', '3'), 24), (('3', '2'), 14)]
+security_ credential_compromise   acc=0.671 err_conf=0.73 gold={'true': 120, 'false': 105} confused=[(('false', 'true'), 70), (('true', 'false'), 4)]
+security_ disposition             acc=0.760 err_conf=0.65 gold={'investigate': 163, 'contain': 24, 'monitor': 17, 'close_benign': 21} confused=[(('contain', 'investigate'), 18), (('close_benign', 'investigate'), 13), (('monitor', 'investigate'), 12), (('close_benign', 'monitor'), 6)]
+security_ severity                acc=0.733 err_conf=0.46 gold={'1': 31, '3': 97, '2': 68, '0': 5, '4': 24} confused=[(('1', '2'), 18), (('3', '2'), 14), (('4', '3'), 7), (('2', '3'), 6)]
+security_ true_positive           acc=0.827 err_conf=0.65 gold={'true': 154, 'false': 71} confused=[(('false', 'true'), 32), (('true', 'false'), 7)]
+security_ urgency                 acc=0.573 err_conf=0.56 gold={'1': 44, '2': 59, '3': 116, '0': 6} confused=[(('3', '2'), 58), (('1', '2'), 27), (('0', '1'), 5), (('2', '3'), 3)]
+
+Head forward source:
+     def __init__(
+        self,
+        width: int,
+        heads: int,
+        feedforward: int,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        self.query_norm = torch.nn.LayerNorm(width)
+        self.memory_norm = torch.nn.LayerNorm(width)
+        self.attention = torch.nn.MultiheadAttention(
+            width,
+            heads,
+            dropout=dropout,
+            batch_first=True,
+        )
+        self.attention_dropout = torch.nn.Dropout(dropout)
+        self.feedforward_norm = torch.nn.LayerNorm(width)
+        self.feedforward = torch.nn.Sequential(
+            torch.nn.Linear(width, feedforward),
+            torch.nn.GELU(),
+            torch.nn.Dropout(dropout),
+            torch.nn.Linear(feedforward, width),
+            torch.nn.Dropout(dropout),
+        )
+
+    def forward(self, queries: torch.Tensor, memory: torch.Tensor) -> torch.Tensor:
+        normalized_queries = self.query_norm(queries)
+        routed, _ = self.attention(
+            normalized_queries,
+            self.memory_norm(memory),
+            self.memory_norm(memory),
+            need_weights=False,
+        )
+        queries = queries + self.attention_dropout(routed)
+        return queries + self.feedforward(self.feedforward_norm(queries))
+
+
+class JointSchemaHead(torch.nn.Module):
+    def __init__(
+        self,
+        hidden_size: int,
+        width: int,
+        routing_layers: int,
+        layers: int,
+        heads: int,
+        feedforward: int,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        self.hidden_norm = torch.nn.LayerNorm(hidden_size)
+        self.memory_projection = torch.nn.Linear(hidden_size, width, bias=False)
+        self.question_projection = torch.nn.Linear(hidden_size, width, bias=False)
+        self.option_question_projection = torch.nn.Linear(hidden_size, width, bias=False)
+        self.global_projection = torch.nn.Linear(hidden_size, width, bias=False)
+        self.option_context_projection = torch.nn.Linear(hidden_size, width, bias=False)
+        self.option_lexical_projection = torch.nn.Linear(hidden_size, width, bias=False)
+        self.type_embedding = torch.nn.Embedding(3, width)
+        self.evidence_layers = torch.nn.ModuleList(
+            [
+                EvidenceRoutingLayer(
+                    width=width,
+                    heads=heads,
+                    feedforward=feedforward,
+                    dropout=dropout,
+                )
+                for _ in range(routing_layers)
+            ]
+        )
+        self.option_summary_norm = torch.nn.LayerNorm(width)
+        self.layers = torch.nn.ModuleList(
+            [
+                torch.nn.TransformerDecoderLayer(
+                    d_model=width,
+                    nhead=heads,
+                    dim_feedforward=feedforward,
+                    dropout=dropout,
+                    activation="gelu",
+                    batch_first=True,
+                    norm_first=True,
+                )
+                for _ in range(layers)
+            ]
+        )
+        self.field_norm = torch.nn.LayerNorm(width)
+        self.option_norm = torch.nn.LayerNorm(width)
+        self.residual_scorer = torch.nn.Sequential(
+            torch.nn.Linear(width * 4, width),
+            torch.nn.GELU(),
+            torch.nn.Dropout(dropout),
+            torch.nn.Linear(width, 1),
+        )
+        self.prior_logit_scale = torch.nn.Parameter(torch.zeros(()))
+        self.joint_logit_scale = torch.nn.Parameter(torch.zeros(()))
+        self.residual_gate = torch.nn.Parameter(torch.zeros(()))
+
+    @staticmethod
+    def _mean_span(values: torch.Tensor, span: tuple[int, int]) -> torch.Tensor:
+        start, end = span
+        return values[start:end].mean(dim=0)
+
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        input_ids: torch.Tensor,
+        attention_mask: torch.Tensor,
+        records: list[EncodedRecord],
+        output_embedding_weight: torch.Tensor,
+    ) -> list[list[torch.Tensor]]:
+        results: list[list[torch.Tensor]] = []
+        normalized_hidden = self.hidden_norm(hidden_states)
+        for batch_index, record in enumerate(records):
+            sequence_length = int(attention_mask[batch_index].sum().item())
+            sequence_hidden = normalized_hidden[batch_index, :sequence_length]
+            memory = self.memory_projection(sequence_hidden).unsqueeze(0)
+            global_vector = sequence_hidden[-1]
+            question_vectors = torch.stack(
+                [
+                    self._mean_span(sequence_hidden, question.question_span)
+                    for question in record.questions
+                ]
+            )
+            type_ids = torch.tensor(
+                [question.question_type for question in record.questions],
+                device=hidden_states.device,
+            )
+            option_contexts: list[torch.Tensor] = []
+            lexical_options: list[torch.Tensor] = []
+            option_counts = []
+            for question in record.questions:
+                context_vectors = torch.stack(
+                    [
+                        self._mean_span(sequence_hidden, span)
+                        for span in question.option_spans
+                    ]
+                )
+                lexical_vectors = []
+                for start, end in question.option_spans:
+                    token_ids = input_ids[batch_index, start:end]
+                    lexical_vectors.append(output_embedding_weight[token_ids].mean(dim=0))
+                lexical = torch.stack(lexical_vectors)
+                option_contexts.append(context_vectors)
+                lexical_options.append(lexical)
+                option_counts.append(len(question.option_spans))
+
+            option_queries = []
+            for question_index, (context_vectors, lexical) in enumerate(
+                zip(option_contexts, lexical_options)
+            ):
+                option_queries.append(
+            
+[output cut at 10,000 characters]
+```
+[forward passes used: 1 of 25; Python runs used: 3 of 300]

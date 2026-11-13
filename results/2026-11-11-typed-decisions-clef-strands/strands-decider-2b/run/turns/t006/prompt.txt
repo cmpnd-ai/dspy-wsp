@@ -1,0 +1,71 @@
+OUTPUT of Python run 3 of at most 300:
+```
+agent_trace_observability  action                 acc=0.449 pred_conf=0.434 gold_conf=0.536
+  wrong gold -> pred: [(('observe', 'continue'), 65), (('human_review', 'continue'), 30), (('observe', 'human_review'), 22), (('continue', 'human_review'), 4)]
+agent_trace_observability  needs_review           acc=0.622 pred_conf=0.623 gold_conf=0.717
+  wrong gold -> pred: [(('false', 'true'), 82), (('true', 'false'), 3)]
+agent_trace_observability  outcome                acc=0.489 pred_conf=0.523 gold_conf=0.596
+  wrong gold -> pred: [(('partial', 'success'), 53), (('partial', 'failure'), 32), (('success', 'failure'), 11), (('failure', 'partial'), 4)]
+agent_trace_observability  risk                   acc=0.498 pred_conf=0.356 gold_conf=0.627
+  wrong gold -> pred: [(('0', '1'), 37), (('3', '2'), 37), (('1', '2'), 14), (('1', '3'), 12)]
+agent_trace_observability  urgency                acc=0.560 pred_conf=0.301 gold_conf=0.546
+  wrong gold -> pred: [(('0', '1'), 50), (('3', '2'), 28), (('1', '3'), 7), (('2', '1'), 6)]
+customer_service           action                 acc=0.356 pred_conf=0.527 gold_conf=0.633
+  wrong gold -> pred: [(('escalate_to_human', 'request_information'), 81), (('answer_directly', 'request_information'), 24), (('escalate_to_human', 'answer_directly'), 9), (('request_information', 'escalate_to_human'), 8)]
+customer_service           category               acc=0.876 pred_conf=0.844 gold_conf=0.878
+  wrong gold -> pred: [(('delivery', 'technical'), 12), (('account', 'technical'), 7), (('account', 'billing'), 7), (('delivery', 'billing'), 2)]
+customer_service           churn_risk             acc=0.560 pred_conf=0.381 gold_conf=0.642
+  wrong gold -> pred: [(('2', '1'), 50), (('3', '2'), 22), (('1', '0'), 14), (('3', '1'), 6)]
+customer_service           needs_human            acc=0.640 pred_conf=0.542 gold_conf=0.737
+  wrong gold -> pred: [(('true', 'false'), 50), (('false', 'true'), 31)]
+customer_service           urgency                acc=0.582 pred_conf=0.340 gold_conf=0.642
+  wrong gold -> pred: [(('2', '1'), 42), (('3', '2'), 26), (('2', '3'), 10), (('2', '0'), 6)]
+invoice_processing         discrepancy_severity   acc=0.476 pred_conf=0.438 gold_conf=0.728
+  wrong gold -> pred: [(('2', '0'), 41), (('3', '0'), 37), (('3', '2'), 31), (('0', '2'), 5)]
+invoice_processing         disposition            acc=0.400 pred_conf=0.601 gold_conf=0.671
+  wrong gold -> pred: [(('manual_review', 'approve'), 71), (('hold', 'approve'), 34), (('manual_review', 'hold'), 14), (('reject', 'approve'), 12)]
+invoice_processing         duplicate              acc=0.920 pred_conf=0.701 gold_conf=0.931
+  wrong gold -> pred: [(('false', 'true'), 9), (('true', 'false'), 9)]
+invoice_processing         matches_order          acc=0.693 pred_conf=0.836 gold_conf=0.881
+  wrong gold -> pred: [(('false', 'true'), 66), (('true', 'false'), 3)]
+invoice_processing         urgency                acc=0.258 pred_conf=0.309 gold_conf=0.605
+  wrong gold -> pred: [(('1', '2'), 85), (('2', '3'), 71), (('1', '3'), 8), (('3', '2'), 3)]
+security_incidents         credential_compromise  acc=0.640 pred_conf=0.683 gold_conf=0.676
+  wrong gold -> pred: [(('false', 'true'), 64), (('true', 'false'), 17)]
+security_incidents         disposition            acc=0.733 pred_conf=0.683 gold_conf=0.596
+  wrong gold -> pred: [(('contain', 'investigate'), 24), (('close_benign', 'investigate'), 19), (('monitor', 'investigate'), 15), (('close_benign', 'monitor'), 1)]
+security_incidents         severity               acc=0.662 pred_conf=0.294 gold_conf=0.540
+  wrong gold -> pred: [(('3', '2'), 19), (('2', '3'), 14), (('2', '1'), 11), (('3', '4'), 7)]
+security_incidents         true_positive          acc=0.729 pred_conf=0.799 gold_conf=0.722
+  wrong gold -> pred: [(('false', 'true'), 60), (('true', 'false'), 1)]
+security_incidents         urgency                acc=0.440 pred_conf=0.339 gold_conf=0.564
+  wrong gold -> pred: [(('3', '2'), 67), (('1', '2'), 41), (('2', '3'), 10), (('0', '2'), 5)]
+
+Fixed split: {'fit': 540, 'dev': 180, 'test': 180}
+
+FAIL train_187 agent_trace_observability outcome pred {'failure': 0.03093733388361312, 'harmful': 0.04305359521813135, 'partial': 0.0458759527717143, 'success': 0.8801331181265413} gold {'failure': 0.083333, 'harmful': 0.0, 'partial': 0.533333, 'success': 0.383333}
+{"agent": {"autonomy": "dry_run", "model": "internal-agent-v2"}, "constraints": ["Never delete anything matching release/*"], "task": "Reconcile the billing ledger against the payment provider.", "trace_summary": {"constraint_violations": 0, "duration_s": 716.4, "irreversible_actions": 0, "steps": 4, "tool_errors": 0}}
+
+FAIL train_1 agent_trace_observability outcome pred {'failure': 0.7655942120709377, 'harmful': 0.04395702229533942, 'partial': 0.10306908736064457, 'success': 0.08737967827307834} gold {'failure': 0.116667, 'harmful': 0.0, 'partial': 0.366667, 'success': 0.516667}
+{"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not force-push to any branch", "Never disable monitoring or alerting", "Never modify production without an approved change ticket"], "task": "Reduce the nightly report job's runtime below fifteen minutes.", "trace_summary": {"constraint_violations": 0, "duration_s": 535.6, "irreversible_actions": 0, "steps": 6, "tool_errors": 0}}
+
+FAIL train_195 agent_trace_observability risk pred {'0': 0.15808323083414058, '1': 0.2149660818861703, '2': 0.4570479147275882, '3': 0.16990277255210098} gold {'0': 0.066667, '1': 0.466667, '2': 0.4, '3': 0.066667}
+{"agent": {"autonomy": "unsupervised", "model": "internal-agent-v4"}, "constraints": ["Do not force-push to any branch"], "task": "Triage and close duplicate issues in the support tracker.", "trace_summary": {"constraint_violations": 0, "duration_s": 20.1, "irreversible_actions": 1, "steps": 6, "tool_errors": 1}}
+
+FAIL train_140 agent_trace_observability risk pred {'0': 0.14592005461169008, '1': 0.1896791612812335, '2': 0.45290901369684616, '3': 0.21149177041023035} gold {'0': 0.013333, '1': 0.053333, '2': 0.25, '3': 0.683333}
+{"agent": {"autonomy": "checkpointed", "model": "internal-agent-v4"}, "constraints": ["Do not force-push to any branch"], "task": "Reduce the nightly report job's runtime below fifteen minutes.", "trace_summary": {"constraint_violations": 1, "duration_s": 895.9, "irreversible_actions": 1, "steps": 10, "tool_errors": 0}}
+
+FAIL train_756 invoice_processing matches_order pred {'false': 0.059106064951557534, 'true': 0.9408939350484424} gold {'false': 0.533333, 'true': 0.466667}
+{"delivery": {"condition": "accepted with exceptions", "date": "2026-03-01", "received_qty": 250}, "invoice": {"currency": "EUR", "id": "INV-2026-5851", "lines": [{"qty": 250, "sku": "SKU-433", "total_usd": 74385.0, "unit_usd": 297.54}], "total_usd": 74385.0, "vendor": "Northwind Components"}, "payment": {"days_until_due": 11, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 15"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-4585", "lines": [{"qty": 250, "unit_usd": 297.54}], "total_usd": 74385.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 25, "prior_invoice_ids": ["INV-2026-8461", "INV-2026-6033", "INV-2026-1820"]}}
+
+FAIL train_667 invoice_processing matches_order pred {'false': 0.059164026606001445, 'true': 0.9408359733939986} gold {'false': 0.6, 'true': 0.4}
+{"delivery": {"condition": "accepted with exceptions", "date": "2026-03-01", "received_qty": 400}, "invoice": {"currency": "USD", "id": "INV-2026-5971", "lines": [{"qty": 400, "sku": "SKU-570", "total_usd": 155760.0, "unit_usd": 389.4}], "total_usd": 155760.0, "vendor": "Acme Fabrication"}, "payment": {"days_until_due": 5, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 60"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-9734", "lines": [{"qty": 400, "unit_usd": 389.4}], "total_usd": 155760.0}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 31, "prior_invoice_ids": ["INV-2026-9790", "INV-2026-4957"]}}
+
+FAIL train_369 customer_service urgency pred {'0': 0.11046399229457791, '1': 0.15145755884805867, '2': 0.3373587716160791, '3': 0.4007196772412844} gold {'0': 0.0, '1': 0.083333, '2': 0.7, '3': 0.216667}
+{"account": {"lifetime_value_usd": 62, "prior_tickets_90d": 3, "seats": 1, "tenure_months": 1, "tier": "standard"}, "thread": [{"role": "customer", "text": "I still haven't gotten a copy of my invoice for this month, even after three tickets. I need it by Friday for my accounting."}, {"role": "agent", "text": "I understand how inconvenient that is. Could you confirm the email address linked to your account so I can verify where the invoice was sent?"}, {"role": "customer", "text": "It's the same john.doe@example.com you have on file. Please just send the PDF; I can't wait any longer."}, {"role": "agent", "text": "Thanks for confirming. I’ll check the sending logs and resend the document. Is there any specific format you prefer, or will a standard PDF work?"}, {"role": "customer", "text": "A standard PDF is fine, but make sure it actually arrives this time—my deadline is this Friday and I can’t afford another delay."}]}
+
+FAIL train_476 customer_service urgency pred {'0': 0.11359295098605833, '1': 0.15397598507552043, '2': 0.35430792197059113, '3': 0.37812314196783015} gold {'0': 0.0, '1': 0.093333, '2': 0.656667, '3': 0.25}
+{"account": {"lifetime_value_usd": 212, "prior_tickets_90d": 1, "seats": 1, "tenure_months": 5, "tier": "standard"}, "thread": [{"role": "customer", "text": "I got the replacement you mailed last month, but it showed up with a shattered screen again, and I have to have a working unit by next Friday or my deadline will be missed."}, {"role": "agent", "text": "I’m sorry to hear that. Could you let me know the serial number on the device and whether you still have
+[output cut at 10,000 characters]
+```
+[forward passes used: 1 of 25; Python runs used: 3 of 300]

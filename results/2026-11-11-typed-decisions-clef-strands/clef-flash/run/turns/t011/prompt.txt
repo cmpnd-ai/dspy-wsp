@@ -1,0 +1,14 @@
+OUTPUT of Python run 6 of at most 300:
+```
+Meta keys: ['rows', 'layers', 'conventions', 'model', 'files']
+layers []
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "each option's logit: prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * cosine + residual_scorer(head_inputs))", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "the backbone's hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens", 'head_inputs': "residual_scorer's input per option: [field, option, field * option, |field - option|], each of the head's width", 'prior': "the lexical prior added to each option's logit", 'cosine': "the cosine of the question's field vector and the option vector"}
+model original
+files {'option_mask.npy': [1000, 5], 'option_logits.npy': [1000, 5], 'head_inputs.npy': [1000, 5, 4096], 'prior.npy': [1000, 5], 'cosine.npy': [1000, 5], 'probabilities.npy': [1000, 5]}
+First requested IDs: ['train_381', 'train_791', 'train_789', 'train_996', 'train_715', 'train_488']
+Request mapping: [('train_381', 'customer_service'), ('train_791', 'invoice_processing'), ('train_789', 'invoice_processing'), ('train_996', 'security_incidents'), ('train_715', 'invoice_processing'), ('train_488', 'customer_service')]
+prior centered RMS nan
+cosine centered RMS nan
+residual centered RMS nan
+```
+[forward passes used: 3 of 25; Python runs used: 6 of 300]

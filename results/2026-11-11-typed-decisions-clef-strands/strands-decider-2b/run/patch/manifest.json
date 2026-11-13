@@ -1,0 +1,43 @@
+{
+ "format": "dspy-wsp-patch",
+ "version": 1,
+ "meta": {
+  "created": "2026-11-11T21:22:06+00:00",
+  "base_model": "StrandsAgents/strands-decider-2B-qwen3.5-v1-2610",
+  "revision": "216d1ccb46a9e9b036eb9187b248db98480f77d4",
+  "writer": "openai/gpt-6-astra",
+  "budget": {
+   "max_passes": 25,
+   "max_code_runs": 300,
+   "passes_used": 25,
+   "code_runs_used": 41
+  },
+  "run_dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra",
+  "validation": {
+   "items": 400,
+   "original": 0.5975,
+   "edited": 0.727,
+   "gain": 0.1295,
+   "se": 0.011775867383406581,
+   "improved": 214,
+   "worsened": 55
+  }
+ },
+ "changed_tensors": 1,
+ "changed_entries_total": 1572864,
+ "tensors": [
+  {
+   "name": "k.weight",
+   "shape": [
+    768,
+    2048
+   ],
+   "dtype": "float32",
+   "form": "dense",
+   "changed_entries": 1572864,
+   "relative_change": 10.588519096374512,
+   "base_sha256": "c0d70b24f8af6b6f8d25f77da0a3c5ab7f7aab218532c949694c064290692798",
+   "edited_sha256": "80c9be568fb3ee14d5fb7b75700b738dccb6f4d6e9280574f65b5dae1f077140"
+  }
+ ]
+}

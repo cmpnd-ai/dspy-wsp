@@ -1,0 +1,6 @@
+OUTPUT of Python run 12 of at most 300:
+```
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 14.1339
+Full-strength predicted dev: (0.7477777600288391, 0.17000000178813934, 0.021343747313461822, 0.07331855595111847)
+```
+[forward passes used: 6 of 25; Python runs used: 12 of 300]

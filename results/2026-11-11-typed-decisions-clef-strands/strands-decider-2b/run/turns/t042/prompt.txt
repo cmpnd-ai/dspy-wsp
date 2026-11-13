@@ -1,0 +1,158 @@
+OUTPUT of Python run 25 of at most 300:
+```
+Record fields: ['id', 'sample', 'model', 'inputs', 'outputs', 'score', 'feedback', 'calls', 'cut', 'output_tokens']
+Existing globals:
+load function
+load_original function
+save_edit function
+drop_edit function
+edited function
+examples list 900
+ex dict ['id', 'inputs', 'labels']
+baseline_req dict ['type', 'model', 'problems']
+records list 900
+rows list 4500
+r dict ['id', 'wf', 'qid', 'type', 'p', 'gold', 'best', 'target', 'ok', 'confidence']
+ans dict ['credential_compromise', 'disposition', 'severity', 'true_positive', 'urgency']
+gold dict ['confidence', 'label', 'probabilities', 'score', 'type']
+p dict ['0', '1', '2', '3']
+groups dict [('agent_trace_observability', 'action'), ('agent_trace_observability', 'needs_review'), ('agent_trace_observability', 'outcome'), ('agent_trace_observability', 'risk'), ('agent_trace_observability', 'urgency'), ('customer_service', 'action'), ('customer_service', 'category'), ('customer_service', 'churn_risk'), ('customer_service', 'needs_human'), ('customer_service', 'urgency'), ('invoice_processing', 'discrepancy_severity'), ('invoice_processing', 'disposition'), ('invoice_processing', 'duplicate'), ('invoice_processing', 'matches_order'), ('invoice_processing', 'urgency'), ('security_incidents', 'credential_compromise'), ('security_incidents', 'disposition'), ('security_incidents', 'severity'), ('security_incidents', 'true_positive'), ('security_incidents', 'urgency')]
+rr tensor (2048,) torch.float64
+conf dict [('1', '2'), ('3', '2'), ('2', '3'), ('1', '3'), ('0', '1'), ('0', '2')]
+splits dict ['fit', 'dev', 'test']
+ids list 180
+wf_ids list 135
+req dict ['type', 'model', 'from']
+meta2 dict ['rows', 'layers', 'conventions', 'model', 'files']
+H0 dict ['norm.weight', 'norm.bias', 'q.weight', 'q.bias', 'k.weight', 'k.bias']
+t tensor (768,) torch.float32
+val dict ['option_mask.npy', 'option_logits.npy', 'head_inputs.npy', 'decide.npy', 'probabilities.npy']
+d2_raw tensor (900, 2048) torch.float32
+o2_raw tensor (900, 5, 2048) torch.float32
+mask2 tensor (900, 5) torch.bool
+L2 tensor (900, 5) torch.float32
+d2 tensor (900, 2048) torch.float32
+o2 tensor (900, 5, 2048) torch.float32
+q2 tensor (900, 768) torch.float32
+k2 tensor (900, 5, 768) torch.float32
+predL2 tensor (900, 5) torch.float32
+x tensor (3195, 2048) torch.float32
+energy tensor (2048,) torch.float32
+temps dict ['choice', 'noul', 'score']
+fit dict ['d', 'o', 'mask', 'L', 'p', 'gold', 'temp', 'ids', 'group', 'meta', 'Q', 'g']
+qmean tensor (768,) torch.float32
+u tensor (768,) torch.float32
+constL tensor (2700, 5) torch.float32
+deltaL tensor (2700, 5) torch.float32
+pred0 tensor (2700,) torch.int64
+predconst tensor (2700,) torch.int64
+dev dict ['d', 'o', 'mask', 'L', 'p', 'gold', 'temp', 'ids', 'group', 'meta', 'Q', 'g']
+weights tensor (9585,) torch.float32
+target_log tensor (2700, 5) torch.float32
+y3 tensor (2700, 5) torch.float32
+y tensor (9585,) torch.float32
+v tensor (2048,) torch.float32
+LF tensor (2700, 5) torch.float32
+LD tensor (900, 5) torch.float32
+read_ids dict [2, 3, 4, 5]
+data dict ['d', 'o', 'mask', 'L', 'p', 'gold', 'temp', 'ids', 'group', 'meta', 'Q', 'g']
+Xfit3 tensor (2700, 5, 2048) torch.float32
+Xdev3 tensor (900, 5, 2048) torch.float32
+X tensor (9585, 2048) torch.float32
+gram tensor (2048, 2048) torch.float64
+rhs tensor (2048,) torch.float64
+evals tensor (2048,) torch.float64
+evecs tensor (2048, 2048) torch.float64
+projrhs tensor (2048,) torch.float64
+ridge_vs dict [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+v0 tensor (2048,) torch.float32
+deltaK0 tensor (768, 2048) torch.float32
+Cfit tensor (2700, 5) torch.float32
+Cdev tensor (900, 5) torch.float32
+schema_means dict ['agent_trace_observability/action', 'agent_trace_observability/needs_review', 'agent_trace_observability/outcome', 'agent_trace_observability/risk', 'agent_trace_observability/urgency', 'customer_service/action', 'customer_service/category', 'customer_service/churn_risk', 'customer_service/needs_human', 'customer_service/urgency', 'invoice_processing/discrepancy_severity', 'invoice_processing/disposition', 'invoice_processing/duplicate', 'invoice_processing/matches_order', 'invoice_processing/urgency', 'security_incidents/credential_compromise', 'security_incidents/disposition', 'security_incidents/severity', 'security_incidents/true_positive', 'security_incidents/urgency']
+ix tensor (135,) torch.int64
+Cdev_static tensor (900, 5) torch.float32
+LL tensor (900, 5) torch.float32
+Cshuf tensor (900, 5) torch.float32
+energy_by_dim tensor (2048,) torch.float32
+basepred tensor (900,) torch.int64
+newpred tensor (900,) torch.int64
+m dict ['request', 'question', 'type', 'options']
+fitids_ordered list 540
+invoice_ids list 135
+agent_ids list 135
+security_ids list 135
+pnew tensor (900,) torch.int64
+cf dict ['d', 'o', 'mask', 'L', 'meta', 'temp', 'Q', 'g']
+cfC tensor (400, 5) torch.float32
+cue_stats dict ['delivery_exceptions', 'payment_deadline', 'constraint_violation', 'source_allowlisted']
+pair dict ['base_id', 'cue', 'requests', 'qid', 'positive', 'negative']
+dmean tensor (2048,) torch.float32
+Dc tensor (2700, 2048) torch.float32
+deig tensor (2048,) torch.float64
+dvec tensor (2048, 2048) torch.float64
+Kfit tensor (2700, 5, 768) torch.float32
+Kc tensor (2700, 5, 768) torch.float32
+Korth tensor (2700, 5, 768) torch.float32
+Kg tensor (9585, 768) torch.float32
+keig tensor (768,) torch.float64
+kvec tensor (768, 768) torch.float64
+cf_edit dict ['d', 'o', 'mask', 'L', 'meta', 'temp']
+DP tensor (2048, 64) torch.float32
+B tensor (768, 16) torch.float32
+ksd tensor (16,) torch.float32
+Bscaled tensor (768, 16) torch.float32
+Ffit tensor (2700, 5, 1040) torch.float32
+Zfit tensor (2700, 65) torch.float32
+Fdev tensor (900, 5, 1040) torch.float32
+Zdev tensor (900, 65) torch.float32
+FX tensor (9585, 1040) torch.float32
+resid tensor (2700, 5) torch.float32
+qy tensor (9585,) torch.float32
+qgram tensor (1040, 1040) torch.float64
+qrhs tensor (1040,) torch.float64
+qeig tensor (1040,) torch.float64
+qvec tensor (1040, 1040) torch.float64
+qproj tensor (1040,) torch.float64
+q_candidates dict [1.0, 10.0, 100.0, 1000.0]
+coeff tensor (3072,) torch.float32
+refine_vs dict [(0.003, 0.0001), (0.003, 0.0003), (0.003, 0.001), (0.003, 0.003), (0.003, 0.01), (0.01, 0.0001), (0.01, 0.0003), (0.01, 0.001), (0.01, 0.003), (0.01, 0.01), (0.03, 0.0001), (0.03, 0.0003), (0.03, 0.001), (0.03, 0.003), (0.03, 0.01), (0.1, 0.0001), (0.1, 0.0003), (0.1, 0.001), (0.1, 0.003), (0.1, 0.01)]
+yy3 tensor (2700, 5) torch.float32
+yy tensor (9585,) torch.float32
+vv tensor (2048,) torch.float32
+lf tensor (2700, 5) torch.float32
+ld tensor (900, 5) torch.float32
+v_ref tensor (2048,) torch.float32
+Cfit_ref tensor (2700, 5) torch.float32
+Cdev_ref tensor (900, 5) torch.float32
+r13 list 180
+Qorth tensor (2700, 768) torch.float32
+qoeig tensor (768,) torch.float64
+qovec tensor (768, 768) torch.float64
+OP tensor (9585, 2048) torch.float32
+opeig tensor (2048,) torch.float64
+opvec tensor (2048, 2048) torch.float64
+grouping list 2700
+xx tensor (135, 768) torch.float32
+Uctx tensor (768, 4) torch.float32
+gate_std tensor (4,) torch.float32
+Popt tensor (2048, 256) torch.float32
+Jfit tensor (2700, 5, 3072) torch.float32
+Jdev tensor (900, 5, 3072) torch.float32
+JX tensor (9585, 3072) torch.float32
+jy3 tensor (2700, 5) torch.float32
+jy tensor (9585,) torch.float32
+jgram tensor (3072, 3072) torch.float64
+jrhs tensor (3072,) torch.float64
+jeig tensor (3072,) torch.float64
+jvec tensor (3072, 3072) torch.float64
+jproj tensor (3072,) torch.float64
+joint_candidates dict [0.0003, 0.001, 0.003, 0.01]
+jc tensor (3072,) torch.float32
+deltaK_joint tensor (768, 2048) torch.float32
+Ljoint_dev tensor (900, 5) torch.float32
+pred_joint tensor (900, 5) torch.float32
+r15 list 180
+Best_2 files: ['results.json', 'edited', 'weights_and_direction.pt', 'edited/k.weight.npy']
+```
+[forward passes used: 15 of 25; Python runs used: 25 of 300]

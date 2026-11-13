@@ -1,0 +1,52 @@
+OUTPUT of Python run 33 of at most 300:
+```
+Reserved test descriptive results (NOT used to select the new direction):
+agent_tr action [66.7, 73.3, 73.3]
+agent_tr needs_review [80.0, 81.3, 81.3]
+agent_tr outcome [65.3, 76.0, 76.0]
+agent_tr risk [56.0, 74.7, 74.7]
+agent_tr urgency [46.7, 56.0, 58.7]
+customer action [64.0, 65.3, 68.0]
+customer category [93.3, 94.7, 94.7]
+customer churn_risk [68.0, 80.0, 80.0]
+customer needs_human [73.3, 80.0, 76.0]
+customer urgency [81.3, 78.7, 78.7]
+invoice_ discrepancy_severity [66.7, 70.7, 70.7]
+invoice_ disposition [64.0, 70.7, 70.7]
+invoice_ duplicate [88.0, 88.0, 88.0]
+invoice_ matches_order [85.3, 85.3, 85.3]
+invoice_ urgency [58.7, 70.7, 70.7]
+security credential_compromise [69.3, 80.0, 80.0]
+security disposition [65.3, 64.0, 64.0]
+security severity [77.3, 81.3, 81.3]
+security true_positive [89.3, 90.7, 90.7]
+security urgency [52.0, 61.3, 61.3]
+Security miss: train_996 {'alert': {'description': 'an unusual volume of files read in a short window', 'evidence': 'At 2026-09-15 03:12 UTC the gitlab-runner process (PID 8421) on host 172.20.5.12 accessed 8,764 distinct files under /var/lib/gitlab-runner/builds within a five‑minute window. The request originated from IP 203.0.113.45, which is not listed in the organization’s asset inventory, and the runner’s credentials have not been rotated for 412 days.', 'rule': 'mass_download'}, 'context': {'asset_criticality': 'low', 'change_window_active': False, 'source_on_allowlist': False}, 'history': {'credential_rotation_days_ago': 412, 'distinct_countries_30d': 2, 'logins_30d': 1415, 'prior_alerts_90d': 0}, 'principal': {'mfa_enrolled': True, 'name': 'adm-support-164', 'privileges': ['repo:read'], 'type': 'ci_runner'}} gold {'false': 0.616667, 'true': 0.383333} original {'false': 0.17313080467379965, 'true': 0.8268691953262003}
+Security miss: train_917 {'alert': {'description': 'an unusual volume of files read in a short window', 'evidence': 'Between 01:00 and 01:15\u202fUTC on 2026‑09‑13, employee account emp_jane accessed 4,372 files (totaling 12.4\u202fGB) from the share \\fileserver\\public on host 10.0.1.45. The account has privileged rights, MFA enabled, and its password was rotated 90\u202fdays prior.', 'rule': 'mass_download'}, 'context': {'asset_criticality': 'low', 'change_window_active': False, 'source_on_allowlist': False}, 'history': {'credential_rotation_days_ago': 90, 'distinct_countries_30d': 2, 'logins_30d': 328, 'prior_alerts_90d': 0}, 'principal': {'mfa_enrolled': True, 'name': 'adm-infra-268', 'privileges': ['deploy:production', 'secrets:read'], 'type': 'employee'}} gold {'false': 0.706667, 'true': 0.293333} original {'false': 0.2766295548973156, 'true': 0.7233704451026844}
+Security miss: train_1125 {'alert': {'description': 'audit logging was turned off on a host', 'evidence': 'Audit logging was disabled on the host workstation at 14:22 UTC. The authenticated employee account, which has not rotated credentials in 412 days, performed this action outside of an approved change window.', 'rule': 'disabled_logging'}, 'context': {'asset_criticality': 'medium', 'change_window_active': False, 'source_on_allowlist': True}, 'history': {'credential_rotation_days_ago': 412, 'distinct_countries_30d': 3, 'logins_30d': 1204, 'prior_alerts_90d': 0}, 'principal': {'mfa_enrolled': True, 'name': 'ci-infra-325', 'privileges': ['repo:read'], 'type': 'employee'}} gold {'false': 0.533333, 'true': 0.466667} original {'false': 0.36426035110516725, 'true': 0.6357396488948328}
+Feature stats: 0.9373820424079895 FC std 0.32021236419677734 shared correction rms 4.827669620513916
+Target stats: [('mixed', -2.1302735805511475, 3.3597640991210938), ('hard_margin', -1.25, 2.0)]
+Tensor save formats: [('linear_bypass_candidate.pt', 'dict'), ('targeted_candidate.pt', 'dict')]
+By field tune, original / shared / targeted:
+('agent_trace_observability', 'action') [0.52, 0.04, 0.64]
+('agent_trace_observability', 'needs_review') [0.76, 0.04, 0.88]
+('agent_trace_observability', 'outcome') [0.28, 0.0, 0.72]
+('agent_trace_observability', 'risk') [0.64, 0.04, 0.76]
+('agent_trace_observability', 'urgency') [0.56, 0.0, 0.88]
+('customer_service', 'action') [0.6, 0.68, 0.72]
+('customer_service', 'category') [1.0, 1.0, 1.0]
+('customer_service', 'churn_risk') [0.52, 0.0, 0.84]
+('customer_service', 'needs_human') [0.52, 0.0, 0.84]
+('customer_service', 'urgency') [0.44, 0.04, 0.88]
+('invoice_processing', 'discrepancy_severity') [0.68, 0.04, 0.68]
+('invoice_processing', 'disposition') [0.68, 0.2, 0.72]
+('invoice_processing', 'duplicate') [0.88, 0.0, 0.88]
+('invoice_processing', 'matches_order') [0.76, 0.32, 0.88]
+('invoice_processing', 'urgency') [0.44, 0.0, 0.6]
+('security_incidents', 'credential_compromise') [0.16, 0.04, 0.64]
+('security_incidents', 'disposition') [0.44, 0.68, 0.88]
+('security_incidents', 'severity') [0.76, 0.76, 0.76]
+('security_incidents', 'true_positive') [0.32, 0.24, 0.84]
+('security_incidents', 'urgency') [0.16, 0.0, 0.68]
+```
+[forward passes used: 11 of 25; Python runs used: 33 of 300]

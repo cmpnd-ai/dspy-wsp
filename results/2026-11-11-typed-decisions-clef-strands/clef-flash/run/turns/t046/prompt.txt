@@ -1,0 +1,22 @@
+OUTPUT of Python run 29 of at most 300:
+```
+Read outputs:
+cosine.npy 20128
+head_inputs.npy 81920128
+meta.json 142501
+option_logits.npy 20128
+option_mask.npy 5128
+prior.npy 20128
+probabilities.npy 20128
+requests.json 496726
+Meta keys: ['rows', 'layers', 'conventions', 'model', 'files']
+layers []
+conventions {'rows': "one row per question, in request order; meta.rows names each row's request, question and options", 'option_mask': "True on a question's real options; padded options are NaN", 'option_logits': "each option's logit: prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * cosine + residual_scorer(head_inputs))", 'probabilities': "the answer's distribution over the options", 'hidden_mean': "the backbone's hidden state after each listed layer (0 = embeddings, l = after block l-1), averaged over the state's tokens", 'head_inputs': "residual_scorer's input per option: [field, option, field * option, |field - option|], each of the head's width", 'prior': "the lexical prior added to each option's logit", 'cosine': "the cosine of the question's field vector and the option vector"}
+model original
+files {'option_mask.npy': [1000, 5], 'option_logits.npy': [1000, 5], 'head_inputs.npy': [1000, 5, 4096], 'prior.npy': [1000, 5], 'cosine.npy': [1000, 5], 'probabilities.npy': [1000, 5]}
+Variables:
+Traceback (most recent call last):
+  File "<cell>", line 18, in <module>
+TypeError: 'numpy._ArrayFunctionDispatcher' object is not iterable
+```
+[forward passes used: 11 of 25; Python runs used: 29 of 300]

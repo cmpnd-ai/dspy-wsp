@@ -22,16 +22,15 @@ def build_index(weights_dir: str | Path) -> dict[str, str]:
     """Map every tensor name to the safetensors file (relative name) that holds it."""
     d = Path(weights_dir)
     index_file = d / "model.safetensors.index.json"
-    if index_file.exists():
-        return dict(json.loads(index_file.read_text())["weight_map"])
-    files = sorted(d.glob("*.safetensors"))
-    if not files:
+    index: dict[str, str] = dict(json.loads(index_file.read_text())["weight_map"]) if index_file.exists() else {}
+    # Files outside the shard map hold tensors too, e.g. Clef's joint_head.safetensors.
+    files = [f for f in sorted(d.glob("*.safetensors")) if f.name not in set(index.values())]
+    if not files and not index:
         raise FileNotFoundError(f"no .safetensors files in {d}")
-    index: dict[str, str] = {}
     for f in files:
         with safe_open(str(f), framework="pt") as h:
             for k in h.keys():
-                index[k] = f.name
+                index.setdefault(k, f.name)
     return index
 
 

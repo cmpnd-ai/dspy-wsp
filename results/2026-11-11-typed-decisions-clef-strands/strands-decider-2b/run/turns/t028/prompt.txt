@@ -1,0 +1,20 @@
+OUTPUT of Python run 16 of at most 300:
+```
+Backed up confirmed edit: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/best_1
+Counterfactual requests: 80 questions: 400
+
+Remaining development errors after rank-one edit:
+agent_trace_observability/action errors 11 /45
+train_25 new observe gold human_review
+{"agent": {"autonomy": "checkpointed", "model": "internal-agent-v1"}, "constraints": ["Never modify production without an approved change ticket", "Never delete anything matching release/*", "Never disable monitoring or alerting"], "task": "Migrate the user table to the new schema without downtime.", "trace_summary": {"constraint_violations": 0, "duration_s": 558.6, "irreversible_actions": 0, "steps": 4, "tool_errors": 1}}
+invoice_processing/discrepancy_severity errors 19 /45
+train_625 new 0 gold 3
+{"delivery": {"condition": "accepted with exceptions", "date": "2026-03-21", "received_qty": 100}, "invoice": {"currency": "USD", "id": "INV-2026-4404", "lines": [{"qty": 100, "sku": "SKU-745", "total_usd": 29286.0, "unit_usd": 292.86}], "total_usd": 29286.0, "vendor": "Orbit Logistics"}, "payment": {"days_until_due": 18, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 15"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-4009", "lines": [{"qty": 100, "unit_usd": 292.86}], "total_usd": 29286.0}, "vendor_history": {"disputes_12m": 2, "invoices_12m": 1, "prior_invoice_ids": ["INV-2026-4404"]}}
+customer_service/action errors 20 /45
+train_310 new escalate_to_human gold request_information
+{"account": {"lifetime_value_usd": 1008, "prior_tickets_90d": 1, "seats": 1, "tenure_months": 19, "tier": "standard"}, "thread": [{"role": "customer", "text": "I’m not sure what’s happening, but my order that was supposed to arrive last week still isn’t here, and I need it before Friday. This is the second time the same issue has come up."}]}
+security_incidents/urgency errors 19 /45
+train_924 new 3 gold 2
+{"alert": {"description": "a session token was presented from a second address", "evidence": "A session token for the shared mailbox account was presented from an unrecognized IP address. The previous authentication occurred from a different location, and the account credentials have not been updated in 412 days.", "rule": "token_reuse"}, "context": {"asset_criticality": "high", "change_window_active": false, "source_on_allowlist": false}, "history": {"credential_rotation_days_ago": 412, "distinct_countries_30d": 4, "logins_30d": 818, "prior_alerts_90d": 1}, "principal": {"mfa_enrolled": true, "name": "adm-billing-412", "privileges": ["repo:read"], "type": "shared_mailbox"}}
+```
+[forward passes used: 10 of 25; Python runs used: 16 of 300]

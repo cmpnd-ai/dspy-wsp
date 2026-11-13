@@ -1,0 +1,10 @@
+OUTPUT of Python run 41 of at most 300:
+```
+Full refit direction norm: 46.43427658081055 ridge 0.060667363164820236
+Cosine with 500-fit direction: 0.7938077449798584
+In-sample practice only: {'acc': 0.7871111035346985, 'gain': 0.08577777777777776, 'se': 0.00497403411672396, 'n': 900}
+saved edit residual_scorer.0.weight: 8,192 of 4,194,304 entries changed, relative change 1.6017
+saved edit residual_scorer.0.bias: 2 of 1,024 entries changed, relative change 0.0067
+saved edit residual_scorer.3.weight: 2 of 1,024 entries changed, relative change 58.7277
+```
+[forward passes used: 13 of 25; Python runs used: 41 of 300]
