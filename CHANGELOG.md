@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 - `ClefBackend` loads Cloudflare's Clef decision models in MLX, with the alias `"clef-flash"`. The backbone stays fixed and the writer edits the joint schema head.
 - `StrandsBackend` loads Strands decider models in MLX, with the alias `"strands-2b"`. It folds the checkpoint's LoRA adapter into the base model's weights and saves the result in `~/.cache/dspy-wsp`, so the writer can edit the backbone and the head.
