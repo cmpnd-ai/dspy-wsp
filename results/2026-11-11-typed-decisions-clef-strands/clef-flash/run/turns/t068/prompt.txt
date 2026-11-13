@@ -1,0 +1,5 @@
+OUTPUT of Python run 46 of at most 300:
+```
+Controlled requests: 156 questions 780
+```
+[forward passes used: 15 of 25; Python runs used: 46 of 300]

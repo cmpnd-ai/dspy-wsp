@@ -1,0 +1,14 @@
+OUTPUT of Python run 43 of at most 300:
+```
+Field ridge scaling: 20.553879093639736 trace/n 20.553879093639736 trace/d 2.509018444047819
+Original target differences: [('soft', -2.3212151527404785, 3.3597640991210938), ('mixed', -2.1302735805511475, 3.3597640991210938), ('hard', -1.25, 2.0)]
+Original field input equality: 0.0
+Target soft relation to loggold: 0.0
+Class samples: [(('agent_trace_observability', 'action'), 'continue'), (('agent_trace_observability', 'action'), 'human_review'), (('agent_trace_observability', 'action'), 'observe'), (('agent_trace_observability', 'action'), 'stop'), (('agent_trace_observability', 'needs_review'), 'false')] selected [14, 15, 16, 17, 18, 19, 20, 21, 22, 32, 33] expert gain 8.375 full linear gain 8.375
+Gate ridge scale: 1208.7144583396805 1208.7144583396796 lambda 0.0013270664925446169
+Reference gate accuracy: 1.0
+Traceback (most recent call last):
+  File "<cell>", line 11, in <module>
+RuntimeError: expected m1 and m2 to have the same dtype, but got: double != float
+```
+[forward passes used: 14 of 25; Python runs used: 43 of 300]

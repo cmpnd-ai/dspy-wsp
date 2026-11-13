@@ -1,0 +1,39 @@
+RESULT of forward pass 18:
+```
+{
+ "type": "read",
+ "model": "edited",
+ "requests": 156,
+ "questions": 780,
+ "dir": "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/fwd_18",
+ "files": {
+  "option_mask.npy": [
+   780,
+   5
+  ],
+  "option_logits.npy": [
+   780,
+   5
+  ],
+  "head_inputs.npy": [
+   780,
+   5,
+   4096
+  ],
+  "prior.npy": [
+   780,
+   5
+  ],
+  "cosine.npy": [
+   780,
+   5
+  ],
+  "probabilities.npy": [
+   780,
+   5
+  ]
+ },
+ "seconds": 2.1
+}
+```
+[forward passes used: 18 of 25; Python runs used: 48 of 300]

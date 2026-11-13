@@ -7,7 +7,7 @@ name = "dspy-wsp"
 version = "0.1.2"
 description = "Weight-space programming as a DSPy optimizer: a frontier LM reads and edits a small model's weights, with no gradients."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Drew Breunig", email = "dbreunig@gmail.com" }]
 keywords = ["dspy", "llm", "optimizer", "interpretability", "weight editing"]
@@ -45,7 +45,7 @@ filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.ruff]
 line-length = 200
-target-version = "py310"
+target-version = "py311"
 extend-exclude = ["examples/runs", "results"]
 
 [tool.ruff.lint]

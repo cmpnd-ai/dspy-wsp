@@ -1,0 +1,10 @@
+OUTPUT of Python run 19 of at most 300:
+```
+Gate ridge, fit accuracy, tune accuracy, target min-positive/max-negative
+1e-06 1.0 0.9994 0.627 0.438
+1e-05 1.0 1.0 0.651 0.411
+0.0001 1.0 1.0 0.602 0.403
+0.001 1.0 1.0 0.489 0.343
+0.01 0.9998 0.9994 0.357 0.281
+```
+[forward passes used: 7 of 25; Python runs used: 19 of 300]

@@ -1,0 +1,30 @@
+OUTPUT of Python run 22 of at most 300:
+```
+workflow explained query variance 0.0821
+question type explained query variance 0.2781
+question schema explained query variance 0.7759
+Residual-query variance captured: {2: 0.7227, 4: 0.8366, 8: 0.9171, 16: 0.9658}
+Option-contrast variance captured: {32: 0.9231, 64: 0.9617, 128: 0.9802, 256: 0.99}
+Best2 development remaining accuracy by question:
+agent_trace_observability/action                    0.556 -> 0.733 (+0.178)
+agent_trace_observability/needs_review              0.733 -> 0.889 (+0.156)
+agent_trace_observability/outcome                   0.578 -> 0.889 (+0.311)
+agent_trace_observability/risk                      0.533 -> 0.822 (+0.289)
+agent_trace_observability/urgency                   0.511 -> 0.667 (+0.156)
+customer_service/action                             0.333 -> 0.578 (+0.244)
+customer_service/category                           0.867 -> 0.978 (+0.111)
+customer_service/churn_risk                         0.489 -> 0.800 (+0.311)
+customer_service/needs_human                        0.644 -> 0.733 (+0.089)
+customer_service/urgency                            0.667 -> 0.822 (+0.156)
+invoice_processing/discrepancy_severity             0.356 -> 0.667 (+0.311)
+invoice_processing/disposition                      0.311 -> 0.622 (+0.311)
+invoice_processing/duplicate                        0.978 -> 0.978 (+0.000)
+invoice_processing/matches_order                    0.667 -> 0.889 (+0.222)
+invoice_processing/urgency                          0.244 -> 0.733 (+0.489)
+security_incidents/credential_compromise            0.689 -> 0.800 (+0.111)
+security_incidents/disposition                      0.689 -> 0.711 (+0.022)
+security_incidents/severity                         0.622 -> 0.689 (+0.067)
+security_incidents/true_positive                    0.756 -> 0.867 (+0.111)
+security_incidents/urgency                          0.333 -> 0.578 (+0.244)
+```
+[forward passes used: 14 of 25; Python runs used: 22 of 300]

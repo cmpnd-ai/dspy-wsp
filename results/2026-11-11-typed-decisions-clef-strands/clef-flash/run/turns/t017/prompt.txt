@@ -1,0 +1,20 @@
+OUTPUT of Python run 11 of at most 300:
+```
+Pair: [791, 1015] gain: 8.375 direction norm: 56.13894271850586
+0.0 fit 0.6972 tune {'accuracy': 0.71, 'gain': 0.0, 'se': 0.0, 'n': 100.0}
+0.125 fit 0.7236 tune {'accuracy': 0.73, 'gain': 0.02, 'se': 0.00829, 'n': 100.0}
+0.25 fit 0.7536 tune {'accuracy': 0.73, 'gain': 0.02, 'se': 0.01005, 'n': 100.0}
+0.5 fit 0.8056 tune {'accuracy': 0.766, 'gain': 0.056, 'se': 0.01559, 'n': 100.0}
+0.75 fit 0.8484 tune {'accuracy': 0.752, 'gain': 0.042, 'se': 0.01892, 'n': 100.0}
+1.0 fit 0.8804 tune {'accuracy': 0.728, 'gain': 0.018, 'se': 0.02222, 'n': 100.0}
+Predicted corrections to representative fit failures:
+train_0 outcome target partial corrections {'failure': 0.17100000381469727, 'harmful': 0.6930000185966492, 'partial': 0.4269999861717224, 'success': -1.2899999618530273} before/after success partial
+train_8 outcome target partial corrections {'failure': 0.16599999368190765, 'harmful': 0.3529999852180481, 'partial': 0.3919999897480011, 'success': -0.9110000133514404} before/after success partial
+train_3 urgency target 3 corrections {'0': 0.14499999582767487, '1': -0.3630000054836273, '2': -0.5490000247955322, '3': 0.7670000195503235} before/after 2 3
+train_901 credential_compromise target false corrections {'false': 0.11999999731779099, 'true': -0.11999999731779099} before/after true true
+train_663 duplicate target true corrections {'false': -0.6389999985694885, 'true': 0.6389999985694885} before/after false false
+saved edit residual_scorer.0.weight: 8,192 of 4,194,304 entries changed, relative change 1.9327
+saved edit residual_scorer.0.bias: 2 of 1,024 entries changed, relative change 0.0067
+saved edit residual_scorer.3.weight: 2 of 1,024 entries changed, relative change 58.7277
+```
+[forward passes used: 4 of 25; Python runs used: 11 of 300]

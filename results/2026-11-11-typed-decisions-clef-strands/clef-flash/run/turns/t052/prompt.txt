@@ -1,0 +1,29 @@
+OUTPUT of Python run 34 of at most 300:
+```
+Saved keys: dict_keys(['delta', 'pair', 'strength', 'first_weight', 'first_bias', 'last_weight']) dict_keys(['tensors', 'neurons', 'qkeys'])
+Stored tensor shapes: {'delta': (3072,), 'pair': 'list', 'strength': 'float', 'first_weight': (1024, 4096), 'first_bias': (1024,), 'last_weight': (1024,)}
+Current tune reconstruction: {'acc': 0.7860000133514404, 'gain': 0.07600000000000001, 'se': 0.01723984110170744, 'n': 100}
+Fit/tune padded mask agreement: True
+Corrected tune by field, original/current:
+('agent_trace_observability', 'action') [0.6, 0.64]
+('agent_trace_observability', 'needs_review') [0.88, 0.88]
+('agent_trace_observability', 'outcome') [0.4, 0.72]
+('agent_trace_observability', 'risk') [0.68, 0.76]
+('agent_trace_observability', 'urgency') [0.56, 0.88]
+('customer_service', 'action') [0.6, 0.72]
+('customer_service', 'category') [1.0, 1.0]
+('customer_service', 'churn_risk') [0.76, 0.84]
+('customer_service', 'needs_human') [0.72, 0.84]
+('customer_service', 'urgency') [0.72, 0.88]
+('invoice_processing', 'discrepancy_severity') [0.68, 0.68]
+('invoice_processing', 'disposition') [0.76, 0.72]
+('invoice_processing', 'duplicate') [0.88, 0.88]
+('invoice_processing', 'matches_order') [0.88, 0.88]
+('invoice_processing', 'urgency') [0.56, 0.6]
+('security_incidents', 'credential_compromise') [0.6, 0.64]
+('security_incidents', 'disposition') [0.84, 0.88]
+('security_incidents', 'severity') [0.76, 0.76]
+('security_incidents', 'true_positive') [0.76, 0.84]
+('security_incidents', 'urgency') [0.56, 0.68]
+```
+[forward passes used: 11 of 25; Python runs used: 34 of 300]

@@ -1,0 +1,18 @@
+OUTPUT of Python run 18 of at most 300:
+```
+Number of option identities: 71
+Prototype identity accuracy fit/tune: 0.8597183227539062 0.8670422434806824
+agent_t urgency 0 fit margin -0.297 tune min+/max- -1.84 4.14
+agent_t urgency 1 fit margin -0.545 tune min+/max- -1.49 2.25
+agent_t urgency 2 fit margin -1.178 tune min+/max- -0.73 2.16
+agent_t urgency 3 fit margin -0.478 tune min+/max- -2.2 4.33
+custome action answer_directly fit margin -0.085 tune min+/max- -10.08 14.12
+custome action close_no_action fit margin -0.316 tune min+/max- -3.75 2.83
+custome action escalate_to_human fit margin -0.294 tune min+/max- -3.4 4.61
+custome action execute_refund fit margin -0.05 tune min+/max- -23.57 18.58
+custome action request_information fit margin -0.28 tune min+/max- -3.07 3.83
+custome needs_human false fit margin -0.076 tune min+/max- -8.08 14.24
+custome needs_human true fit margin 0.057 tune min+/max- 1.55 -2.62
+Ideal targeted replacement: {'accuracy': 0.7879999876022339, 'gain': np.float64(0.07800000000000001), 'se': np.float64(0.017031165728176274), 'n': 100}
+```
+[forward passes used: 7 of 25; Python runs used: 18 of 300]

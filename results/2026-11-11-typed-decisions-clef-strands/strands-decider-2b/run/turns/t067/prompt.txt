@@ -1,0 +1,24 @@
+RESULT of forward pass 24:
+```
+{
+ "type": "decide",
+ "model": "edited",
+ "generations": 900,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/gen_24.jsonl"
+ ],
+ "graded": 900,
+ "score": 0.7786666666666667,
+ "score_se_over_items": 0.007065419888475819,
+ "mean_output_tokens": 0.0,
+ "cut_share": 0.0,
+ "failures": {
+  "cut_at_max_tokens": 0,
+  "program_error": 0,
+  "metric_error": 0,
+  "scored_below_1": 597
+ },
+ "seconds": 7.1
+}
+```
+[forward passes used: 24 of 25; Python runs used: 40 of 300]

@@ -1,0 +1,11 @@
+OUTPUT of Python run 50 of at most 300:
+```
+Half-dose feature error: 0.0
+Half-dose logit reconstruction error: 0.00017452239990234375
+Observed half-dose midpoint error: 5.7220458984375e-06
+saved edit residual_scorer.0.weight: 98,302 of 4,194,304 entries changed, relative change 47.1994
+saved edit residual_scorer.0.bias: 24 of 1,024 entries changed, relative change 329.5970
+saved edit residual_scorer.3.weight: 24 of 1,024 entries changed, relative change 203.3978
+Nuisance probes: 120 requests, 600 questions
+```
+[forward passes used: 19 of 25; Python runs used: 50 of 300]

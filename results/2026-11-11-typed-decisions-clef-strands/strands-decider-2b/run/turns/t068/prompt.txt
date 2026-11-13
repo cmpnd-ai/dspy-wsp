@@ -1,0 +1,12 @@
+OUTPUT of Python run 41 of at most 300:
+```
+all_practice {"items": 900, "original": 0.5791111111111111, "edited": 0.7786666666666666, "gain": 0.19955555555555557, "paired_se": 0.008271727957570694, "improved": 571, "worsened": 90}
+fit {"items": 540, "original": 0.5755555555555556, "edited": 0.7911111111111111, "gain": 0.21555555555555556, "paired_se": 0.01043763950652292, "improved": 357, "worsened": 44}
+dev {"items": 180, "original": 0.5777777777777777, "edited": 0.7722222222222223, "gain": 0.19444444444444445, "paired_se": 0.01853950807173797, "improved": 115, "worsened": 21}
+test {"items": 180, "original": 0.5911111111111111, "edited": 0.7477777777777775, "gain": 0.15666666666666668, "paired_se": 0.019380536993403977, "improved": 99, "worsened": 25}
+agent_trace_observability {"items": 225, "original": 0.5235555555555556, "edited": 0.768, "gain": 0.24444444444444444, "paired_se": 0.015958499971500704, "improved": 156, "worsened": 13}
+customer_service {"items": 225, "original": 0.6026666666666668, "edited": 0.8044444444444444, "gain": 0.20177777777777778, "paired_se": 0.016426416544512292, "improved": 150, "worsened": 27}
+invoice_processing {"items": 225, "original": 0.5493333333333333, "edited": 0.7893333333333334, "gain": 0.24, "paired_se": 0.017593288763724922, "improved": 157, "worsened": 21}
+security_incidents {"items": 225, "original": 0.6408888888888888, "edited": 0.7528888888888889, "gain": 0.11200000000000002, "paired_se": 0.014623312546795608, "improved": 108, "worsened": 29}
+```
+[forward passes used: 24 of 25; Python runs used: 41 of 300]

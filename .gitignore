@@ -6,7 +6,7 @@ dist/
 wsp_runs/
 runs/
 .env
-docs/superpowers/
+docs/
 .superpowers/
 .DS_Store
 .venv/

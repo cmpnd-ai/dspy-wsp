@@ -1,0 +1,34 @@
+OUTPUT of Python run 31 of at most 300:
+```
+D fields: [('option_mask', (3000, 5)), ('option_logits', (3000, 5)), ('prior', (3000, 5)), ('cosine', (3000, 5)), ('probabilities', (3000, 5)), ('activations', (3000, 5, 1024)), ('gold', (3000, 5)), ('target', (3000,)), ('meta', ('list', 3000)), ('ids', ('list', 3000)), ('isfit', (3000,)), ('istune', (3000,)), ('mask', (3000, 5)), ('logits', (3000, 5)), ('C', (3000, 5, 1024)), ('features', (3000, 5, 4096)), ('FC', (3000, 5, 3072)), ('qkey', ('list', 3000))]
+Diagnostic candidate value structures: {"('soft', 0.0001)": ('dict', ['correction', 'param'])}
+qdata keys / example: [('agent_trace_observability', 'action'), ('agent_trace_observability', 'needs_review')] {'ix': (3000,), 'tr': (3000,), 'te': (3000,), 'mu': (1024,), 'xc': (125, 1024), 'ev': (125,), 'U': (125, 125), 'scale': '94.38812096588728'}
+Existing table first 6: [('soft', 0.0001, 0.5, 0.8331999778747559, 0.7480000257492065, np.float64(0.038000000000000006), np.float64(0.01650099476646267)), ('soft', 0.0001, 1.0, 0.9940000176429749, 0.7300000190734863, np.float64(0.020000000000000004), np.float64(0.024863262420322444)), ('soft', 0.001, 0.5, 0.8159999847412109, 0.7459999918937683, np.float64(0.036000000000000004), np.float64(0.015408249135256786)), ('soft', 0.001, 1.0, 0.9567999839782715, 0.7480000257492065, np.float64(0.038000000000000006), np.float64(0.02489493072409674)), ('soft', 0.01, 0.5, 0.7888000011444092, 0.7459999918937683, np.float64(0.036000000000000004), np.float64(0.013745155253007981)), ('soft', 0.01, 1.0, 0.8763999938964844, 0.7580000162124634, np.float64(0.04800000000000001), np.float64(0.021295420857427295))]
+Signatures: {'summary_logits': '(logits, subset, verbose=False)', 'center_options': '(t, m)', 'pair_tensors': '(strength, delta=tensor([-1.9991,  1.3118,  1.5201,  ...,  0.2449,  0.8203,  0.0855]), neurons=[791, 1015])', 'edited_pair_logits': '(strength)', 'targeted_tensors': '(gate_strength=32.0, expert_strength=1.0)', 'simulate_scoring_tensors': '(tensors, neurons=[791, 1015, 700, 28, 248, 703, 626, 861, 508, 39, 523, 1007, 689, 904, 452, 921, 624, 823, 449, 1017, 140, 711, 692, 822])'}
+One output {'discrepancy_severity': 'confidence=0.8166245851211515 value=0.1833754148788484 probabilities={0: 0.8758889020367087, 1: 0.08131069806149493, 2: 0.02633648288803562, 3: 0.016463917013760744} level=0', 'disposition': "confidence=0.9081066319718819 value='approve' probabilities={'approve': 0.9310799739789114, 'hold': 0.03191615675936918, 'manual_review': 0.014866535566437675, 'reject': 0.02213733369528158}", 'duplicate': 'confidence=0.9761304023099834 value=False probability=0.011934798845008305', 'matches_order': 'confidence=0.9059526327654304 value=True probability=0.9529763163827152', 'urgency': 'confidence=0.4314219201614613 value=1.4467275321136062 probabilities={0: 0.06092527386246636, 1: 0.5062165083155216, 2: 0.3580636296679515, 3: 0.07479458815406043} level=1'}
+Reserved-practice accuracy by field (original,best1,best2):
+agent_tr action [0.0, 0.0, 0.0]
+agent_tr needs_review [0.0, 0.0, 0.0]
+agent_tr outcome [0.0, 0.0, 0.0]
+agent_tr risk [0.0, 0.0, 0.0]
+agent_tr urgency [0.0, 0.0, 0.0]
+customer action [0.0, 0.0, 0.0]
+customer category [0.0, 0.0, 0.0]
+customer churn_risk [0.0, 0.0, 0.0]
+customer needs_human [0.0, 0.0, 0.0]
+customer urgency [0.0, 0.0, 0.0]
+invoice_ discrepancy_severity [0.0, 0.0, 0.0]
+invoice_ disposition [0.0, 0.0, 0.0]
+invoice_ duplicate [0.0, 0.0, 0.0]
+invoice_ matches_order [0.0, 0.0, 0.0]
+invoice_ urgency [0.0, 0.0, 0.0]
+security credential_compromise [0.0, 0.0, 0.0]
+security disposition [0.0, 0.0, 0.0]
+security severity [0.0, 0.0, 0.0]
+security true_positive [0.0, 0.0, 0.0]
+security urgency [0.0, 0.0, 0.0]
+Traceback (most recent call last):
+  File "<cell>", line 32, in <module>
+AttributeError: 'str' object has no attribute 'get'
+```
+[forward passes used: 11 of 25; Python runs used: 31 of 300]

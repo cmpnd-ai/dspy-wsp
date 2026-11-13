@@ -1,0 +1,46 @@
+OUTPUT of Python run 10 of at most 300:
+```
+Raw-input candidate, tune by workflow:
+agent_trace_observability [0.624 0.68 ]
+customer_service [0.76  0.776]
+invoice_processing [0.752 0.768]
+security_incidents [0.704 0.76 ]
+{'accuracy': 0.7459999918937683, 'gain': np.float64(0.036000000000000004), 'se': np.float64(0.015143755588800729), 'n': 100}
+agent_tr action 0.6 -> 0.56
+agent_tr needs_review 0.88 -> 0.84
+agent_tr outcome 0.4 -> 0.68
+agent_tr risk 0.68 -> 0.76
+agent_tr urgency 0.56 -> 0.56
+customer action 0.6 -> 0.64
+customer category 1.0 -> 1.0
+customer churn_risk 0.76 -> 0.84
+customer needs_human 0.72 -> 0.64
+customer urgency 0.72 -> 0.76
+invoice_ discrepancy_severity 0.68 -> 0.68
+invoice_ disposition 0.76 -> 0.68
+invoice_ duplicate 0.88 -> 0.88
+invoice_ matches_order 0.88 -> 0.88
+invoice_ urgency 0.56 -> 0.72
+security credential_compromise 0.6 -> 0.64
+security disposition 0.84 -> 0.84
+security severity 0.76 -> 0.8
+security true_positive 0.76 -> 0.84
+security urgency 0.56 -> 0.68
+
+Alternative closed-form targets: target ridge strength fit tune gain se
+mixed 1e-05 0.5 0.8132 0.756 0.046 0.0163
+mixed 1e-05 1.0 0.8828 0.716 0.006 0.0223
+mixed 0.0001 0.5 0.794 0.75 0.04 0.0156
+mixed 0.0001 1.0 0.8512 0.728 0.018 0.0211
+mixed 0.001 0.5 0.7636 0.736 0.026 0.0129
+mixed 0.001 1.0 0.81 0.746 0.036 0.0183
+hard_margin 1e-05 0.5 0.8276 0.75 0.04 0.0178
+hard_margin 1e-05 1.0 0.9164 0.69 -0.02 0.0249
+hard_margin 0.0001 0.5 0.8056 0.766 0.056 0.0156
+hard_margin 0.0001 1.0 0.88 0.722 0.012 0.0229
+hard_margin 0.001 0.5 0.7732 0.742 0.032 0.0141
+hard_margin 0.001 1.0 0.824 0.74 0.03 0.0183
+Field coordinate RMS and across-question std: 1.002038598060608 0.3377296030521393
+Option coordinate RMS and across-option std: 0.9955031871795654 0.4017535448074341
+```
+[forward passes used: 4 of 25; Python runs used: 10 of 300]

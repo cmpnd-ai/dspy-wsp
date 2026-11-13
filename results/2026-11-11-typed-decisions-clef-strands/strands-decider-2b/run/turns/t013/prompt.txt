@@ -1,0 +1,10 @@
+OUTPUT of Python run 7 of at most 300:
+```
+Fit query: mean norm 9.875273704528809 centered RMS norm 2.950411319732666
+Query-axis factor min/mean/max 0.3241909444332123 0.35634326934814453 0.4140927195549011
+Contextual query contribution to centered logits: RMS 0.09034082293510437
+Original centered logits RMS 0.8176795840263367
+Replacing all queries by mean changes predictions: 4 / 2700
+Effective key-readout norm 1.00569748878479
+```
+[forward passes used: 4 of 25; Python runs used: 7 of 300]

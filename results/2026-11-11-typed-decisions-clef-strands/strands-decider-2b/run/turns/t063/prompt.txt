@@ -1,0 +1,11 @@
+OUTPUT of Python run 38 of at most 300:
+```
+Pair container: list count: 40
+First pair: {'base_id': 'train_600', 'cue': 'delivery_exceptions', 'requests': [0, 1], 'qid': 'matches_order', 'positive': 'false', 'negative': 'true'}
+First counterfactual metadata: [{'request': 0, 'question': 'discrepancy_severity', 'type': 'score', 'options': ['0', '1', '2', '3']}, {'request': 0, 'question': 'disposition', 'type': 'choice', 'options': ['approve', 'hold', 'manual_review', 'reject']}]
+delivery_exceptions original/final mean signed log-odds response: [0.0769, 0.8105] positive pairs: [10, 10] / 10
+payment_deadline original/final mean signed log-odds response: [1.1551, 2.0773] positive pairs: [10, 10] / 10
+constraint_violation original/final mean signed log-odds response: [0.7278, 1.3528] positive pairs: [10, 10] / 10
+source_allowlisted original/final mean signed log-odds response: [0.1141, 0.2376] positive pairs: [10, 9] / 10
+```
+[forward passes used: 22 of 25; Python runs used: 38 of 300]

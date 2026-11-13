@@ -1,0 +1,32 @@
+OUTPUT of Python run 59 of at most 300:
+```
+family / level / question / margin: original, shared, full (means)
+tool_errors / 0 / outcome / partial-success: [-1.385, -1.544, -1.544]
+tool_errors / 1 / outcome / partial-success: [-0.346, 0.389, 0.389]
+tool_errors / 2 / outcome / partial-success: [0.491, 1.122, 1.122]
+tool_errors / 4 / outcome / partial-success: [2.022, 1.928, 1.928]
+constraint_violations / 0 / urgency / 3-1: [-2.137, -1.958, -2.765]
+constraint_violations / 1 / urgency / 3-1: [-2.063, -0.755, 0.028]
+constraint_violations / 2 / urgency / 3-1: [-1.699, -0.712, 0.733]
+customer_resolution_authority / routine_information / action / answer_directly-best_other: [1.74, 0.821, 3.775]
+customer_resolution_authority / routine_information / needs_human / true-false: [-2.246, -2.22, -2.012]
+customer_resolution_authority / human_authority / action / escalate_to_human-best_other: [5.019, 2.365, 3.251]
+customer_resolution_authority / human_authority / needs_human / true-false: [3.298, 1.398, 2.057]
+customer_resolution_authority / resolved / action / close_no_action-best_other: [4.553, 3.39, 2.472]
+customer_resolution_authority / resolved / needs_human / true-false: [-0.311, 0.084, 0.16]
+customer_resolution_authority / verified_refund / action / execute_refund-best_other: [1.077, 0.97, 1.827]
+customer_resolution_authority / verified_refund / needs_human / true-false: [0.091, 0.209, -0.7]
+customer_resolution_authority / missing_information / action / request_information-best_other: [4.577, 3.091, 2.864]
+customer_resolution_authority / missing_information / needs_human / true-false: [-0.199, -0.426, 0.423]
+duplicate_invoice_id / False / duplicate / true-false: [-4.225, -3.418, -3.418]
+duplicate_invoice_id / True / duplicate / true-false: [-2.845, -1.831, -1.831]
+benign_security_context / unapproved / credential_compromise / true-false: [1.476, 1.129, 1.129]
+benign_security_context / unapproved / true_positive / true-false: [1.323, 1.263, 1.263]
+benign_security_context / allowlisted / credential_compromise / true-false: [1.13, 0.306, 0.306]
+benign_security_context / allowlisted / true_positive / true-false: [0.449, 0.214, 0.214]
+benign_security_context / allowlisted_change_window / credential_compromise / true-false: [0.985, 0.064, 0.064]
+benign_security_context / allowlisted_change_window / true_positive / true-false: [0.349, -0.11, -0.11]
+
+Pass 23 request: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/held_cue_probes_edited.json
+```
+[forward passes used: 22 of 25; Python runs used: 59 of 300]

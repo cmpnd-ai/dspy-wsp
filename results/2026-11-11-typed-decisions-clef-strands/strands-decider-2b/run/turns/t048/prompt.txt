@@ -1,0 +1,9 @@
+OUTPUT of Python run 30 of at most 300:
+```
+Correct temperature-scaled Brier: {'accuracy': 0.7722222317424086, 'gain': 0.19444444866644012, 'se': 0.018539508509868297, 'brier': 0.08730112761259079}
+top10 RMS within-question log-odds change 0.058447614312171936
+other2038 RMS within-question log-odds change 0.5044434666633606
+full RMS within-question log-odds change 0.5374802350997925
+saved edit k.weight: 1,565,184 of 1,572,864 entries changed, relative change 10.5888
+```
+[forward passes used: 16 of 25; Python runs used: 30 of 300]

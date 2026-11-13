@@ -1,0 +1,49 @@
+RESULT of forward pass 24:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 300,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/gen_24_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/gen_24_edited.jsonl"
+ ],
+ "original": {
+  "graded": 300,
+  "score": 0.7053333333333334,
+  "score_se_over_items": 0.01398815658734213,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 233
+  }
+ },
+ "edited": {
+  "graded": 300,
+  "score": 0.762,
+  "score_se_over_items": 0.013190483377343765,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 205
+  }
+ },
+ "paired": {
+  "items": 300,
+  "original": 0.7053333333333334,
+  "edited": 0.762,
+  "gain": 0.056666666666666664,
+  "se": 0.009925399928010711,
+  "improved": 104,
+  "worsened": 39
+ },
+ "seconds": 456.3
+}
+```
+[forward passes used: 24 of 25; Python runs used: 61 of 300]

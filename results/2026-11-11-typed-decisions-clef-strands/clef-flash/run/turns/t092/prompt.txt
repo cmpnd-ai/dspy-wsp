@@ -1,0 +1,6 @@
+OUTPUT of Python run 61 of at most 300:
+```
+Saved split sizes: {'fit': 500, 'tune': 100, 'test': 300}
+Ready: /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/final_practice_check.json
+```
+[forward passes used: 23 of 25; Python runs used: 61 of 300]

@@ -1,0 +1,13 @@
+OUTPUT of Python run 20 of at most 300:
+```
+Gated extension uses 22 additional neurons: [700, 28, 248, 703, 626, 861, 508, 39, 523, 1007, 689, 904, 452, 921, 624, 823, 449, 1017, 140, 711, 692, 822]
+gate 16.0 strength 0.5 fit 0.8148 tune 0.772 gain/SE 0.062 0.0157 non-target leak RMS/max 0.0385 1.5545
+gate 16.0 strength 1.0 fit 0.8192 tune 0.78 gain/SE 0.07 0.0164 non-target leak RMS/max 0.184 4.4693
+gate 32.0 strength 0.5 fit 0.8052 tune 0.766 gain/SE 0.056 0.0161 non-target leak RMS/max 0.0031 0.1078
+gate 32.0 strength 1.0 fit 0.808 tune 0.774 gain/SE 0.064 0.0173 non-target leak RMS/max 0.0771 3.172
+gate 64.0 strength 0.5 fit 0.8096 tune 0.77 gain/SE 0.06 0.0149 non-target leak RMS/max 0.0 0.0
+gate 64.0 strength 1.0 fit 0.7832 tune 0.75 gain/SE 0.04 0.0166 non-target leak RMS/max 0.0003 0.0139
+gate 128.0 strength 0.5 fit 0.7816 tune 0.752 gain/SE 0.042 0.0176 non-target leak RMS/max 0.0 0.0
+gate 128.0 strength 1.0 fit 0.7888 tune 0.744 gain/SE 0.034 0.0156 non-target leak RMS/max 0.0 0.0
+```
+[forward passes used: 7 of 25; Python runs used: 20 of 300]

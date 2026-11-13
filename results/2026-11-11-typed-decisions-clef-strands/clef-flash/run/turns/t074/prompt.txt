@@ -1,0 +1,11 @@
+OUTPUT of Python run 49 of at most 300:
+```
+Full repair max feature difference: 0.0
+Full repair max logit reconstruction error: 0.000339508056640625
+Half-extension deviation from midpoint: 2.86102294921875e-06
+Half-extension tuning diagnostic: {'acc': 0.7699999809265137, 'gain': 0.06000000000000001, 'se': 0.015699192541804387, 'n': 100}
+saved edit residual_scorer.0.weight: 98,302 of 4,194,304 entries changed, relative change 47.1994
+saved edit residual_scorer.0.bias: 24 of 1,024 entries changed, relative change 329.5970
+saved edit residual_scorer.3.weight: 24 of 1,024 entries changed, relative change 113.7077
+```
+[forward passes used: 18 of 25; Python runs used: 49 of 300]

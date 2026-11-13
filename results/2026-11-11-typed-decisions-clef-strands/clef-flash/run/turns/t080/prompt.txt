@@ -1,0 +1,7 @@
+OUTPUT of Python run 52 of at most 300:
+```
+Metadata probe feature error: 0.0
+Metadata probe logit reconstruction error: 0.000392913818359375
+Independent-seed probes: 170 requests, 850 questions
+```
+[forward passes used: 21 of 25; Python runs used: 52 of 300]

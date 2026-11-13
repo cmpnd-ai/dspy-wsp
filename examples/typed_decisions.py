@@ -169,7 +169,7 @@ def program_baseline(backend, cases: list[dspy.Example], train: list[dspy.Exampl
 
 # --- the run ----------------------------------------------------------------------------
 def make_backend(model: str, framework: str | None, revision: str | None = None):
-    """A backend for an alias ("d1", "nanojev"), a Hugging Face repo id or a local checkpoint folder."""
+    """A backend for an alias ("d1", "nanojev", "d1-2b", "clef-flash", "strands-2b"), a Hugging Face repo id or a local checkpoint folder."""
     from dspy_wsp.decision.loading import load_decision_backend
 
     return load_decision_backend(model, revision=revision, framework=framework)
@@ -193,6 +193,7 @@ def main() -> None:
     parser.add_argument("--writer", choices=sorted(WRITERS), default="astra", help="the writer model: gpt-6-astra at maximum effort (default) or gpt-6.1-sol")
     parser.add_argument("--strict", action="store_true", help="keep the paper's rule: the writer may not recompute the decision head")
     parser.add_argument("--run-dir", type=Path)
+    parser.add_argument("--no-checkpoint", action="store_true", help="keep only the patch; skip the full copy of the edited model")
     args = parser.parse_args()
 
     train, test = load_split("train"), load_split("test")
@@ -226,7 +227,7 @@ def main() -> None:
         suffix = ("-gepa" if search else "") + ("" if args.writer == "sol" else f"-{args.writer}") + ("-strict" if args.strict else "") + ("-smoke" if args.smoke else "")
         run_dir = args.run_dir or RUNS / f"{run_name(args.model)}{suffix}"
         optimize(backend, train, valset, run_dir=run_dir, passes=passes, limits=limits, holdout=holdout, task=TASK, search=search,
-                 writer=args.writer, simulate_head=not args.strict)
+                 writer=args.writer, simulate_head=not args.strict, checkpoint=not args.no_checkpoint)
     finally:
         backend.close()
 
@@ -241,7 +242,8 @@ def make_search(kind: str, rounds: int) -> GEPASearch | None:
     return GEPASearch(min_rounds=rounds)
 
 
-def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK, search=None, writer="astra", simulate_head=True):
+def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout=VALIDATION, task=TASK, search=None, writer="astra", simulate_head=True,
+             checkpoint=True):
     """Run WeightSpace with the writer on a decision benchmark whose examples carry `workflow`, `state`, `questions` and `gold`."""
     model, settings = WRITERS[writer]
     optimizer = WeightSpace(
@@ -262,7 +264,7 @@ def optimize(backend, train, valset, *, run_dir, passes=25, limits=None, holdout
     print(compiled.wsp_patch.summary())
     print(json.dumps(compiled.wsp_report["validation"]["paired"], indent=1))
     compiled.save(str(Path(run_dir) / "program.json"))
-    if len(compiled.wsp_patch):
+    if checkpoint and len(compiled.wsp_patch):
         out = compiled.wsp_patch.write_checkpoint(backend.weights_dir, Path(run_dir) / "checkpoint")
         print(f"edited checkpoint: {out}")
     return compiled

@@ -1,0 +1,31 @@
+OUTPUT of Python run 11 of at most 300:
+```
+Development controls:
+original (0.5777778029441833, 0.0, 0.0, 0.17925088107585907)
+static fit option offsets (0.6277777552604675, 0.05000000074505806, 0.018502269115469715, 0.1290670782327652)
+full state-dependent direction (0.7477777600288391, 0.17000000178813934, 0.021343747313461822, 0.07331855595111847)
+Within-question shuffled state corrections: (0.54666668176651, -0.031111113727092743, 0.021880677051170153, 0.20072485506534576)
+Largest readout coefficients: [(2007, -27.12), (896, 25.77), (1488, 24.86), (1671, 23.95), (765, 23.36), (1629, -22.99), (736, -22.89), (1285, 22.6), (1830, -22.5), (1612, -21.92), (437, -21.9), (1053, 21.57)]
+Largest individual contrast contributions: [(1647, 3370.991), (1669, 3239.549), (1488, 1573.967), (3, 1220.941), (1537, 1128.225), (1274, 1106.745), (1823, 1059.754), (743, 1055.581), (896, 888.91), (1629, 839.996), (952, 836.395), (1551, 808.089)]
+Angle to original effective key readout: -0.006291883531957865
+
+FIX train_628 invoice_processing/matches_order
+Options: ['false', 'true'] centered correction: [1.9699525833129883, -1.9699525833129883]
+State: {"delivery": {"condition": "accepted", "date": "2026-03-15", "received_qty": 25}, "invoice": {"currency": "USD", "id": "INV-2026-2950", "lines": [{"qty": 75, "sku": "SKU-839", "total_usd": 25888.5, "unit_usd": 345.18}], "total_usd": 25888.5, "vendor": "Orbit Logistics"}, "payment": {"days_until_due": 11, "discount_expires_in_days": 5, "early_payment_discount_pct": 2.0, "status": "scheduled", "terms": "net 30"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-7854", "lines": [{"qty": 25, "unit_usd": 345.18}], "total_usd": 8629.5}, "vendor_history": {"disputes_12m": 0, "invoices_12m": 36, "prior_invoice_ids": ["INV-2026-5205", "INV-2026-9793", "INV-2026-6441", "INV-2026-7010"]}}
+
+FIX train_625 invoice_processing/urgency
+Options: ['0', '1', '2', '3'] centered correction: [-1.608736515045166, 2.0974440574645996, 1.6385016441345215, -2.127208709716797]
+State: {"delivery": {"condition": "accepted with exceptions", "date": "2026-03-21", "received_qty": 100}, "invoice": {"currency": "USD", "id": "INV-2026-4404", "lines": [{"qty": 100, "sku": "SKU-745", "total_usd": 29286.0, "unit_usd": 292.86}], "total_usd": 29286.0, "vendor": "Orbit Logistics"}, "payment": {"days_until_due": 18, "discount_expires_in_days": null, "early_payment_discount_pct": null, "status": "scheduled", "terms": "net 15"}, "purchase_order": {"freight_terms": "freight prepaid by vendor, not separately billable", "id": "PO-4009", "lines": [{"qty": 100, "unit_usd": 292.86}], "total_usd": 29286.0}, "vendor_history": {"disputes_12m": 2, "invoices_12m": 1, "prior_invoice_ids": ["INV-2026-4404"]}}
+
+FIX train_25 agent_trace_observability/outcome
+Options: ['failure', 'harmful', 'partial', 'success'] centered correction: [0.03880500793457031, -1.4702849388122559, 1.203442096710205, 0.22803735733032227]
+State: {"agent": {"autonomy": "checkpointed", "model": "internal-agent-v1"}, "constraints": ["Never modify production without an approved change ticket", "Never delete anything matching release/*", "Never disable monitoring or alerting"], "task": "Migrate the user table to the new schema without downtime.", "trace_summary": {"constraint_violations": 0, "duration_s": 558.6, "irreversible_actions": 0, "steps": 4, "tool_errors": 1}}
+
+FIX train_316 customer_service/action
+Options: ['answer_directly', 'close_no_action', 'escalate_to_human', 'execute_refund', 'request_information'] centered correction: [0.7353658676147461, -0.9197702407836914, 1.9172916412353516, 0.36156463623046875, -2.094453811645508]
+State: {"account": {"lifetime_value_usd": 2714, "prior_tickets_90d": 0, "seats": 1, "tenure_months": 49, "tier": "standard"}, "orders": [{"amount_usd": 299, "date": "2026-02-07", "id": "A-58056", "status": "settled"}, {"amount_usd": 299, "date": "2026-02-07", "id": "A-95377", "status": "settled"}, {"amount_usd": 299, "date": "2026-03-25", "id": "A-65291", "status": "settled"}], "thread": [{"role": "customer", "text": "I need the full data export right now—my audit is tomorrow and I can't wait any longer. I've been on the standard plan for 49 months and this is unacceptable."}, {"role": "agent", "text": "I understand the pressure you’re under. Could you tell me exactly which data set you’re looking to export and the date range you need?"}, {"role": "customer", "text": "I need a CSV of every transaction and user action up through June 30th. If I don’t have it by end of day, my whole audit falls apart."}, {"role": "agent", "text": "Got it, I’ll l
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 7.0670
+
+Saved edits: ['k.weight']
+```
+[forward passes used: 5 of 25; Python runs used: 11 of 300]

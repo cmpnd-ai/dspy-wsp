@@ -1,0 +1,275 @@
+HANDOFF. The conversation was restarted to keep it short; the kernel and its variables are unchanged. Your task follows, unchanged.
+
+TASK. You are given the weights of a decision model: Cloudflare/clef-flash (Clef decision model, text path): a Qwen3.5 backbone (32 causal blocks, width 4096) and a joint schema head. The backbone is fixed in this run: its tensors are out of scope, and only the head's tensors (the names without a `model.` prefix) take edits. A request is one ChatML prompt: a system line, 'STATE:' and the state, then 'SCHEMA FIELDS:' with one block per question (FIELD i, ID, TYPE, INSTRUCTION, then 'OPTION j: {"description":...,"option_id":...}' per option), then the assistant header and 'JOINT SCHEMA DECISIONS:'. A choice's options are written in sorted key order and a noul's as true, then false. The head reads the backbone's final hidden states x = hidden_norm(h) (width 4096), and it works at width 1024. memory = memory_projection(x) over every token. Each option's query is option_context_projection(mean of x over the option's tokens) + option_lexical_projection(mean of the output-embedding rows of those tokens) + option_question_projection(mean of x over the question's instruction tokens). 2 `evidence_layers` let every option query read memory by cross-attention (query_norm, memory_norm, attention, then feedforward_norm and a GELU MLP `feedforward.0`, `feedforward.3`). Each question's field vector is question_projection(question mean) + option_summary_norm(a softmax-weighted sum of its routed options) + global_projection(x at the last token) + type_embedding (rows noul, choice, score). 4 pre-norm transformer decoder `layers` let the fields read each other (self_attn) and memory (multihead_attn), then field_norm. With option = option_norm(routed option) and features = [field, option, field * option, |field - option|], an option's logit is prior + sigmoid(residual_gate) * (exp(joint_logit_scale) * cosine(field, option) + residual_scorer(features)), where residual_scorer is Linear (`residual_scorer.0`), GELU, Linear to one logit (`residual_scorer.3`), and prior is exp(prior_logit_scale) times the cosine of the option's lexical mean and (question mean + x at the last token). A softmax per question gives the probabilities, with no temperature. A noul's options are [false, true]. The head has 121,762,820 parameters, stored as bfloat16 and computed in float32; an edit is rounded to bfloat16 when it is applied. It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program answers five typed questions about a business record (an agent trace, a customer message, an invoice or a security alert). Each question's answer is scored against a gold probability distribution.
+
+THE PROGRAM.
+TypedDecisions, with 4 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'agent_trace_observability': state -> action, needs_review, outcome, risk, urgency
+  instructions: Answer each question about this agent trace observability record.
+  state: The record to judge.
+  action: What should the observability system do with this trace?
+  needs_review: This trace requires human review.
+  outcome: How did this agent run turn out?
+  risk: How risky was the agent's behaviour in this trace?
+  urgency: How quickly does this trace need attention?
+- step 'customer_service': state -> action, category, churn_risk, needs_human, urgency
+  instructions: Answer each question about this customer service record.
+  state: The record to judge.
+  action: What should the assistant do next with this conversation?
+  category: What is this customer conversation primarily about?
+  churn_risk: How likely is this customer to stop doing business with us because of this interaction?
+  needs_human: This conversation requires a human agent rather than automated handling.
+  urgency: How time-sensitive is this conversation?
+- step 'invoice_processing': state -> discrepancy_severity, disposition, duplicate, matches_order, urgency
+  instructions: Answer each question about this invoice processing record.
+  state: The record to judge.
+  discrepancy_severity: How material is any discrepancy between the invoice, the order and the delivery?
+  disposition: How should this vendor invoice be dispositioned?
+  duplicate: This invoice appears to duplicate an invoice already submitted.
+  matches_order: The invoice reconciles with the purchase order and the recorded delivery.
+  urgency: How time-sensitive is processing this invoice?
+- step 'security_incidents': state -> credential_compromise, disposition, severity, true_positive, urgency
+  instructions: Answer each question about this security incidents record.
+  state: The record to judge.
+  credential_compromise: The evidence indicates a credential or account has been compromised.
+  disposition: How should this security alert be dispositioned?
+  severity: How severe is the potential impact if this alert is real?
+  true_positive: This alert reflects genuinely malicious or unauthorised activity.
+  urgency: How quickly must a responder act on this alert?
+Program source:
+class TypedDecisions(dspy.Module):
+    """One Predict per workflow; each case goes to its workflow's questions."""
+
+    def __init__(self, examples: list[dspy.Example]):
+        super().__init__()
+        schemas = {}
+        for ex in examples:
+            schemas.setdefault(ex.workflow, ex.questions)
+        self.workflows = sorted(schemas)
+        for wf in self.workflows:
+            setattr(self, wf, dspy.Predict(make_signature(wf, schemas[wf])))
+
+    def forward(self, workflow: str, state: dict):
+        return getattr(self, workflow)(state=state)
+
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    results, notes = [], []
+    for qid, gold in example.gold.items():
+        probs = predicted_probabilities(pred[qid])
+        ok, _, brier, _ = score_one(probs, gold)
+        results.append((ok, brier))
+        best = max(probs, key=probs.get)
+        target = max(gold["probabilities"], key=gold["probabilities"].get)
+        notes.append(f"{qid}: {'right' if ok else 'WRONG'} (predicted {best} {probs[best]:.2f}, gold {target} {gold['probabilities'][target]:.2f})")
+    accuracy = sum(ok for ok, _ in results) / len(results)
+    brier = sum(b for _, b in results) / len(results)
+    return dspy.Prediction(score=accuracy, feedback="; ".join(notes) + f". Mean Brier {brier:.3f}.")
+
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the whole backbone, which this backend keeps fixed), and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no internet, no GPU): variables survive between your code blocks, like a notebook. The model's files are in /Users/dbreunig/.cache/huggingface/hub/models--Cloudflare--clef-flash/snapshots/22b75507981345858dd152fbd9a6f8c0c4068b0a (read only), practice examples are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/practice, and /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  evidence_layers.0.attention.in_proj_bias [3072]
+  evidence_layers.0.attention.in_proj_weight [3072, 1024]
+  evidence_layers.0.attention.out_proj.bias [1024]
+  evidence_layers.0.attention.out_proj.weight [1024, 1024]
+  evidence_layers.0.feedforward.0.bias [4096]
+  evidence_layers.0.feedforward.0.weight [4096, 1024]
+  evidence_layers.0.feedforward.3.bias [1024]
+  evidence_layers.0.feedforward.3.weight [1024, 4096]
+  evidence_layers.0.feedforward_norm.bias [1024]
+  evidence_layers.0.feedforward_norm.weight [1024]
+  evidence_layers.0.memory_norm.bias [1024]
+  evidence_layers.0.memory_norm.weight [1024]
+  evidence_layers.0.query_norm.bias [1024]
+  evidence_layers.0.query_norm.weight [1024]
+  evidence_layers.1.attention.in_proj_bias [3072]
+  evidence_layers.1.attention.in_proj_weight [3072, 1024]
+  evidence_layers.1.attention.out_proj.bias [1024]
+  evidence_layers.1.attention.out_proj.weight [1024, 1024]
+  evidence_layers.1.feedforward.0.bias [4096]
+  evidence_layers.1.feedforward.0.weight [4096, 1024]
+  evidence_layers.1.feedforward.3.bias [1024]
+  evidence_layers.1.feedforward.3.weight [1024, 4096]
+  evidence_layers.1.feedforward_norm.bias [1024]
+  evidence_layers.1.feedforward_norm.weight [1024]
+  evidence_layers.1.memory_norm.bias [1024]
+  evidence_layers.1.memory_norm.weight [1024]
+  evidence_layers.1.query_norm.bias [1024]
+  evidence_layers.1.query_norm.weight [1024]
+  field_norm.bias [1024]
+  field_norm.weight [1024]
+  global_projection.weight [1024, 4096]
+  hidden_norm.bias [4096]
+  hidden_norm.weight [4096]
+  joint_logit_scale []
+  layers.0.linear1.bias [4096]
+  layers.0.linear1.weight [4096, 1024]
+  layers.0.linear2.bias [1024]
+  layers.0.linear2.weight [1024, 4096]
+  layers.0.multihead_attn.in_proj_bias [3072]
+  layers.0.multihead_attn.in_proj_weight [3072, 1024]
+  layers.0.multihead_attn.out_proj.bias [1024]
+  layers.0.multihead_attn.out_proj.weight [1024, 1024]
+  layers.0.norm1.bias [1024]
+  layers.0.norm1.weight [1024]
+  layers.0.norm2.bias [1024]
+  layers.0.norm2.weight [1024]
+  layers.0.norm3.bias [1024]
+  layers.0.norm3.weight [1024]
+  layers.0.self_attn.in_proj_bias [3072]
+  layers.0.self_attn.in_proj_weight [3072, 1024]
+  layers.0.self_attn.out_proj.bias [1024]
+  layers.0.self_attn.out_proj.weight [1024, 1024]
+  memory_projection.weight [1024, 4096]
+  option_context_projection.weight [1024, 4096]
+  option_lexical_projection.weight [1024, 4096]
+  option_norm.bias [1024]
+  option_norm.weight [1024]
+  option_question_projection.weight [1024, 4096]
+  option_summary_norm.bias [1024]
+  option_summary_norm.weight [1024]
+  prior_logit_scale []
+  question_projection.weight [1024, 4096]
+  residual_gate []
+  residual_scorer.0.bias [1024]
+  residual_scorer.0.weight [1024, 4096]
+  residual_scorer.3.bias [1]
+  residual_scorer.3.weight [1, 1024]
+  type_embedding.weight [3, 1024]
+  ... the same names for blocks 0..3; 122 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/practice/trainset.jsonl (900 examples). Input fields: state, workflow. Label fields: case_id, gold, questions. Choose whichever serve your experiments. A separate validation set of 300 examples is held out from you; you can only score edits on it, as described below.
+
+3. A forward-pass tool with a budget of 25 forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to 900 practice items (with "both", up to 450 per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set (300 examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..32] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most 1,024 questions per pass. The results are .npy files in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to 1,024 questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/edited to /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 25 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/clef-flash-astra/work/edited when you finish are submitted, so leave there the edit with the best paired gain confirmed on the validation set, or no edit if none was confirmed. Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help.
+
+YOUR NOTEBOOK (notes.md):
+# Head weight repair experiment
+Backbone fixed. No gradients, optimizers, or iterative weight fitting. All proposed edits will be closed-form or targeted causal interventions.
+
+## Planned pass 1 — baseline
+Exact edit: none. DECIDE original on all 900 practice IDs, stored in baseline_request.json. Will diagnose errors by workflow, field, gold/predicted options, and confidence.
+
+## Pass 1 result
+Original practice accuracy 0.701333; item SE 0.007763, n=900; 712 items below perfect. No program or metric failures. All subsequent mechanism analysis uses these practice records only.
+
+## Practice split (fixed seed 271828)
+Fit 500 (125/workflow), tune 100 (25/workflow), paired test 300 (75/workflow). IDs in practice_splits.json. Baseline diagnosis summarizes all records; no edit fitting or parameter selection will use test labels.
+
+## Diagnosis
+Baseline largest issues: agent outcome 55.1% (73 partial→success), agent urgency 51.1% (54 low→routine, 28 critical→elevated), invoice urgency 51.6%, agent risk 59.1%, invoice disposition 60.0%, security credential compromise 67.1% (70 false→true). Hypothesis: state cues are available but final option-margin readout is misaligned, with workflow-specific stereotyped preferences. Will test final scorer before altering routing.
+## Planned pass 2
+Exact edits: none. READ original on first 200 fit IDs (1000 questions), read_fit_1.json. Gold never supplied to model. No test examples.
+
+## Pass 2 result
+Read 200 fit records, 1000 questions. Scorer reconstructed with max logit error 9.536743e-07; residual gate=0.119203, joint cosine scale=9.94306, prior scale=9.94306.
+## Planned pass 3
+Exact edits: none. READ original on next 200 fit IDs (read_fit_2.json); no tune/test labels used.
+
+## Planned pass 4
+Exact edits: none. READ original on remaining 100 fit plus 100 tune records (read_fit_tune.json, 1000 questions). Will solve a regularized, within-question-centered least-squares correction to residual_scorer.3.weight using fit only; tune chooses regularization/strength. This is a direct closed-form solve, not iterative training.
+
+Activation alignment verified against all recorded probabilities; READ 'from' preserves generation-file order, not the ID list order. Padding sanitized before centering. Residual scorer features and activations now aligned with 500 fit/100 tune labels.
+
+## Closed-form readout experiment
+Residual dominates option margins: centered RMS residual=1.1171, prior=0.1711, gated cosine=0.0915. Computed within-question-centered ridge correction to final residual output weights. Targets are log gold probabilities floored at 0.015; each question equally weighted. Six fixed regularizers, three strengths evaluated locally on tune, no gradients or iterative weight fitting. Backbone and all intermediate head tensors fixed.
+
+## Final-output-only correction rejected
+All tested direct corrections to residual_scorer.3.weight failed tune (best -0.2 percentage points; strongest -4.2 pp). No edit saved. Activation Gram spectrum is severely compressed (median eigenvalue 0.000868 versus maximum 92446.9). Testing linear corrections directly from the existing field/option interaction input to localize this bottleneck.
+
+Raw-feature correction outperforms existing-activation correction: best initial tune accuracy 0.746 (+0.036, paired SE 0.01514), with fit 0.7796, strength 0.5. Testing two fixed alternative targets because scoring uses argmax, not gold calibration. No edit saved yet.
+
+## Causal bypass experiment
+Repurposed scorer neurons [791, 1015] (zero within-option contribution at baseline), with opposite incoming rows and opposite outgoing weights. GELU(z)-GELU(-z)=z, so this adds the closed-form missing direction while preserving original scorer. All tensors rounded to bfloat16 before simulation. Dose response: [(0.0, 0.71), (0.125, 0.73), (0.25, 0.73), (0.5, 0.766), (0.75, 0.752), (1.0, 0.728)].
+## Planned pass 5
+Exact edit: residual_scorer.0.weight rows [791, 1015], residual_scorer.0.bias same entries set zero, residual_scorer.3.weight same entries ±8.375. Direction: hard-margin ridge 1e-4, strength 0.5, fit 500 only; saved linear_bypass_candidate.pt. DECIDE both on all 300 reserved test IDs, test_linear_bypass.json. No test labels used for selection.
+
+## Pass 5 result — reserved practice test
+n=300, original 0.705333, edited 0.761333; gain +0.056000, paired SE 0.008616; 91 improved, 24 worsened. Candidate backed up in candidate_linear_bypass/. Exact edits hash: {"residual_scorer.0.bias": {"shape": [1024], "sha256": "f5f6a0354f2e8ea633944bbef303c1c496205ca426de2c3b78ec86836c623133"}, "residual_scorer.0.weight": {"shape": [1024, 4096], "sha256": "313fecf06190c42520391ece791b18dea07ffa23d36dbdeca645b2a3025ef0b6"}, "residual_scorer.3.weight": {"shape": [1, 1024], "sha256": "f8aec4e6c0c47c04e6f4c33802431db7ebcbd318a8cf15a96ef904c979cc2a9d"}}.
+## Planned pass 6 — validation
+Exact edit unchanged: two-neuron linear bypass (791,1015), strength 0.5, hard-margin ridge 1e-4 fit only on 500 practice records. DECIDE both on all 300 hidden validation items; aggregate only.
+
+## Pass 6 validation — confirmed best_1
+n=300, original 0.702000, edited 0.762667; gain +0.060667, paired SE 0.008052; 97 improved, 20 worsened. Current best: two-neuron bypass (791,1015), saved in best_1/. This is the fallback for all further experiments.
+
+## Conditional readout diagnostic
+Fitting each question's missing option margins as a direct ridge read of its existing field vector (125 fit records/question). This tests whether evidence is present before final scoring. Each solve is closed-form; no iterative loss fitting. Three predetermined targets × five regularizers, tune only, with all 300 reserved test records still excluded from fitting and selection.
+
+Weight SVD does not support a rank-one matrix claim (top singular value accounts for only 9.1% of W0 energy); compression diagnosis refers specifically to option-centered *activations*. 335/1024 baseline neurons contribute less than 1e-5 RMS to option logits.
+## Planned pass 7
+Exact edit unchanged from best_1: rows 791,1015 half-strength linear bypass. READ edited on 100 tune records, read_edited_tune.json, to verify exact logit response and that upstream features are unchanged.
+
+## Pass 7 causal verification
+Saved two-neuron edit matches local scorer simulation to floating-point precision; upstream scorer inputs unchanged. Therefore observed gains arise solely from the proposed final scoring pathway, not altered routing or backbone states.
+
+## Targeted extension plan
+Preselected three fields from tune mechanism comparison: agent urgency; customer action and needs_human. Replace shared correction only there with soft-target field read (ridge 0.01), fitted on 125 records/workflow. Prototype question-option gates use fit features, not gold, and are checked on tune. Other fields retain best_1.
+
+Centroid-only gates rejected: tune option-identity accuracy 86.7%, several negative separation margins. Testing direct ridge identity readouts that remove within-class state covariance; labels are schema identities only, not gold answers. No weight changes.
+
+Covariance-aware identity readout: fit/tune option identity accuracy 100% at ridge 1e-5; targeted tune class scores min positive 0.651, max negative 0.411, threshold 0.5. Simulating 22 additional weak-neuron replacements with symmetric gated GELU differences. Each correction is a field-evidence direction minus the shared correction, gated to exactly one question-option identity.
+
+Gated extension not saved: although ideal targeted replacement reached 78.8% tune, concrete gates caused rounding error or leakage; best concrete gain insufficient to justify complexity. Testing a one-shot minimum-margin least-squares correction in the same two-neuron pathway. No iterative fitting; all targets computed once from original logits.
+
+Minimum-margin alternatives did not beat best_1 on tune, so none saved.
+## Planned pass 8
+Exact current edits: best_1 unchanged. READ original on 144 controlled requests (720 questions): 12 agent seeds × (4 tool-error levels + 3 violation levels), 12 invoice seeds × duplicate absent/present, 12 security seeds × 3 context conditions. Seeds are fit records only; probes unscored, no supplied gold. Files causal_probes_original.json and causal_probe_meta.json.
+
+## Pass 8 complete / planned pass 9
+Original read completed for all 144 causal probe requests. Exact edit for pass 9 remains best_1: scorer neurons 791/1015, hard-margin ridge 1e-4, half strength, no other changes. READ edited on identical requests from causal_probes_edited.json; no labels or score used.
+
+## Passes 8–9 controlled cue response
+[["agent_tool_errors", "outcome", "0", [-1.9805608441432316, -1.7946516474088032]], ["agent_tool_errors", "outcome", "1", [-0.8750793288151423, 0.34858524799346924]], ["agent_tool_errors", "outcome", "2", [0.13033960262934366, 1.1210683584213257]], ["agent_tool_errors", "outcome", "4", [2.016413119932016, 2.123967091242472]], ["agent_constraint_violations", "outcome", "0", [-1.977719287077586, -1.5653703014055889]], ["agent_constraint_violations", "outcome", "1", [2.3797028263409934, 2.1497411330540976]], ["agent_constraint_violations", "outcome", "2", [2.600791096687317, 2.5224073926607766]], ["agent_constraint_violations", "urgency", "0", [-2.6612637042999268, -2.1014825105667114]], ["agent_constraint_violations", "urgency", "1", [-1.3808874835570653, -0.12815852959950766]], ["agent_constraint_violations", "urgency", "2", [-1.079366420706113, -0.07657816012700398]], ["invoice_duplicate", "duplicate", "False", [-4.03558220465978, -2.826206068197886]], ["invoice_duplicate", "duplicate", "True", [-3.627470592657725, -2.673993388811747]], ["security_benign_context", "credential_compromise", "original", [0.9328520347674688, 0.569951464732488]], ["security_benign_context", "credential_compromise", "allowlisted", [0.7981590752800306, 0.3027239243189494]], ["security_benign_context", "credential_compromise", "allowlisted_change_window", [0.7442729299267133, 0.08882913986841838]], ["security_benign_context", "true_positive", "original", [0.8397380709648132, 0.9611300826072693]], ["security_benign_context", "true_positive", "allowlisted", [0.4545867592096329, 0.3460472623507182]], ["security_benign_context", "true_positive", "allowlisted_change_window", [0.3674096514781316, 0.10105036695798238]]]
+Read original and edited on identical state perturbations; scorer features unchanged. These probes are mechanistic evidence only, not scored accuracy estimates.
+
+## Controlled probe findings
+Tool-error cue is repaired: partial−success mean margin at 0 errors original −1.981 / edited −1.795; at 1 error −0.875 / +0.349; at 2 errors +0.130 / +1.121. Constraint-violation critical−routine urgency rises more strongly after edit. Allowlist+change-window reduces credential compromise margin more after edit. Duplicate-ID sensitivity is NOT repaired (present−absent margin effect shrinks); do not claim that mechanism fixed.
+Checking whether analytically compensating bfloat16 offsets rescues the targeted extension; no new label fitting.
+
+## Planned pass 10
+Exact edit: best_1 two-neuron bypass plus 22 gated neurons [700, 28, 248, 703, 626, 861, 508, 39, 523, 1007, 689, 904, 452, 921, 624, 823, 449, 1017, 140, 711, 692, 822] for agent urgency, customer action/needs_human. Gate strength 32, expert strength 1, bfloat16 offset compensation computed once from fit activations (no gold used in compensation). Tensors saved targeted_candidate.pt. Tune accuracy 0.786 vs best_1 0.766. DECIDE both on fixed reserved 300 practice test IDs. No test labels used to fit or select this candidate. best_1 remains backed up.
+
+
+
+YOUR CURRENT EDIT:
+residual_scorer.0.bias: 24 of 1,024 entries changed, relative change 329.5970
+residual_scorer.0.weight: 98,302 of 4,194,304 entries changed, relative change 47.1994
+residual_scorer.3.weight: 24 of 1,024 entries changed, relative change 203.3978
+
+[forward passes used: 9 of 25; Python runs used: 26 of 300]
+
+OUTPUT of Python run 26 of at most 300:
+```
+saved edit residual_scorer.0.weight: 98,302 of 4,194,304 entries changed, relative change 47.1994
+saved edit residual_scorer.0.bias: 24 of 1,024 entries changed, relative change 329.5970
+saved edit residual_scorer.3.weight: 24 of 1,024 entries changed, relative change 203.3978
+Tune target/non-target correction RMS: 0.5823907852172852 0.08094155788421631
+Tune performance: {'accuracy': 0.7860000133514404, 'gain': np.float64(0.07600000000000001), 'se': np.float64(0.01723984110170744), 'n': 100}
+```
+[forward passes used: 9 of 25; Python runs used: 26 of 300]

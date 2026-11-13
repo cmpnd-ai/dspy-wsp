@@ -1,0 +1,21 @@
+OUTPUT of Python run 32 of at most 300:
+```
+('log_p+.05', 0.0003, 0.75) accuracy 0.766667 inc_best2 (-0.005556, 0.006387) Brier 0.08112
+('log_p+.05', 0.0003, 1.0) accuracy 0.758889 inc_best2 (-0.013333, 0.009533) Brier 0.07593
+('log_p+.05', 0.001, 0.75) accuracy 0.758889 inc_best2 (-0.013333, 0.007973) Brier 0.0824
+('log_p+.05', 0.001, 1.0) accuracy 0.76 inc_best2 (-0.012222, 0.009606) Brier 0.07495
+('log_p+.1', 0.0003, 0.75) accuracy 0.762222 inc_best2 (-0.01, 0.005291) Brier 0.09003
+('log_p+.1', 0.0003, 1.0) accuracy 0.762222 inc_best2 (-0.01, 0.009225) Brier 0.08485
+('log_p+.1', 0.001, 0.75) accuracy 0.754444 inc_best2 (-0.017778, 0.006552) Brier 0.09177
+('log_p+.1', 0.001, 1.0) accuracy 0.764444 inc_best2 (-0.007778, 0.009502) Brier 0.08498
+('log_p+.2', 0.0003, 0.75) accuracy 0.761111 inc_best2 (-0.011111, 0.005837) Brier 0.1053
+('log_p+.2', 0.0003, 1.0) accuracy 0.763333 inc_best2 (-0.008889, 0.009562) Brier 0.10396
+('log_p+.2', 0.001, 0.75) accuracy 0.75 inc_best2 (-0.022222, 0.007539) Brier 0.10725
+('log_p+.2', 0.001, 1.0) accuracy 0.772222 inc_best2 (0.0, 0.009188) Brier 0.10506
+('4*p', 0.0003, 0.75) accuracy 0.775556 inc_best2 (0.003333, 0.006587) Brier 0.07808
+('4*p', 0.0003, 1.0) accuracy 0.763333 inc_best2 (-0.008889, 0.009298) Brier 0.07721
+('4*p', 0.001, 0.75) accuracy 0.782222 inc_best2 (0.01, 0.007268) Brier 0.07868
+('4*p', 0.001, 1.0) accuracy 0.768889 inc_best2 (-0.003333, 0.00884) Brier 0.0749
+Best independent smooth candidate: ('4*p', 0.001, 0.75) {'accuracy': 0.7822222313119306, 'gain': 0.20444444922937288, 'se': 0.018507673699077458, 'brier': 0.07868214696645737} increment (0.010000000000000002, 0.0072680349966549335)
+```
+[forward passes used: 17 of 25; Python runs used: 32 of 300]

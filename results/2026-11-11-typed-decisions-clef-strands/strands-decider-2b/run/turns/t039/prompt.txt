@@ -1,0 +1,18 @@
+OUTPUT of Python run 23 of at most 300:
+```
+Joint closed-form feature count 3072 eigensolve seconds 3.14
+joint ridge=0.0003 s=0.50: fit=0.7644 dev=0.7500 increment best2=-0.0222 SE=0.0106 Brier=0.1025
+joint ridge=0.0003 s=0.75: fit=0.8185 dev=0.7744 increment best2=+0.0022 SE=0.0097 Brier=0.0849
+joint ridge=0.0003 s=1.00: fit=0.8404 dev=0.7767 increment best2=+0.0044 SE=0.0109 Brier=0.0836
+joint ridge=0.001 s=0.50: fit=0.7537 dev=0.7478 increment best2=-0.0244 SE=0.0105 Brier=0.1027
+joint ridge=0.001 s=0.75: fit=0.8011 dev=0.7767 increment best2=+0.0044 SE=0.0088 Brier=0.0835
+joint ridge=0.001 s=1.00: fit=0.8219 dev=0.7789 increment best2=+0.0067 SE=0.0106 Brier=0.0793
+joint ridge=0.003 s=0.50: fit=0.7448 dev=0.7456 increment best2=-0.0267 SE=0.0108 Brier=0.1039
+joint ridge=0.003 s=0.75: fit=0.7863 dev=0.7711 increment best2=-0.0011 SE=0.0095 Brier=0.0838
+joint ridge=0.003 s=1.00: fit=0.8085 dev=0.7756 increment best2=+0.0033 SE=0.0100 Brier=0.0780
+joint ridge=0.01 s=0.50: fit=0.7337 dev=0.7333 increment best2=-0.0389 SE=0.0121 Brier=0.1066
+joint ridge=0.01 s=0.75: fit=0.7719 dev=0.7722 increment best2=-0.0000 SE=0.0091 Brier=0.0863
+joint ridge=0.01 s=1.00: fit=0.7859 dev=0.7689 increment best2=-0.0033 SE=0.0099 Brier=0.0791
+Best joint candidate (0.001, 1.0, (0.8218518495559692, 0.24629630148410797, 0.011414523234063778, 0.053287114948034286), (0.7788888812065125, 0.2011111080646515, 0.019266320254402038, 0.07933992892503738), (0.006666666828095913, 0.010558576739526452))
+```
+[forward passes used: 14 of 25; Python runs used: 23 of 300]

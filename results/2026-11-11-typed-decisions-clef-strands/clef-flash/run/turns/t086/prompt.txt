@@ -1,0 +1,17 @@
+OUTPUT of Python run 57 of at most 300:
+```
+best_2 bundle:
+tensors tuple 3 [('Tensor', (1024, 4096)), ('Tensor', (1024,)), ('Tensor', (1024,))]
+neurons list 24 [('int', '791'), ('int', '1015'), ('int', '700'), ('int', '28'), ('int', '248')]
+qkeys list 3 [('tuple', "('agent_trace_observability', 'urgency')"), ('tuple', "('customer_service', 'action')"), ('tuple', "('customer_service', 'needs_human')")]
+best_1 bundle:
+delta Tensor (3072,)
+pair list [791, 1015]
+strength float 0.5
+first_weight Tensor (1024, 4096)
+first_bias Tensor (1024,)
+last_weight Tensor (1024,)
+read_probe_arrays result: tuple
+[('list', 850), ('Tensor', (850, 5, 4096)), ('Tensor', (850, 5)), ('Tensor', (850, 5))]
+```
+[forward passes used: 22 of 25; Python runs used: 57 of 300]

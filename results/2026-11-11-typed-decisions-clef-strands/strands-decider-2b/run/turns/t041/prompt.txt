@@ -1,0 +1,372 @@
+HANDOFF. The conversation was restarted to keep it short; the kernel and its variables are unchanged. Your task follows, unchanged.
+
+TASK. You are given the weights of a decision model: StrandsAgents/strands-decider-2B-qwen3.5-v1-2610 (Strands decider, text path): a Qwen3.5 backbone (24 causal blocks, width 2048) and a pointer head. The backbone is Qwen/Qwen3.5-2B-Base with the checkpoint's LoRA adapter already folded into its weights, so there are no separate adapter tensors. Its tensors are named `backbone.` plus the module path and are stored as bfloat16; an edit is rounded to that type when it is applied. `backbone.embed_tokens` embeds the tokens. Block i (`backbone.layers.i`) is pre-norm: x += mixer(input_layernorm(x)), then x += mlp(post_attention_layernorm(x)). Every 4th block (i + 1 divisible by 4) mixes with full causal attention (`self_attn.q_proj`, `k_proj`, `v_proj`, `o_proj`, with RMSNorms `q_norm` and `k_norm` on each head's queries and keys, and rotary positions). The other blocks mix with a Gated DeltaNet, a causal linear-attention recurrence (`linear_attn.in_proj_qkv`, `in_proj_z`, `in_proj_a`, `in_proj_b`, a depthwise causal `conv1d`, `dt_bias`, `A_log`, `norm`, `out_proj`). mlp is SwiGLU: down_proj(silu(gate_proj(x)) * up_proj(x)). The layernorms are RMSNorms with a stored scale. `backbone.norm` is the final RMSNorm. Every question gets its own prompt: '<state>', the state (a string as written, anything else as indented JSON) and '</state>', then '<question type="...">', a fixed header line for the type, the instructions, '<options>', one numbered line per option ('1. name — description'), '</options>', '</question>' and '<answer>'. A noul's options are false, then true; a score's are its levels, named by index. With decide = the backbone's output (after `backbone.norm`) at the prompt's last token and option = its output at the last token of the option's line, an option's logit is k(norm(option)) . q(norm(decide)) / sqrt(768), where norm is one LayerNorm (`norm.weight`, `norm.bias`) shared by both and q and k are Linear layers to 768 dimensions. The probabilities are a softmax of the logits divided by a fixed temperature per question type (noul 1.070, choice 0.863, score 1.834), which is not a tensor. The head has 3,151,360 parameters, stored and computed in float32. A pass with an edited backbone recomputes every prompt; a pass that edits only the head reuses the backbone's outputs and is much faster. It answers every model call of the DSPy program described below: it reads a state and typed questions (choice: one of named options; noul: yes or no; score: one of ordered levels) and returns a probability for every option. It does not generate text. Your job is to make the program score higher on its metric by EDITING THE MODEL'S WEIGHTS DIRECTLY: find out what goes wrong inside the network when the program fails, and repair that with targeted changes. The program answers five typed questions about a business record (an agent trace, a customer message, an invoice or a security alert). Each question's answer is scored against a gold probability distribution.
+
+THE PROGRAM.
+TypedDecisions, with 4 LM-calling step(s); DSPy formats each step's prompt and parses its answer.
+- step 'agent_trace_observability': state -> action, needs_review, outcome, risk, urgency
+  instructions: Answer each question about this agent trace observability record.
+  state: The record to judge.
+  action: What should the observability system do with this trace?
+  needs_review: This trace requires human review.
+  outcome: How did this agent run turn out?
+  risk: How risky was the agent's behaviour in this trace?
+  urgency: How quickly does this trace need attention?
+- step 'customer_service': state -> action, category, churn_risk, needs_human, urgency
+  instructions: Answer each question about this customer service record.
+  state: The record to judge.
+  action: What should the assistant do next with this conversation?
+  category: What is this customer conversation primarily about?
+  churn_risk: How likely is this customer to stop doing business with us because of this interaction?
+  needs_human: This conversation requires a human agent rather than automated handling.
+  urgency: How time-sensitive is this conversation?
+- step 'invoice_processing': state -> discrepancy_severity, disposition, duplicate, matches_order, urgency
+  instructions: Answer each question about this invoice processing record.
+  state: The record to judge.
+  discrepancy_severity: How material is any discrepancy between the invoice, the order and the delivery?
+  disposition: How should this vendor invoice be dispositioned?
+  duplicate: This invoice appears to duplicate an invoice already submitted.
+  matches_order: The invoice reconciles with the purchase order and the recorded delivery.
+  urgency: How time-sensitive is processing this invoice?
+- step 'security_incidents': state -> credential_compromise, disposition, severity, true_positive, urgency
+  instructions: Answer each question about this security incidents record.
+  state: The record to judge.
+  credential_compromise: The evidence indicates a credential or account has been compromised.
+  disposition: How should this security alert be dispositioned?
+  severity: How severe is the potential impact if this alert is real?
+  true_positive: This alert reflects genuinely malicious or unauthorised activity.
+  urgency: How quickly must a responder act on this alert?
+Program source:
+class TypedDecisions(dspy.Module):
+    """One Predict per workflow; each case goes to its workflow's questions."""
+
+    def __init__(self, examples: list[dspy.Example]):
+        super().__init__()
+        schemas = {}
+        for ex in examples:
+            schemas.setdefault(ex.workflow, ex.questions)
+        self.workflows = sorted(schemas)
+        for wf in self.workflows:
+            setattr(self, wf, dspy.Predict(make_signature(wf, schemas[wf])))
+
+    def forward(self, workflow: str, state: dict):
+        return getattr(self, workflow)(state=state)
+
+
+HOW IT WILL BE MEASURED. After you finish, the program is run with your edited weights and with the original weights on held-out examples that you never see, and every answer is scored with this metric:
+metric
+def metric(example, pred, trace=None):
+    results, notes = [], []
+    for qid, gold in example.gold.items():
+        probs = predicted_probabilities(pred[qid])
+        ok, _, brier, _ = score_one(probs, gold)
+        results.append((ok, brier))
+        best = max(probs, key=probs.get)
+        target = max(gold["probabilities"], key=gold["probabilities"].get)
+        notes.append(f"{qid}: {'right' if ok else 'WRONG'} (predicted {best} {probs[best]:.2f}, gold {target} {gold['probabilities'][target]:.2f})")
+    accuracy = sum(ok for ok, _ in results) / len(results)
+    brier = sum(b for _, b in results) / len(results)
+    return dspy.Prediction(score=accuracy, feedback="; ".join(notes) + f". Mean Brier {brier:.3f}.")
+
+Only weight values can change (same tensor names and shapes): the program, its questions, the tokenizer and the way requests are encoded stay fixed.
+
+WHAT COUNTS. We want edits that come from understanding the network: find out what goes wrong when the program fails, identify the components responsible (specific neurons, heads, directions or parts of the decision head) and change them in a way you can justify with evidence. Repairing a specific failure mechanism is in scope: for example, if the model ignores a cue in the state that should decide a question, finding the direction that carries the cue and strengthening how the head reads it counts. Out of scope, and refused by save_edit: the tensors marked (out of scope) below (the token embedding and the backbone's final norm), and any edit that only multiplies a whole tensor by a constant. Global knobs (making every distribution sharper or flatter) are not what we are looking for.
+
+WHAT YOU HAVE.
+1. A persistent Python kernel (no internet, no GPU): variables survive between your code blocks, like a notebook. The model's files are in /Users/dbreunig/.cache/dspy-wsp/folded/StrandsAgents--strands-decider-2B-qwen3.5-v1-2610-216d1ccb46a9 (read only), practice examples are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/practice, and /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work is your read-write folder. Available: numpy, PyTorch (CPU) and the other packages installed with it. Defined in advance: NAMES (all tensor names), SHAPES, load(name) (a float32 torch tensor: your current edit if there is one, else the original), load_original(name), save_edit(name, tensor), drop_edit(name), edited() and tok (the tokenizer). Gradients are disabled. To run code, reply with exactly one block that starts with ```python and nothing else; if its last line is an expression, its value is shown. One execution may take up to 900 seconds; output is cut at 10,000 characters. You may run code up to 300 times. If the kernel is restarted (time or memory limit), its variables are lost and you are told so.
+Tensor names, with block 0 standing for every block:
+  backbone.embed_tokens.weight [248320, 2048] (out of scope)
+  backbone.layers.0.input_layernorm.weight [2048]
+  backbone.layers.0.linear_attn.A_log [16]
+  backbone.layers.0.linear_attn.conv1d.weight [6144, 4, 1]
+  backbone.layers.0.linear_attn.dt_bias [16]
+  backbone.layers.0.linear_attn.in_proj_a.weight [16, 2048]
+  backbone.layers.0.linear_attn.in_proj_b.weight [16, 2048]
+  backbone.layers.0.linear_attn.in_proj_qkv.weight [6144, 2048]
+  backbone.layers.0.linear_attn.in_proj_z.weight [2048, 2048]
+  backbone.layers.0.linear_attn.norm.weight [128]
+  backbone.layers.0.linear_attn.out_proj.weight [2048, 2048]
+  backbone.layers.0.mlp.down_proj.weight [2048, 6144]
+  backbone.layers.0.mlp.gate_proj.weight [6144, 2048]
+  backbone.layers.0.mlp.up_proj.weight [6144, 2048]
+  backbone.layers.0.post_attention_layernorm.weight [2048]
+  backbone.norm.weight [2048] (out of scope)
+  k.bias [768]
+  k.weight [768, 2048]
+  norm.bias [2048]
+  norm.weight [2048]
+  q.bias [768]
+  q.weight [768, 2048]
+  ... the same names for blocks 0..23; 326 tensors in total
+
+2. Practice examples with their labels (none is in the evaluation), one JSON object per line with "id", "inputs" and "labels": /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/practice/trainset.jsonl (900 examples). Input fields: state, workflow. Label fields: case_id, gold, questions. Choose whichever serve your experiments. A separate validation set of 300 examples is held out from you; you can only score edits on it, as described below.
+
+3. A forward-pass tool with a budget of 25 forward passes in total. A forward pass is one of three things, and each counts as one pass whatever its size:
+ (a) DECIDE: the program runs on up to 900 practice items (with "both", up to 450 per model), and every answer is scored with the metric. Reply with exactly one block that starts with ```forward and contains JSON:
+ {"type": "decide", "model": "original", "edited" or "both", "problems": ["<practice id>", ...], "inputs": [{<the input fields>}, ...] (optional: your own inputs, not scored)}
+ "original" runs the unedited weights, "edited" your current edits, and "both" runs both on the same items and returns a paired comparison (the score difference edited - original, averaged per item, with its standard error over items, and how many items improved or worsened). You get the mean score and the failure counts; per-item records (inputs, outputs, score, the metric's feedback if any, and every model call) are in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/gen_<k>.jsonl (with "both": gen_<k>_original.jsonl and gen_<k>_edited.jsonl). In a model call, "prompt" holds the System One request as JSON ({"state", "questions"}) and "completion" the answers, with every option's probability.
+ (b) VALIDATION: {"type": "decide", "model": "both", "validation": true} runs the program on the whole held-out validation set (300 examples) and returns only aggregate scores and the paired comparison: no records. Run it to confirm an edit before you keep it.
+ (c) READ: the model reads System One requests, with no program and no metric, and returns for every question each option's raw logit, its probability and the decision head's inputs. Reply with a ```forward block containing JSON:
+ {"type": "read", "model": "original" or "edited", "requests": [{"state": ..., "questions": {...}}, ...] or "from": {"pass": <k>, "ids": ["<practice id>", ...], "model": "original" or "edited" (only for a "both" pass)}, "layers": [hidden-state indices 0..24] (optional)}
+ "from" takes the requests recorded in an earlier decide pass. At most 1,024 questions per pass. The results are .npy files in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/fwd_<k>/, one row per question, with meta.json naming each row's request, question and options and explaining every array.
+Any request can also be written as JSON to a file in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work from Python (json.dump) and sent as {"file": "<path>"}. A request that fails does not count against the budget.
+
+HOW TO WORK.
+1. Diagnose first. Look at how the program fails on practice examples: which questions it gets wrong, which option it prefers instead, and how confident it is. Read some failing records, including each model call's request and answers. Go after the largest failure you can explain.
+2. Localize causally. That a component differs between right and wrong answers is not enough (right answers come from easier examples). Before relying on a component, show that changing it changes the behaviour you predicted, and try several strengths to see a dose-response.
+3. Measure with enough power. With a 0/1 metric, a score over n examples has a standard error of about 50/sqrt(n) percentage points. The model is deterministic, so a decide pass with "model": "both" shows the exact effect of an edit on every example; its paired standard error over examples is the uncertainty that remains. Keep an edit only if its gain is clearly larger than its standard error on examples that were not used to choose it, and only after a validation run confirms it. Read passes are cheap and dense: one pass returns every option's logit and the head's inputs for up to 1,024 questions.
+4. Closed-form edits are allowed. You may recompute the decision head in the kernel from read outputs and derive an edit from them directly, for example a mean difference between the head inputs of right and wrong options, or a least-squares solution. Fit such edits on practice examples only, and confirm them on the validation set: an edit that fits the practice examples closely may not carry over.
+5. Work efficiently: state the hypothesis of each code block in its first comment line; load things once into kernel variables; print compact summaries, never whole arrays; keep /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/notes.md up to date (findings with numbers, edits tried and their measured effect, the current best edit; it is shown to you again if the conversation is restarted); before every forward pass, write the exact current edit and the examples used to notes.md; keep copies of good edits (for example copy /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/edited to /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/best_1/).
+6. EXPLAIN EVERY STEP. Before each ```python or ```forward block, explain in plain English what it does and why. A block without an explanation is sent back unrun.
+
+RULES. Not allowed: (a) gradient descent or any other training: no backward passes, autograd or optimizers, and no iterative fitting of weights to a loss; (b) running the model's backbone other than through the forward-pass tool: you may recompute the decision head from read outputs and derive edits in closed form, but do not implement or simulate the backbone; (c) internet access or search. Allowed: any analysis of the weights and of forward-pass results, any use of the practice examples, and any direct edit of the weights that you compute and that is in scope.
+
+HOW THE SESSION RUNS. It continues until all 25 forward passes are used (replying without a code block does not end it earlier); after that, make your final choice: the tensors in /Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/edited when you finish are submitted, so leave there the edit with the best paired gain confirmed on the validation set, or no edit if none was confirmed. Then reply without a code block, saying what you changed, the evidence for it, its measured gains (practice and validation) with their standard errors, and why you expect it to help.
+
+YOUR NOTEBOOK (notes.md):
+# Weight-repair experiment
+
+Baseline: no edits. Plan: diagnose option/question failures, localize them in the pointer head, derive only closed-form targeted edits, test strengths, then confirm on untouched practice and validation.
+
+## Before pass 1
+Exact edit: none. Original baseline on all 900 practice IDs, listed in baseline_request.json. No examples have yet been used to fit or select edits.
+
+Pass 1: original accuracy 0.579111, SE over 900 items 0.008414; 807 items below perfect. Records: gen_1.jsonl. No edits.
+
+Fixed stratified practice split (seed 2610): fit=540 (135/workflow), dev=180, test=180. IDs in splits.json. Test labels/outputs will not be used for fitting or strength selection. All baseline aggregate groups inspected, but only fit individual failures inspected.
+
+Baseline per question:
+- agent_trace_observability/action: 0.4489
+- agent_trace_observability/needs_review: 0.6222
+- agent_trace_observability/outcome: 0.4889
+- agent_trace_observability/risk: 0.4978
+- agent_trace_observability/urgency: 0.5600
+- customer_service/action: 0.3556
+- customer_service/category: 0.8756
+- customer_service/churn_risk: 0.5600
+- customer_service/needs_human: 0.6400
+- customer_service/urgency: 0.5822
+- invoice_processing/discrepancy_severity: 0.4756
+- invoice_processing/disposition: 0.4000
+- invoice_processing/duplicate: 0.9200
+- invoice_processing/matches_order: 0.6933
+- invoice_processing/urgency: 0.2578
+- security_incidents/credential_compromise: 0.6400
+- security_incidents/disposition: 0.7333
+- security_incidents/severity: 0.6622
+- security_incidents/true_positive: 0.7289
+- security_incidents/urgency: 0.4400
+
+## Before pass 2
+Exact edit: none. READ original fit_a, 180 fit items (45/workflow), 900 questions; IDs and request in read_fit_a.json. Hypothesis: final states contain workflow-specific evidence that the shared pointer readout underweights. Planned reads fit_b, fit_c, dev, test are disjoint; test representations will be held unused until an edit is fixed.
+
+## Before pass 3
+Exact edit: none. READ original fit_b, next disjoint 180 fit items, 900 questions. Exact IDs in read_fit_b.json. Pass 2 outputs in fwd_2; inspect array metadata before deriving edits.
+
+Head LayerNorm scale is all ones, bias all zeros. No head edits. Exact cached head reproduction max error 3.09944e-06.
+
+## Before pass 4
+Exact edit: none. READ original fit_c, final 180 fitting items, 900 questions. Exact IDs in read_fit_c.json. All 540 fitting cases will then have head-input coverage.
+
+Localization: after head LN, top ten dimensions carry 89.2% of decision and 90.0% of option energy. Mean-query norm 9.8753, query residual RMS norm 2.9504; replacing query by mean changes 4/2700 fit predictions. Candidate: rank-one addition to k.weight along mean-query direction, reading option-state contrasts. No weights changed yet.
+
+## Before pass 5
+Exact edit: none. READ original development 180 items/900 questions; IDs in read_dev.json. Development is not used to derive candidate directions, only to choose regularization and strength.
+
+Closed-form experiment: X = within-question centered normalized option activations * (query dot mean-query unit direction)/(sqrt(768)*temperature). Targets are centered log(gold probability, floor .01) minus original relative logits. One eigendecomposition of X'X and closed-form ridge solutions, no gradients or iterative fitting. Fit=540 only.
+
+Rank-one key development grid:
+- lambda=0.001, strength=0.5: fit=0.5293, dev=0.4256, paired gain=+0.0189 SE=0.0136, Brier=0.2445
+- lambda=0.001, strength=1.0: fit=0.6074, dev=0.4433, paired gain=+0.0367 SE=0.0196, Brier=0.2370
+- lambda=0.001, strength=1.5: fit=0.5859, dev=0.4389, paired gain=+0.0322 SE=0.0247, Brier=0.2764
+- lambda=0.01, strength=0.5: fit=0.5037, dev=0.4444, paired gain=+0.0378 SE=0.0128, Brier=0.2413
+- lambda=0.01, strength=1.0: fit=0.5559, dev=0.4611, paired gain=+0.0544 SE=0.0201, Brier=0.2158
+- lambda=0.01, strength=1.5: fit=0.5326, dev=0.4422, paired gain=+0.0356 SE=0.0249, Brier=0.2402
+- lambda=0.1, strength=0.5: fit=0.4704, dev=0.4389, paired gain=+0.0322 SE=0.0120, Brier=0.2419
+- lambda=0.1, strength=1.0: fit=0.5078, dev=0.4678, paired gain=+0.0611 SE=0.0192, Brier=0.2086
+- lambda=0.1, strength=1.5: fit=0.4856, dev=0.4544, paired gain=+0.0478 SE=0.0260, Brier=0.2261
+- lambda=1.0, strength=0.5: fit=0.4567, dev=0.4367, paired gain=+0.0300 SE=0.0107, Brier=0.2494
+- lambda=1.0, strength=1.0: fit=0.4700, dev=0.4456, paired gain=+0.0389 SE=0.0185, Brier=0.2127
+- lambda=1.0, strength=1.5: fit=0.4485, dev=0.4500, paired gain=+0.0433 SE=0.0243, Brier=0.2236
+- lambda=10.0, strength=0.5: fit=0.4367, dev=0.4300, paired gain=+0.0233 SE=0.0085, Brier=0.2655
+- lambda=10.0, strength=1.0: fit=0.4493, dev=0.4289, paired gain=+0.0222 SE=0.0137, Brier=0.2272
+- lambda=10.0, strength=1.5: fit=0.4278, dev=0.4256, paired gain=+0.0189 SE=0.0215, Brier=0.2177
+- lambda=100.0, strength=0.5: fit=0.4237, dev=0.4111, paired gain=+0.0044 SE=0.0035, Brier=0.2842
+- lambda=100.0, strength=1.0: fit=0.4322, dev=0.4189, paired gain=+0.0122 SE=0.0061, Brier=0.2603
+- lambda=100.0, strength=1.5: fit=0.4370, dev=0.4289, paired gain=+0.0222 SE=0.0083, Brier=0.2396
+
+IMPORTANT alignment correction: READ-from preserves baseline-file order, not supplied randomized ID order. Initial ridge grid from Python run 8 used misaligned labels and is INVALID/discarded; no edits were saved. Matched every request to baseline completion probabilities (max error <1e-5); verified one-to-one mapping and corrected labels. All subsequent analyses use read_ids matched from actual probabilities.
+
+Correctly aligned rank-one key grid:
+- lambda=0.001, strength=0.5: fit=0.7385, dev=0.7233, gain=+0.1456 SE=0.0164, Brier=0.0909
+- lambda=0.001, strength=1.0: fit=0.7778, dev=0.7478, gain=+0.1700 SE=0.0213, Brier=0.0733
+- lambda=0.001, strength=1.5: fit=0.7622, dev=0.7100, gain=+0.1322 SE=0.0247, Brier=0.0960
+- lambda=0.01, strength=0.5: fit=0.7015, dev=0.7033, gain=+0.1256 SE=0.0161, Brier=0.1014
+- lambda=0.01, strength=1.0: fit=0.7430, dev=0.7344, gain=+0.1567 SE=0.0198, Brier=0.0804
+- lambda=0.01, strength=1.5: fit=0.7352, dev=0.7222, gain=+0.1444 SE=0.0220, Brier=0.0939
+- lambda=0.1, strength=0.5: fit=0.6611, dev=0.6589, gain=+0.0811 SE=0.0129, Brier=0.1205
+- lambda=0.1, strength=1.0: fit=0.6893, dev=0.6956, gain=+0.1178 SE=0.0171, Brier=0.1006
+- lambda=0.1, strength=1.5: fit=0.6904, dev=0.6778, gain=+0.1000 SE=0.0199, Brier=0.1084
+- lambda=1.0, strength=0.5: fit=0.6237, dev=0.6222, gain=+0.0444 SE=0.0106, Brier=0.1426
+- lambda=1.0, strength=1.0: fit=0.6411, dev=0.6444, gain=+0.0667 SE=0.0137, Brier=0.1268
+- lambda=1.0, strength=1.5: fit=0.6404, dev=0.6322, gain=+0.0544 SE=0.0170, Brier=0.1263
+- lambda=10.0, strength=0.5: fit=0.5985, dev=0.5922, gain=+0.0144 SE=0.0082, Brier=0.1633
+- lambda=10.0, strength=1.0: fit=0.6141, dev=0.6133, gain=+0.0356 SE=0.0114, Brier=0.1525
+- lambda=10.0, strength=1.5: fit=0.6241, dev=0.6156, gain=+0.0378 SE=0.0130, Brier=0.1466
+- lambda=100.0, strength=0.5: fit=0.5796, dev=0.5789, gain=+0.0011 SE=0.0033, Brier=0.1761
+- lambda=100.0, strength=1.0: fit=0.5826, dev=0.5822, gain=+0.0044 SE=0.0050, Brier=0.1730
+- lambda=100.0, strength=1.5: fit=0.5852, dev=0.5878, gain=+0.0100 SE=0.0065, Brier=0.1702
+
+Saved k.weight = original + 0.5 * outer(u,v), rank-one key correction; u,v in candidate_rank1/derivation.pt, lambda=0.001. All other tensors original.
+
+Causal controls on dev: original (0.5777778029441833, 0.0, 0.0, 0.17925088107585907); static fit-schema offsets (0.6277777552604675, 0.05000000074505806, 0.018502269115469715, 0.1290670782327652); state-dependent rank1 (0.7477777600288391, 0.17000000178813934, 0.021343747313461822, 0.07331855595111847); within-schema shuffled state corrections (0.54666668176651, -0.031111113727092743, 0.021880677051170153, 0.20072485506534576).
+
+## Before pass 6
+Exact edit: k.weight = K0 + 0.5*outer(u,v), lambda .001, fit=540 only. Paired DECIDE on 180 dev IDs in paired_dev.json; first actual dose-response test.
+
+Pass 6 actual paired dev, strength .5: original .577778 -> edited .723333, gain .145556, paired SE .016363; 98 improved, 20 worsened. Matches cached-head prediction.
+
+Saved k.weight = original + 1 * outer(u,v), rank-one key correction; u,v in candidate_rank1/derivation.pt, lambda=0.001. All other tensors original.
+
+## Before pass 7
+Exact edit: k.weight = K0 + 1.0*outer(u,v), lambda .001, all other tensors original. Same 180 dev IDs in paired_dev.json. Direction unchanged; full-strength causal test.
+
+Pass 7 actual paired dev, strength 1.0: .577778 -> .747778, gain .170000, paired SE .021344; 103 improved, 32 worsened. Matches cached-head prediction.
+
+Saved k.weight = original + 1.5 * outer(u,v), rank-one key correction; u,v in candidate_rank1/derivation.pt, lambda=0.001. All other tensors original.
+
+## Before pass 8
+Exact edit: k.weight = K0 + 1.5*outer(u,v), lambda .001; all other tensors original. Same 180 development cases in paired_dev.json. Overshoot dose-response test; full strength remains provisional best, not yet validation-confirmed.
+
+Pass 8 actual paired dev, strength 1.5: .577778 -> .710000, gain .132222, SE .024723. Dose response strengths 0/.5/1/1.5 gives accuracy .5778/.7233/.7478/.7100; overshoot confirmed. Select strength 1.0 based only on development.
+
+Saved k.weight = original + 1 * outer(u,v), rank-one key correction; u,v in candidate_rank1/derivation.pt, lambda=0.001. All other tensors original.
+
+## Before pass 9
+Exact edit: k.weight = K0 + outer(u,v), lambda .001, rank one; no other edits. Paired DECIDE on reserved 180 practice-test IDs (45/workflow) in paired_test.json. These examples were not used to derive or select the edit; no test read has been performed.
+
+Pass 9 reserved practice-test, strength 1.0: original .591111 -> edited .726667, gain .135556, paired SE .021871; 98 improved, 37 worsened. Candidate fixed before test; gain exceeds six paired SE.
+
+## Before pass 10
+Exact edit: k.weight = K0 + outer(u,v), lambda .001; all other weights original. Hidden VALIDATION both on all 300 cases; no validation examples or per-item records are visible.
+
+Pass 10 hidden validation: original .582000 -> edited .728667, gain .146667, paired SE .015527; 163 improved, 43 worsened. Rank-one key edit is validation-confirmed.
+
+Current best: best_1/edited, validated rank-one k.weight edit. Counterfactual plan: 10 paired examples each for delivery accepted/exceptions, due in 20/1 days, 0/2 constraint violations, source allowlist false/true. All derive from fit items; no gold labels invented.
+
+## Before pass 11
+Exact current edit: validated k.weight = K0 + outer(u,v), lambda .001; READ model=original ignores edit, on 80 synthetic single-cue counterfactual requests (400 questions), exact contents counterfactual_original.json. Pairs and expected margin signs in counterfactual_pairs.json.
+
+Counterfactual predicted sensitivity (positive means expected direction):
+- delivery_exceptions: mean original/edited=[0.07690322356386516, 1.4483779125919651], positive pairs=[10, 10]/10
+- payment_deadline: mean original/edited=[1.155067678571974, 4.757725759743101], positive pairs=[10, 10]/10
+- constraint_violation: mean original/edited=[0.727781351312053, 3.1572797193992708], positive pairs=[10, 10]/10
+- source_allowlisted: mean original/edited=[0.11406780958288894, 0.3777560378666618], positive pairs=[10, 9]/10
+
+## Before pass 12
+Exact edit unchanged: validated K0 + outer(u,v), lambda .001; other tensors original. READ edited on same 80 single-cue counterfactual requests in counterfactual_edited.json. Expected response predicted from pass 11 cached head inputs, now verify actual edited output.
+
+Pass 12 verifies counterfactual head effects, max centered-logit prediction error 1.69277e-05. The validated edit amplifies relevant cues: delivery exceptions 0.077->1.448, due date 1.155->4.758, constraint violations .728->3.157 mean signed log-odds. Allowlist .114->.378, but 1/10 edited responses reverses, a known limitation.
+
+Query candidate: closed-form residual ridge in 64 decision PCs (plus intercept) x 16 option-key PCs, key output basis projected orthogonal to mean-query u. Subspaces from fit activations only. Targets residual log-gold contrasts after validated rank1, no gradients/iterative fitting.
+- q lambda=1.0, strength=0.5, fit=0.8019, dev=0.7522, gain=+0.1744 SE=0.0215, Brier=0.0691
+- q lambda=1.0, strength=1.0, fit=0.8085, dev=0.7511, gain=+0.1733 SE=0.0223, Brier=0.0721
+- q lambda=1.0, strength=1.5, fit=0.8019, dev=0.7356, gain=+0.1578 SE=0.0225, Brier=0.0803
+- q lambda=10.0, strength=0.5, fit=0.7996, dev=0.7578, gain=+0.1800 SE=0.0214, Brier=0.0690
+- q lambda=10.0, strength=1.0, fit=0.8081, dev=0.7533, gain=+0.1756 SE=0.0218, Brier=0.0709
+- q lambda=10.0, strength=1.5, fit=0.8033, dev=0.7378, gain=+0.1600 SE=0.0223, Brier=0.0772
+- q lambda=100.0, strength=0.5, fit=0.7944, dev=0.7500, gain=+0.1722 SE=0.0218, Brier=0.0695
+- q lambda=100.0, strength=1.0, fit=0.8037, dev=0.7500, gain=+0.1722 SE=0.0220, Brier=0.0691
+- q lambda=100.0, strength=1.5, fit=0.8004, dev=0.7444, gain=+0.1667 SE=0.0225, Brier=0.0716
+- q lambda=1000.0, strength=0.5, fit=0.7852, dev=0.7489, gain=+0.1711 SE=0.0216, Brier=0.0710
+- q lambda=1000.0, strength=1.0, fit=0.7919, dev=0.7467, gain=+0.1689 SE=0.0219, Brier=0.0697
+- q lambda=1000.0, strength=1.5, fit=0.7911, dev=0.7467, gain=+0.1689 SE=0.0223, Brier=0.0692
+
+Query residual candidate best development +.0100 over validated key, paired SE 0.007436885592708706; no query weights saved. Not yet sufficient evidence to add complexity.
+
+Rank-one refinement uses the same fit-only eigensystem, predeclared floors .003/.01/.03/.1, ridge .0001/.0003/.001/.003/.01, strengths .75/1. No test/validation used to choose. Best development candidate=(0.1, 0.0003, 0.75, (0.7911111116409302, 0.2155555933713913, 0.010437639483360293, 0.07090549916028976), (0.7722222208976746, 0.1944444626569748, 0.0185395086686121, 0.0873011127114296)). Still no new edit saved.
+
+## Before pass 13
+Exact edit: k.weight = K0 + outer(u,v_ref); v_ref is .75 times fit-only ridge solution lambda .0003 with log-gold floor .1, saved in candidate_rank1_refined/derivation.pt. All other tensors original. Refined candidate fixed using fit/dev only. Paired DECIDE on reserved 180 practice-test cases in paired_test.json. Previous test was used only to confirm best_1; its individual errors were not inspected or used in refinement.
+
+Pass 13 refined rank1 practice-test: .591111 -> .747778, gain .156667, paired SE .019381; 99 improved, 25 worsened. Increment over best_1=0.02111111111111112, paired SE=0.011948287315068714.
+
+## Before pass 14
+Exact edit: k.weight = K0 + outer(u,v_ref), floor .1, ridge .0003, strength .75. All other tensors original. Hidden VALIDATION both, all 300 cases. Candidate chosen on fit/dev, not validation. best_1 remains fallback.
+
+Pass 14 refined rank1 hidden validation: .582000 -> .734000, gain .152000, paired SE .014019; 174 improved, 35 worsened. Best confirmed score improves over best_1.
+
+Current best confirmed edit backed up at best_2/edited. Investigate rank>1 key repair only if fit/dev supports it: residual query modes may condition the option-evidence readout by question context.
+
+Joint key-readout experiment: one closed-form solve from ORIGINAL-head residual targets, not iterative residual fitting. Features = full 2048-dimensional mean-query key path plus 4 orthogonal query context modes x 256 option PCs; fit-only subspaces, log-gold floor .1. All candidates derived independently from same sufficient statistics. Results:
+- lambda=0.0003, strength=0.5, fit=0.7644, dev=0.7500, inc_best2=-0.0222 SE=0.0106, Brier=0.1025
+- lambda=0.0003, strength=0.75, fit=0.8185, dev=0.7744, inc_best2=+0.0022 SE=0.0097, Brier=0.0849
+- lambda=0.0003, strength=1.0, fit=0.8404, dev=0.7767, inc_best2=+0.0044 SE=0.0109, Brier=0.0836
+- lambda=0.001, strength=0.5, fit=0.7537, dev=0.7478, inc_best2=-0.0244 SE=0.0105, Brier=0.1027
+- lambda=0.001, strength=0.75, fit=0.8011, dev=0.7767, inc_best2=+0.0044 SE=0.0088, Brier=0.0835
+- lambda=0.001, strength=1.0, fit=0.8219, dev=0.7789, inc_best2=+0.0067 SE=0.0106, Brier=0.0793
+- lambda=0.003, strength=0.5, fit=0.7448, dev=0.7456, inc_best2=-0.0267 SE=0.0108, Brier=0.1039
+- lambda=0.003, strength=0.75, fit=0.7863, dev=0.7711, inc_best2=-0.0011 SE=0.0095, Brier=0.0838
+- lambda=0.003, strength=1.0, fit=0.8085, dev=0.7756, inc_best2=+0.0033 SE=0.0100, Brier=0.0780
+- lambda=0.01, strength=0.5, fit=0.7337, dev=0.7333, inc_best2=-0.0389 SE=0.0121, Brier=0.1066
+- lambda=0.01, strength=0.75, fit=0.7719, dev=0.7722, inc_best2=-0.0000 SE=0.0091, Brier=0.0863
+- lambda=0.01, strength=1.0, fit=0.7859, dev=0.7689, inc_best2=-0.0033 SE=0.0099, Brier=0.0791
+
+## Before pass 15
+Exact edit: k.weight = K0 + deltaK_joint; rank <=5, deltaK_joint in candidate_joint_key/derivation.pt. Joint closed-form lambda .001, strength1, fit540 only, floor .1. All other tensors original. Paired DECIDE reserved180 test IDs in paired_test.json. Development gain over best2 only .006667 SE .010559; test will determine whether extra context paths merit validation.
+
+
+YOUR CURRENT EDIT:
+k.weight: 1,572,864 of 1,572,864 entries changed, relative change 46.6856
+
+[forward passes used: 15 of 25; Python runs used: 24 of 300]
+
+RESULT of forward pass 15:
+```
+{
+ "type": "decide",
+ "model": "both",
+ "generations": 180,
+ "files": [
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/gen_15_original.jsonl",
+  "/Users/dbreunig/Development/cmpnd/dspy-wsp/examples/runs/typed-decisions/strands-2b-astra/work/gen_15_edited.jsonl"
+ ],
+ "original": {
+  "graded": 180,
+  "score": 0.5911111111111111,
+  "score_se_over_items": 0.01954302403061664,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 157
+  }
+ },
+ "edited": {
+  "graded": 180,
+  "score": 0.7444444444444445,
+  "score_se_over_items": 0.01719321359019821,
+  "mean_output_tokens": 0.0,
+  "cut_share": 0.0,
+  "failures": {
+   "cut_at_max_tokens": 0,
+   "program_error": 0,
+   "metric_error": 0,
+   "scored_below_1": 131
+  }
+ },
+ "paired": {
+  "items": 180,
+  "original": 0.5911111111111111,
+  "edited": 0.7444444444444445,
+  "gain": 0.15333333333333335,
+  "se": 0.021205154966296068,
+  "improved": 101,
+  "worsened": 36
+ },
+ "seconds": 2.9
+}
+```
+[forward passes used: 15 of 25; Python runs used: 24 of 300]

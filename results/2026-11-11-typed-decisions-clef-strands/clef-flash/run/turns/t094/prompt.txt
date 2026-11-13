@@ -1,0 +1,6 @@
+OUTPUT of Python run 62 of at most 300:
+```
+Changed entries: {'residual_scorer.0.weight': 98302, 'residual_scorer.0.bias': 24, 'residual_scorer.3.weight': 24} total 98350
+Final paired practice: {'n': 300, 'original': 0.7053333333333334, 'edited': 0.762, 'paired_gain': 0.056666666666666664, 'paired_se': 0.009925399928010711, 'improved': 104, 'worsened': 39, 'repeat_of_pass': 10}
+```
+[forward passes used: 24 of 25; Python runs used: 62 of 300]

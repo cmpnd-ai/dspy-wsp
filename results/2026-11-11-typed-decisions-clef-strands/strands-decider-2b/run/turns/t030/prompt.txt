@@ -1,0 +1,10 @@
+OUTPUT of Python run 17 of at most 300:
+```
+delivery_exceptions mean expected-sign log-odds movement original/edited [0.077 1.448] positive pairs [10, 10] / 10
+payment_deadline mean expected-sign log-odds movement original/edited [1.155 4.758] positive pairs [10, 10] / 10
+constraint_violation mean expected-sign log-odds movement original/edited [0.728 3.157] positive pairs [10, 10] / 10
+source_allowlisted mean expected-sign log-odds movement original/edited [0.114 0.378] positive pairs [10, 9] / 10
+Decision residual variance captured by PCs: {8: 0.76, 16: 0.8656, 32: 0.9311, 64: 0.9652, 128: 0.9831}
+Orthogonal option-key variance captured by PCs: {4: 0.9606, 8: 0.9718, 16: 0.983, 32: 0.9917, 64: 0.9968}
+```
+[forward passes used: 11 of 25; Python runs used: 17 of 300]

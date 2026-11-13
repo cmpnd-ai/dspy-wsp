@@ -1,0 +1,7 @@
+OUTPUT of Python run 37 of at most 300:
+```
+saved edit k.weight: 1,572,864 of 1,572,864 entries changed, relative change 10.5890
+Restored best2; k.weight file SHA256: b2462ebda90afd3ca91ab230fdf4fc15ab2c845c0c003abd99daf1970cd0b5ca
+Expected full-strength development: {'accuracy': 0.7722222317424086, 'gain': 0.19444444866644012, 'se': 0.018539508509868297, 'brier': 0.08730112761259079}
+```
+[forward passes used: 21 of 25; Python runs used: 37 of 300]

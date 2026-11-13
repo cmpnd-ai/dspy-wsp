@@ -1,0 +1,7 @@
+OUTPUT of Python run 40 of at most 300:
+```
+Aligned records: 200 questions 1000
+Baseline accuracy in read: 0.7110000252723694
+Expected accuracy: 0.711
+```
+[forward passes used: 12 of 25; Python runs used: 40 of 300]

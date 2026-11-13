@@ -1,0 +1,10 @@
+OUTPUT of Python run 9 of at most 300:
+```
+Pass 2 matched 180 max prob error 2.9703662751678905e-08 requested order ['train_229', 'train_251', 'train_167'] actual order ['train_1', 'train_3', 'train_4']
+Pass 3 matched 180 max prob error 2.9748656205086377e-08 requested order ['train_223', 'train_267', 'train_148'] actual order ['train_30', 'train_32', 'train_33']
+Pass 4 matched 180 max prob error 2.9794813283245958e-08 requested order ['train_23', 'train_194', 'train_37'] actual order ['train_23', 'train_37', 'train_46']
+Pass 5 matched 180 max prob error 2.9765507836287952e-08 requested order ['train_184', 'train_173', 'train_186'] actual order ['train_18', 'train_25', 'train_27']
+Corrected original fit/dev (0.5755555629730225, 0.0, 0.0, 0.17667147517204285) (0.5777778029441833, 0.0, 0.0, 0.17925088107585907)
+From baseline records fit/dev 0.5755555555555556 0.5777777777777777
+```
+[forward passes used: 5 of 25; Python runs used: 9 of 300]

@@ -1,0 +1,6 @@
+OUTPUT of Python run 23 of at most 300:
+```
+Current edits: ['residual_scorer.0.bias', 'residual_scorer.0.weight', 'residual_scorer.3.weight']
+Probe families: {'agent_tool_errors': 48, 'agent_constraint_violations': 36, 'invoice_duplicate': 24, 'security_benign_context': 36}
+```
+[forward passes used: 8 of 25; Python runs used: 23 of 300]

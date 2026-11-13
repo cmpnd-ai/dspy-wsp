@@ -6,9 +6,9 @@ Weight-space programming as a DSPy optimizer.
 
 The method comes from [*Sparks of Weight-Space Programming*](https://rikiyat.github.io/blog/weight-space-programming/) by Rikiya Takehi, Jayden Teoh, Alex Zhang and Omar Khattab (MIT CSAIL, 2026). In their Experiment 8, a frontier model edited 0.016% of Qwen3.5-0.8B's weights. The edit raised MATH-500 from 7.9% to 48.1% by removing a direction that drove the model's looping. This package rebuilds that harness around DSPy programs and metrics.
 
-On the Typed Decisions benchmark, `WeightSpace` raised the test accuracy of three small decision models by 13 to 16 points, and the gain compounds with `dspy.experimental.ReAnchor` to reach 17 to 18 points.
+On the Typed Decisions benchmark, `WeightSpace` raised the test accuracy of five decision models by 2 to 16 points, and the gain compounds with `dspy.experimental.ReAnchor` to reach 7 to 20 points.
 
-<img src="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions.png" width="100%" alt="Bar chart of test accuracy on the Typed Decisions benchmark for d1-omni-600M, NanoJev and d1-2B: unoptimized, with ReAnchor, with WeightSpace, and with both.">
+<img src="https://raw.githubusercontent.com/cmpnd-ai/dspy-wsp/main/assets/typed-decisions.png" width="100%" alt="Bar chart of test accuracy on the Typed Decisions benchmark for d1-omni-600M, NanoJev, d1-2B, Strands Decider 2B and Clef-Flash: unoptimized, with ReAnchor, with WeightSpace, and with both.">
 
 This is an early release. We are releasing it outside the core DSPy library so that more people can try it and tell us what breaks. Please report problems and results, and tell us which models you would like us to support, in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
 
@@ -18,7 +18,7 @@ This is an early release. We are releasing it outside the core DSPy library so t
 - [Use](https://github.com/cmpnd-ai/dspy-wsp#use): requirements, cost and a first run
 - [Results](https://github.com/cmpnd-ai/dspy-wsp#results): what the chart measures
 - [How a run works](https://github.com/cmpnd-ai/dspy-wsp#how-a-run-works): the writer's turns, tools, rules and the population search
-- [What you get back](https://github.com/cmpnd-ai/dspy-wsp#what-you-get-back): the run folder, the patch and deployment
+- [What you get back](https://github.com/cmpnd-ai/dspy-wsp#what-you-get-back): the run folder, the patch, saving and reloading, and deployment
 - [Safety](https://github.com/cmpnd-ai/dspy-wsp#safety): what the sandbox allows
 - [Decision models](https://github.com/cmpnd-ai/dspy-wsp#decision-models): the supported families and their tools
 - [Generating LLMs](https://github.com/cmpnd-ai/dspy-wsp#generating-llms): the vLLM, Hugging Face and MLX backends
@@ -47,9 +47,9 @@ The base install runs every supported decision model, with MLX on Apple silicon 
 
 Before you start:
 
-- **Requirements:** Python 3.10 or later, and an API key for the writer. The example below reads `OPENAI_API_KEY`.
-- **Time and cost:** a 25-pass run on a decision model took between 78 and 167 minutes in our tests, and it cost between $5.42 and $7.63 in writer calls. Set `max_passes=3` for a first run that checks your setup.
-- **Writer:** use `gpt-6-astra` at maximum reasoning effort. It wrote better edits than `gpt-6.1-sol` on two of our three models (see [Results](https://github.com/cmpnd-ai/dspy-wsp#results)).
+- **Requirements:** Python 3.11 or later, and an API key for the writer. The example below reads `OPENAI_API_KEY`.
+- **Time and cost:** a 25-pass run on a decision model took between 68 and 167 minutes in our tests, and it cost between $5.42 and $10.78 in writer calls. Set `max_passes=3` for a first run that checks your setup.
+- **Writer:** use `gpt-6-astra` at maximum reasoning effort. It wrote better edits than `gpt-6.1-sol` on two of the three models we tried both on (see [Results](https://github.com/cmpnd-ai/dspy-wsp#results)).
 
 `WeightSpace` works like the other DSPy optimizers. It takes your metric and your module, and `compile` returns the improved module. Here the student is d1-omni-600M, a decision model that runs on a laptop:
 
@@ -114,20 +114,22 @@ A decision model reads `bool` outputs as yes or no questions and `Literal` outpu
 
 ## Results
 
-We edited three decision models on the Typed Decisions benchmark with `gpt-6-astra` at maximum reasoning effort as the writer. The writer had one conversation with 25 forward passes for each model. The chart at the top of this page scores the answers each program returns on 400 held-out test cases. Each gain is the paired gain over the unoptimized model in points. The standard errors are between 1.1 and 1.3 points.
+We edited five decision models on the Typed Decisions benchmark with `gpt-6-astra` at maximum reasoning effort as the writer. The writer had one conversation with 25 forward passes for each model. The chart at the top of this page scores the answers each program returns on 400 held-out test cases. Each gain is the paired gain over the unoptimized model in points. The standard errors are between 0.7 and 1.4 points.
 
 - **ReAnchor:** `dspy.experimental.ReAnchor` fits how the program turns probabilities into answers, i.e., its Noul thresholds, Score cut points and Choice weights. It changes no weights, so it stacks on a `WeightSpace` edit.
-- **The writer matters:** with `gpt-6.1-sol` as the writer, the `WeightSpace` edits alone gained 5.8, 12.1 and −0.6 points on the same three models.
+- **The writer matters:** with `gpt-6.1-sol` as the writer, the `WeightSpace` edits alone gained 5.8, 12.1 and −0.6 points on d1-omni-600M, NanoJev and d1-2B. With `gpt-6-astra` they gained 16.1, 13.3 and 13.4.
+- **Strands Decider 2B:** ReAnchor alone gained more than the edit alone, 13.7 points against 10.4. The two together gained 20.0, the largest gain of the five. The backend opened the whole network to the writer, and the writer edited one head tensor.
+- **Clef-Flash:** the edit gained 1.9 points on the returned answers and 5.8 on the most likely option. ReAnchor closed that gap: the two together gained 6.5.
 - **The paper's rule:** in these runs, the writer could recompute the decision head in its kernel and fit edits there. The paper's writer could run the network only through the forward-pass tool. We ran `gpt-6-astra` on d1-omni-600M again under the paper's rule. Its edit gained 2.8 ± 0.7 points alone, and it added nothing to ReAnchor. Pass `simulate_head=False` to use the paper's rule.
 
-Our unoptimized scores differ from the benchmark's public leaderboard. The leaderboard lists d1-2B at 63.7%, and our chart shows 60.6%. Two things differ:
+Our unoptimized scores differ from the benchmark's public leaderboard. The leaderboard lists d1-2B at 63.7% and Clef-Flash at 71.0%, and our chart shows 60.6% and 68.8%. Two things differ:
 
 - **Request format:** the leaderboard sends each case's own state and questions to the model. We send the requests that a DSPy program builds from its signature.
-- **Measure:** the leaderboard scores the model's most likely option. We score the answer the program returns, after its thresholds and cut points. On the most likely option, our unoptimized d1-2B scores 62.2%.
+- **Measure:** the leaderboard scores the model's most likely option. We score the answer the program returns, after its thresholds and cut points. On the most likely option, our unoptimized d1-2B scores 62.2% and Clef-Flash scores 69.7%.
 
-The leaderboard does not list d1-omni-600M or NanoJev. An edited model has practiced on the benchmark's `train` split, so it belongs with the leaderboard's fitted models and not with its zero-shot table.
+The leaderboard does not list d1-omni-600M, NanoJev or Strands Decider 2B. An edited model has practiced on the benchmark's `train` split, so it belongs with the leaderboard's fitted models and not with its zero-shot table.
 
-[The results folder's README](https://github.com/cmpnd-ai/dspy-wsp/blob/main/results/2026-11-07-typed-decisions-astra/README.md) has the full table with each gain's standard error, the `gpt-6.1-sol` comparison, both accuracy measures, and every run and edit.
+[The results folder's README](https://github.com/cmpnd-ai/dspy-wsp/blob/main/results/2026-11-07-typed-decisions-astra/README.md) has the full table for d1-omni-600M, NanoJev and d1-2B, with each gain's standard error, the `gpt-6.1-sol` comparison, both accuracy measures, and every run and edit. [A second folder](https://github.com/cmpnd-ai/dspy-wsp/blob/main/results/2026-11-11-typed-decisions-clef-strands/README.md) has the same for Strands Decider 2B and Clef-Flash.
 
 ## How a run works
 
@@ -192,9 +194,44 @@ runs/triage/
 
 A GEPA search keeps each round's turns under `rounds/`. It also writes `candidates/`, `rounds.jsonl`, `progress.md` and `gepa_state/`.
 
-`compiled.save("program.json")` records the base model, its settings and the patch location. `program.load("program.json", allow_unsafe_lm_state=True)` rebuilds the edited model; DSPy asks for that flag before it imports a custom engine.
-
 The patch stores only the changed entries, plus the sha256 of every base and edited tensor. Applying it checks both hashes, so anyone with the public base model can rebuild the edited weights bit for bit.
+
+### Save and reload
+
+An edit can be kept in two forms:
+
+| Form | Holds | Needs |
+|---|---|---|
+| The patch (`patch/` in the run folder) | The changed entries, a few megabytes | The base model |
+| A full checkpoint | Every weight | Nothing else |
+
+**Write a checkpoint.** `write_checkpoint` copies the base model's folder with the edited tensors substituted. This continues the example in [Use](https://github.com/cmpnd-ai/dspy-wsp#use):
+
+```python
+compiled.wsp_patch.write_checkpoint(backend.weights_dir, "edited-model/")
+```
+
+**Load it in a new file.** The checkpoint opens like the original model. No writer and no API key are involved:
+
+```python
+import dspy
+from dspy_wsp import load_decision_backend
+
+from triage import Triage   # the signature the model was optimized for
+
+backend = load_decision_backend("edited-model/")
+
+program = dspy.Predict(Triage)
+program.set_lm(backend.lm())
+
+program(ticket="I was charged twice this month.")   # runs on the edited weights
+```
+
+`backend.lm()` starts the local decision server and returns a `dspy.LM` that calls it.
+
+**Or save the program.** `compiled.save("program.json")` records the base model, its settings and the path of the patch folder. The file holds no weights, so keep the run folder where it is. `program.load("program.json", allow_unsafe_lm_state=True)` loads the base model and applies the patch; DSPy asks for that flag before it imports a custom engine.
+
+### Deploy an edited LLM
 
 To deploy an edited LLM, write a full checkpoint and serve it like any other model. This example applies the patch from a run in `runs/qwen-math`:
 
@@ -221,17 +258,23 @@ If no sandbox is available, `WeightSpace(...)` raises an error before it loads a
 
 ## Decision models
 
-A System One decision model reads a state and typed questions (Choice, Noul and Score) and returns a probability for every option. It generates no text. `WeightSpace` supports three families, each with our own loader in MLX and in PyTorch:
+A System One decision model reads a state and typed questions (Choice, Noul and Score) and returns a probability for every option. It generates no text. `WeightSpace` supports five families, each with our own loader. The first three load in MLX and in PyTorch. Clef and Strands load in MLX only:
 
 | Backend | Models | Alias | Network |
 |---|---|---|---|
 | `D1Backend` | Liquid AI's d1-omni models, text path | `"d1"` (d1-omni-600M) | An encoder with a decision head |
 | `NanoJevBackend` | NanoJev models | `"nanojev"` | A Qwen3 backbone with a decision head |
 | `D1LMBackend` | Liquid AI's d1 models built on LFM3 | `"d1-2b"` (d1-2B) | A language model that answers at each question's answer position |
+| `ClefBackend` | Cloudflare's Clef models, text path | `"clef-flash"` (Clef-Flash, 9B) | A Qwen3.5 backbone with a joint schema head |
+| `StrandsBackend` | Strands decider models, text path | `"strands-2b"` (strands-decider-2B-qwen3.5-v1) | A LoRA adapter and a pointer head on a Qwen3.5 base model |
 
 `D1LMBackend` has no separate head, and its output layer is the protected token embedding, so the writer's edits land in the backbone. It answers Choice, Noul and Score questions and refuses d1-2B's other question types.
 
-We have tested these three checkpoints so far. If you run another open decision model, please tell us how it went, and tell us which models you want supported, in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
+`ClefBackend` keeps the backbone fixed, so the writer edits only the head. Each prompt's backbone output is computed once and reused, which keeps passes fast on a 9B model. Clef-Flash needs about 20 GB of memory.
+
+`StrandsBackend` lets the writer edit the whole network. A Strands checkpoint holds a LoRA adapter and a pointer head, and its backbone weights live in a separate base model. On first use the backend downloads that base model and writes a folded copy of the network to `~/.cache/dspy-wsp` (set `DSPY_WSP_CACHE` to move it). The copy holds the base weights with the adapter folded in, so every weight is a tensor a patch can name. For strands-decider-2B the copy takes 3.5 GB.
+
+We have tested these five checkpoints so far. If you run another open decision model, please tell us how it went, and tell us which models you want supported, in [GitHub issues](https://github.com/cmpnd-ai/dspy-wsp/issues) or on the DSPy Discord.
 
 **Load a model.** `load_decision_backend` takes an alias, a Hugging Face repo id or a local folder. It reads the checkpoint's config to pick the family, and it refuses other architectures. The aliases open the checkpoints we tested, at pinned revisions.
 
@@ -318,7 +361,7 @@ This path is a bigger step than the decision models, and we have tested it less.
 ## Differences from the paper
 
 - The task is your DSPy program and metric, not fixed math benchmarks. Generation passes run the program; the records show every LM call.
-- The paper's writer was `gpt-6-astra` at maximum reasoning effort, driven through the Codex CLI with every built-in tool switched off. Here the writer is any `dspy.LM`. The writer matters: on our decision model runs, `gpt-6-astra` wrote better edits than `gpt-6.1-sol` on two of three models.
+- The paper's writer was `gpt-6-astra` at maximum reasoning effort, driven through the Codex CLI with every built-in tool switched off. Here the writer is any `dspy.LM`. The writer matters: on our decision model runs, `gpt-6-astra` wrote better edits than `gpt-6.1-sol` on two of the three models we tried both on.
 - For decision models, the writer may recompute the decision head in its kernel. `simulate_head=False` keeps the paper's rule, and the gain then drops sharply (see [Results](https://github.com/cmpnd-ai/dspy-wsp#results)).
 - `activations` takes separate `layers` (hidden-state indices) and `mlp_layers` (block indices) lists, because one list served both in the paper.
 - `fallback_if_worse=True` returns the original weights when the final check shows a loss. This is an addition to the paper's protocol, and it is off by default.

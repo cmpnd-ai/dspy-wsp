@@ -1,0 +1,12 @@
+OUTPUT of Python run 7 of at most 300:
+```
+Read 2 ordering verified max probability error 0.0
+Read 3 ordering verified max probability error 0.0
+Read 4 ordering verified max probability error 0.0
+prior centered RMS 0.1711
+cosine centered RMS 0.0915
+residual centered RMS 1.1171
+Fit baseline: {'accuracy': 0.6972000002861023, 'gain': np.float64(0.0), 'se': np.float64(0.0), 'n': 500}
+Tune baseline: {'accuracy': 0.7099999785423279, 'gain': np.float64(0.0), 'se': np.float64(0.0), 'n': 100}
+```
+[forward passes used: 4 of 25; Python runs used: 7 of 300]

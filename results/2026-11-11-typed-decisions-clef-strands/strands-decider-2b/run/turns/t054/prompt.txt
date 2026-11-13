@@ -1,0 +1,5 @@
+OUTPUT of Python run 34 of at most 300:
+```
+Linear minus best2 reserved practice: -0.0011111111111111115 paired SE 0.00779903099588605
+```
+[forward passes used: 18 of 25; Python runs used: 34 of 300]

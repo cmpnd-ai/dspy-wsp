@@ -1,0 +1,46 @@
+OUTPUT of Python run 10 of at most 300:
+```
+ridge=  0.001 strength=0.5 | fit=0.739 dev=0.723 gain=+0.146 SE=0.016 Brier=0.091 | deltaK norm=174.40
+ridge=  0.001 strength=1.0 | fit=0.778 dev=0.748 gain=+0.170 SE=0.021 Brier=0.073 | deltaK norm=348.80
+ridge=  0.001 strength=1.5 | fit=0.762 dev=0.710 gain=+0.132 SE=0.025 Brier=0.096 | deltaK norm=523.20
+ridge=   0.01 strength=0.5 | fit=0.701 dev=0.703 gain=+0.126 SE=0.016 Brier=0.101 | deltaK norm=66.51
+ridge=   0.01 strength=1.0 | fit=0.743 dev=0.734 gain=+0.157 SE=0.020 Brier=0.080 | deltaK norm=133.02
+ridge=   0.01 strength=1.5 | fit=0.735 dev=0.722 gain=+0.144 SE=0.022 Brier=0.094 | deltaK norm=199.53
+ridge=    0.1 strength=0.5 | fit=0.661 dev=0.659 gain=+0.081 SE=0.013 Brier=0.121 | deltaK norm=23.63
+ridge=    0.1 strength=1.0 | fit=0.689 dev=0.696 gain=+0.118 SE=0.017 Brier=0.101 | deltaK norm=47.26
+ridge=    0.1 strength=1.5 | fit=0.690 dev=0.678 gain=+0.100 SE=0.020 Brier=0.108 | deltaK norm=70.89
+ridge=      1 strength=0.5 | fit=0.624 dev=0.622 gain=+0.044 SE=0.011 Brier=0.143 | deltaK norm=7.71
+ridge=      1 strength=1.0 | fit=0.641 dev=0.644 gain=+0.067 SE=0.014 Brier=0.127 | deltaK norm=15.42
+ridge=      1 strength=1.5 | fit=0.640 dev=0.632 gain=+0.054 SE=0.017 Brier=0.126 | deltaK norm=23.12
+ridge=     10 strength=0.5 | fit=0.599 dev=0.592 gain=+0.014 SE=0.008 Brier=0.163 | deltaK norm=2.26
+ridge=     10 strength=1.0 | fit=0.614 dev=0.613 gain=+0.036 SE=0.011 Brier=0.153 | deltaK norm=4.51
+ridge=     10 strength=1.5 | fit=0.624 dev=0.616 gain=+0.038 SE=0.013 Brier=0.147 | deltaK norm=6.77
+ridge=    100 strength=0.5 | fit=0.580 dev=0.579 gain=+0.001 SE=0.003 Brier=0.176 | deltaK norm=0.38
+ridge=    100 strength=1.0 | fit=0.583 dev=0.582 gain=+0.004 SE=0.005 Brier=0.173 | deltaK norm=0.77
+ridge=    100 strength=1.5 | fit=0.585 dev=0.588 gain=+0.010 SE=0.007 Brier=0.170 | deltaK norm=1.15
+Best dev grid: (0.001, 1.0, (0.7777777910232544, 0.20222222805023193, 0.011897160569819501, 0.05503704026341438), (0.7477777600288391, 0.17000000178813934, 0.021343747313461822, 0.07331854104995728))
+
+DEV by question at selected grid point:
+agent_trace_observability/action                    0.556 -> 0.756 (+0.200)
+agent_trace_observability/needs_review              0.733 -> 0.844 (+0.111)
+agent_trace_observability/outcome                   0.578 -> 0.844 (+0.267)
+agent_trace_observability/risk                      0.533 -> 0.756 (+0.222)
+agent_trace_observability/urgency                   0.511 -> 0.556 (+0.044)
+customer_service/action                             0.333 -> 0.556 (+0.222)
+customer_service/category                           0.867 -> 0.978 (+0.111)
+customer_service/churn_risk                         0.489 -> 0.756 (+0.267)
+customer_service/needs_human                        0.644 -> 0.756 (+0.111)
+customer_service/urgency                            0.667 -> 0.756 (+0.089)
+invoice_processing/discrepancy_severity             0.356 -> 0.578 (+0.222)
+invoice_processing/disposition                      0.311 -> 0.689 (+0.378)
+invoice_processing/duplicate                        0.978 -> 0.978 (+0.000)
+invoice_processing/matches_order                    0.667 -> 0.889 (+0.222)
+invoice_processing/urgency                          0.244 -> 0.800 (+0.556)
+security_incidents/credential_compromise            0.689 -> 0.689 (+0.000)
+security_incidents/disposition                      0.689 -> 0.689 (+0.000)
+security_incidents/severity                         0.622 -> 0.711 (+0.089)
+security_incidents/true_positive                    0.756 -> 0.800 (+0.044)
+security_incidents/urgency                          0.333 -> 0.578 (+0.244)
+No edits saved yet.
+```
+[forward passes used: 5 of 25; Python runs used: 10 of 300]
